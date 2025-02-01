@@ -20,13 +20,25 @@ class Game:
         self.images: dict[pg.Surface] = {
             "background": load_image("background/Game background.png"),
         }
-        print(self.images)
 
     def event_handler(self) -> None:
         """ Handles events in the game. """
+        # get events
         for event in pg.event.get():
+            # handle quit event
             if event.type == pg.QUIT:
                 self.running = False
+
+            # check key events
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_UP or event.key == pg.K_w:
+                    print("Up key pressed")
+                if event.key == pg.K_DOWN or event.key == pg.K_s:
+                    print("Down key pressed")
+                if event.key == pg.K_LEFT or event.key == pg.K_a:
+                    print("Left key pressed")
+                if event.key == pg.K_RIGHT or event.key == pg.K_d:
+                    print("Right key pressed")
 
     def draw_screen(self) -> None:
         """ Draws the game screen. """
@@ -57,6 +69,10 @@ class Game:
             # call the methods
             self.event_handler()
             self.draw_screen()
+
+            # fps break
+            if dt < 1 / 60:
+                pg.time.wait(int(1000 * ((1 / 60) - dt)))
         
         
         pg.quit()
