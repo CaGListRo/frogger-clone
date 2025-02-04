@@ -52,3 +52,55 @@ def scale_image(image: pg.Surface, scale_factor: float) -> pg.Surface:
     pg.Surface: the scaled image
     """
     return pg.transform.scale(image, (int(image.get_width() * scale_factor), int(image.get_height() * scale_factor)))
+
+
+class Animation:
+    def __init__(self, images: list[pg.Surface], animation_duration: float, loop: bool = True) -> None:
+        """
+        Creates an animation from a list of images.
+        Args:
+        images (list[pg.Surface]): the images to use for the animation
+        animation_duration (float): the duration of the animation in seconds
+        loop (bool): whether the animation should loop or not
+        """
+        self.images: list[pg.Surface] = images
+        self.image_duration: float = animation_duration / len(self.images)
+        self.loop: bool = loop
+        self.image_index: int = 0
+        self.image_timer: float = 0.0
+        self.done: bool = False
+
+    def copy(self) -> object:
+        """ Returns a copy of the animation object. """
+        return Animation(images = self.images, animation_duration = self.animation_duration, loop = self.loop)
+    
+    def update(self, dt: float) -> None | bool:
+        """
+        Updates the animation by one frame.
+        Args:
+        dt (float): the time since the last update in seconds
+        Returns:
+        bool: whether the animation has finished or not
+        """
+        if not self.done:
+            self.image_timer += dt
+            if self.image_timer >= self.image_duration:
+                self.image_timer = 0.0
+                self.image_index += 1
+                if self.image_index >= len(self.images):
+                    if self.loop:
+                        self.image_index = 0
+                    else:
+                        self.done = True
+                        return self.done
+    
+    def get_current_image(self) -> pg.Surface | None:
+        """
+        Returns the current image in the animation.
+        Returns:
+        pg.Surface: the current image in the animation
+        """
+        if not self.done:
+            return self.images[self.image_index]
+        else:
+            return None

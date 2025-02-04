@@ -1,4 +1,5 @@
 from utils import load_image, load_images
+from utils import Animation
 import settings as stgs
 
 import pygame as pg
@@ -19,6 +20,10 @@ class Game:
         # load images
         self.images: dict[pg.Surface] = {
             "background": load_image("background/Game background.png"),
+            "cars": load_images("cars/"),
+            "trucks": load_images("trucks/"),
+            "stripe": load_image("objects/stripe.png", scale_factor=0.75),
+            "bulldozer": Animation(load_images("bulldozer/"), animation_duration=0.1)
         }
 
     def event_handler(self) -> None:
@@ -43,8 +48,14 @@ class Game:
     def draw_screen(self) -> None:
         """ Draws the game screen. """
         pg.display.set_caption(f"     F R O G G E R - C L O N E          FPS:{self.fps}")
+        # clear the screen
         self.screen.fill((0, 0, 0))
+        # draw background
         self.screen.blit(self.images["background"], (0, 0))
+        # draw stripes
+        for i in range(4):
+            for j in range(55):
+                self.screen.blit(self.images["stripe"], (-5 + j * 32, 384 + i * 43))
         
         pg.display.update()
 
