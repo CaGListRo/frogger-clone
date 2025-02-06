@@ -1,8 +1,11 @@
 import pygame as pg
 
+from typing import TypeVar
+
+Game = TypeVar("Game")
 
 class Frog:
-    def __init__(self, pos: tuple[int], size: tuple[int], direction: str = "north") -> None:
+    def __init__(self, game: Game, pos: tuple[int], size: tuple[int], direction: str = "north") -> None:
         """
         Initialize a Frog object.
         Args:
@@ -13,3 +16,10 @@ class Frog:
         self.pos: tuple[int] = pos
         self.size: tuple[int] = size
         self.direction: str = direction
+
+    def jump(self, direction: str) -> None:
+        """
+        Make the frog jump in a specified direction.
+        Args:
+        direction (str): The direction to jump.
+        """
