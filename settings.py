@@ -14,9 +14,12 @@ STREET: Final[dict[list[int]]] = {
     "level 3": [3, 2, 5, 4, 4],
 }
 
+SPACING: Final[int] = 250
+
 START_SPEED: Final[dict[list[int]]] = {
     # [trunks, turtles, trunks, trunks, turtles, trucks, racing cars, cars, bulldozer, cars]
     "level 1": [50, -40, 90, 30, -40, -40, 50, -30, 40, -25],
+    "level 2": [70, -30, 50, 70, -50, -50, 90, -50, 50, -40],
 }
 
 CROCS_IN_HOUSES: Final[list[bool]] = [False, True, True]

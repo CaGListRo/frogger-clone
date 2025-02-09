@@ -2,6 +2,7 @@ from utils import load_image, load_images
 from utils import Animation
 import settings as stgs
 from frog import Frog
+from vehicle import SmallCar
 
 import pygame as pg
 from time import perf_counter as pc
@@ -21,13 +22,17 @@ class Game:
         self.running: bool = True
         self.fps: int = 0
 
+        self.level: int = 1
+
         # load images
         self.images: dict[pg.Surface] = {
             "background": load_image("background/Game background.png"),
-            "cars": load_images("cars/"),
+            "small_cars": load_images("small cars/"),
+            "large_cars": load_images("large cars/"),
+            "racing_cars": load_images("racing cars/"),
             "trucks": load_images("trucks/"),
-            "stripe": load_image("objects/stripe.png", scale_factor=0.75),
             "bulldozer": Animation(load_images("bulldozer/"), animation_duration=0.1),
+            "stripe": load_image("objects/stripe.png", scale_factor=0.75),
             "frog/house": load_image("frog/house/frog.png")
         }
         
@@ -35,11 +40,15 @@ class Game:
         self.frog: Frog = Frog(self, self.START_POS, self.FROG_SIZE)
 
         self.clear_houses()
+        self.create_traffic()
         
+    def create_traffic(self) -> None:
+        """ Creates traffic on the road. """
+        self.traffic: list[Animation | pg.Surface] = [SmallCar(self, 600 - i * stgs.SPACING, 536) for i in range(stgs.STREET[f"level {str(self.level)}"][4])]
 
     def clear_houses(self) -> None:
         """ Clears the houses list. """
-        self.houses: list[int] = [True, True, True, True, True] #[False, False, False, False, False]
+        self.houses: list[int] = [False, False, False, False, False]
 
     def event_handler(self) -> None:
         """ Handles events in the game. """
@@ -60,6 +69,10 @@ class Game:
                 if event.key == pg.K_RIGHT or event.key == pg.K_d:
                     self.frog.jump("east")
 
+    def update_traffic(self, dt: float) -> None:
+        for vehicle in self.traffic:
+            vehicle.update(dt)
+
     def draw_screen(self) -> None:
         """ Draws the game screen. """
         pg.display.set_caption(f"     F R O G G E R - C L O N E          FPS:{self.fps}")
@@ -71,10 +84,14 @@ class Game:
         for i in range(4):
             for j in range(55):
                 self.screen.blit(self.images["stripe"], (-5 + j * 32, 384 + i * 43))
-
+        # draw traffic
+        for vehicle in self.traffic:
+            vehicle.render(self.screen)
+        # draw frogs in houses if they're at home
         for i in range(5):
-            multiplicand: int = 167 if i != 3 else 169
-            self.screen.blit(self.images["frog/house"], (35 + i * multiplicand, 26))
+            if self.houses[i]:
+                multiplicand: int = 167 if i != 3 else 169
+                self.screen.blit(self.images["frog/house"], (35 + i * multiplicand, 26))
         
         pg.display.update()
 
@@ -95,6 +112,8 @@ class Game:
                 self.fps = fps_counter
                 fps_counter = 0
                 fps_timer = 0.0
+
+            self.update_traffic(dt)
 
             # call the methods
             self.event_handler()

@@ -36,7 +36,7 @@ def load_images(image_path: str, scale_factor: int|float = 1) -> list[pg.Surface
     images: list[pg.Surface] = []
     try:
         for img_name in os.listdir(BASE_PATH + image_path):
-            img: pg.Surface = load_image(img_name, scale_factor)
+            img: pg.Surface = load_image(image_path + img_name, scale_factor)
             images.append(img)
         return images
     except NotADirectoryError as e:
