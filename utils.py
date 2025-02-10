@@ -64,6 +64,7 @@ class Animation:
         loop (bool): whether the animation should loop or not
         """
         self.images: list[pg.Surface] = images
+        self.animation_duration: float = animation_duration
         self.image_duration: float = animation_duration / len(self.images)
         self.loop: bool = loop
         self.image_index: int = 0

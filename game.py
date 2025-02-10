@@ -2,7 +2,7 @@ from utils import load_image, load_images
 from utils import Animation
 import settings as stgs
 from frog import Frog
-from vehicle import SmallCar
+from vehicle import Truck, RacingCar, LargeCar, Bulldozer, SmallCar
 
 import pygame as pg
 from time import perf_counter as pc
@@ -27,11 +27,11 @@ class Game:
         # load images
         self.images: dict[pg.Surface] = {
             "background": load_image("background/Game background.png"),
-            "small_cars": load_images("small cars/"),
-            "large_cars": load_images("large cars/"),
-            "racing_cars": load_images("racing cars/"),
+            "small_cars": load_images("small cars/", scale_factor=0.85),
+            "large_cars": load_images("large cars/", scale_factor=0.9),
+            "racing_cars": load_images("racing cars/", scale_factor=0.8),
             "trucks": load_images("trucks/"),
-            "bulldozer": Animation(load_images("bulldozer/"), animation_duration=0.1),
+            "bulldozer": Animation(load_images("bulldozer/"), animation_duration=0.4),
             "stripe": load_image("objects/stripe.png", scale_factor=0.75),
             "frog/house": load_image("frog/house/frog.png")
         }
@@ -44,7 +44,12 @@ class Game:
         
     def create_traffic(self) -> None:
         """ Creates traffic on the road. """
-        self.traffic: list[Animation | pg.Surface] = [SmallCar(self, 600 - i * stgs.SPACING, 536) for i in range(stgs.STREET[f"level {str(self.level)}"][4])]
+        self.traffic: list[Animation | pg.Surface] = [
+            [Truck(self, 700 - i * (stgs.SPACING + 100), 363) for i in range(stgs.STREET[f"level {str(self.level)}"][0])],
+            [RacingCar(self, 400 - i * stgs.SPACING, 407) for i in range(stgs.STREET[f"level {str(self.level)}"][1])],
+            [LargeCar(self, 800 - i * stgs.SPACING, 450) for i in range(stgs.STREET[f"level {str(self.level)}"][2])],
+            [Bulldozer(self, 400 - i * stgs.SPACING, 493) for i in range(stgs.STREET[f"level {str(self.level)}"][3])],
+            [SmallCar(self, 600 - i * stgs.SPACING, 536) for i in range(stgs.STREET[f"level {str(self.level)}"][4])],]
 
     def clear_houses(self) -> None:
         """ Clears the houses list. """
@@ -70,8 +75,9 @@ class Game:
                     self.frog.jump("east")
 
     def update_traffic(self, dt: float) -> None:
-        for vehicle in self.traffic:
-            vehicle.update(dt)
+        for lane in self.traffic:
+            for vehicle in lane:
+                vehicle.update(dt)
 
     def draw_screen(self) -> None:
         """ Draws the game screen. """
@@ -85,8 +91,9 @@ class Game:
             for j in range(55):
                 self.screen.blit(self.images["stripe"], (-5 + j * 32, 384 + i * 43))
         # draw traffic
-        for vehicle in self.traffic:
-            vehicle.render(self.screen)
+        for lane in self.traffic:
+            for vehicle in lane:
+                vehicle.render(self.screen)
         # draw frogs in houses if they're at home
         for i in range(5):
             if self.houses[i]:
