@@ -3,6 +3,7 @@ from utils import Animation
 import settings as stgs
 from frog import Frog
 from vehicle import Truck, RacingCar, LargeCar, Bulldozer, SmallCar
+from water import Tree, Turtle
 
 import pygame as pg
 from time import perf_counter as pc
@@ -27,11 +28,14 @@ class Game:
         # load images
         self.images: dict[pg.Surface] = {
             "background": load_image("background/Game background.png"),
-            "small_cars": load_images("small cars/", scale_factor=0.85),
-            "large_cars": load_images("large cars/", scale_factor=0.9),
-            "racing_cars": load_images("racing cars/", scale_factor=0.8),
+            "tree/large": load_images("objects/large trees/", scale_factor=0.9),
+            "tree/medium": load_images("objects/medium trees/", scale_factor=0.9),
+            "tree/small": load_images("objects/small trees/", scale_factor=0.9),
             "trucks": load_images("trucks/"),
-            "bulldozer": Animation(load_images("bulldozer/"), animation_duration=0.4),
+            "racing_cars": load_images("racing cars/", scale_factor=0.8),
+            "large_cars": load_images("large cars/", scale_factor=0.9),            
+            "bulldozer": Animation(load_images("bulldozer/", scale_factor=0.9), animation_duration=0.4),
+            "small_cars": load_images("small cars/", scale_factor=0.85),
             "stripe": load_image("objects/stripe.png", scale_factor=0.75),
             "frog/house": load_image("frog/house/frog.png")
         }
@@ -41,6 +45,15 @@ class Game:
 
         self.clear_houses()
         self.create_traffic()
+        self.create_water_traffic()
+
+    def create_water_traffic(self) -> None:
+        """ Creates water traffic. """
+        self.water_traffic: list[Animation | pg.Surface] = [
+            [Tree(self, 750 - i * (stgs.SPACING + 100), 104, "medium", 0) for i in range(stgs.WATER[f"level {str(self.level)}"][0])],
+            [Tree(self, 650 - i * (stgs.SPACING + 300), 191, "large", 2) for i in range(stgs.WATER[f"level {str(self.level)}"][2])],
+            [Tree(self, 450 - i * (stgs.SPACING), 234, "small", 3) for i in range(stgs.WATER[f"level {str(self.level)}"][3])],
+        ]
         
     def create_traffic(self) -> None:
         """ Creates traffic on the road. """
@@ -75,6 +88,9 @@ class Game:
                     self.frog.jump("east")
 
     def update_traffic(self, dt: float) -> None:
+        for lane in self.water_traffic:
+            for element in lane:
+                element.update(dt)
         for lane in self.traffic:
             for vehicle in lane:
                 vehicle.update(dt)
@@ -90,6 +106,10 @@ class Game:
         for i in range(4):
             for j in range(55):
                 self.screen.blit(self.images["stripe"], (-5 + j * 32, 384 + i * 43))
+        # draw water traffic
+        for lane in self.water_traffic:
+            for element in lane:
+                element.render(self.screen)
         # draw traffic
         for lane in self.traffic:
             for vehicle in lane:

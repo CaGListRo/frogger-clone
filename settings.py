@@ -3,8 +3,8 @@ from typing import Final
 WINDOW_SIZE: Final[tuple[int]] = (800, 620)
 
 WATER: Final[dict[list[int]]] = {
-    "level 1": [4, 5, 3, 4, 4],  # [medium trunks, turtle pairs, large trunks, small trunks, turtle trios]
-    "level 2": [4, 5, 2, 4, 4],  # [medium trunks/one crocodile, turtle pairs, large trunks, small trunks, turtle trios]
+    "level 1": [3, 5, 2, 4, 4],  # [medium trunks, turtle pairs, large trunks, small trunks, turtle trios]
+    "level 2": [3, 5, 2, 4, 4],  # [medium trunks/one crocodile, turtle pairs, large trunks, small trunks, turtle trios]
     "level 3": [2, 5, 1, 4, 4],
 }
 
