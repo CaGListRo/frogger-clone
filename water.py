@@ -65,10 +65,10 @@ class Turtle:
         """
         self.game: Game = game
         self.pos: tuple[int] = (x, y)
-        self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][lane]
-        self.animation: Animation = self.game.images["turtle"].copy()
+        self.speed: int = stgs.START_SPEED[f"level {self.game.level}"][lane]
+        self.animation: Animation = self.game.images["test_turtle"].copy()
         image_to_blit: pg.Surface = self.animation.get_current_image()
-        self.image: pg.Surface = pg.Surface(image_to_blit.get_size())
+        self.image: pg.Surface = pg.Surface(image_to_blit.get_size(), pg.SRCALPHA)
         self.image.fill(self.TRANSPARENT_COLOR)
         
         self.image.blit(image_to_blit, (0, 0))
@@ -87,8 +87,8 @@ class Turtle:
         self.image.blit(image_to_blit, (0, 0))
 
         self.pos = (self.pos[0] + self.speed * dt, self.pos[1])
-        if self.pos[0] > stgs.WINDOW_SIZE[0] + self.half_image_width:
-            self.pos = (-self.half_image_width, self.pos[1])
+        if self.pos[0] < 0 - self.half_image_width:
+            self.pos = (stgs.WINDOW_SIZE[0] + self.half_image_width, self.pos[1])
         self.rect.center = self.pos
 
     def set_speed(self, speed: int) -> None:

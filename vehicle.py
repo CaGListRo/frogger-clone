@@ -157,7 +157,7 @@ class Bulldozer:
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][8]
         self.animation: Animation = self.game.images["bulldozer"].copy()
         image_to_blit: pg.Surface = self.animation.get_current_image()
-        self.image: pg.Surface = pg.Surface(image_to_blit.get_size())
+        self.image: pg.Surface = pg.Surface(image_to_blit.get_size(), pg.SRCALPHA)
         self.image.fill(self.TRANSPARENT_COLOR)
         
         self.image.blit(image_to_blit, (0, 0))

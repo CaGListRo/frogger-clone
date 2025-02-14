@@ -23,7 +23,7 @@ class Game:
         self.running: bool = True
         self.fps: int = 0
 
-        self.level: int = 1
+        self.level: int = 2
 
         # load images
         self.images: dict[pg.Surface] = {
@@ -37,7 +37,8 @@ class Game:
             "bulldozer": Animation(load_images("bulldozer/", scale_factor=0.9), animation_duration=0.4),
             "small_cars": load_images("small cars/", scale_factor=0.85),
             "stripe": load_image("objects/stripe.png", scale_factor=0.75),
-            "frog/house": load_image("frog/house/frog.png")
+            "frog/house": load_image("frog/house/frog.png"),
+            "test_turtle": Animation(load_images("turtle/", scale_factor=0.9), animation_duration=0.5)
         }
         
         # create a frog
@@ -50,19 +51,21 @@ class Game:
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """
         self.water_traffic: list[Animation | pg.Surface] = [
-            [Tree(self, 750 - i * (stgs.SPACING + 100), 104, "medium", 0) for i in range(stgs.WATER[f"level {str(self.level)}"][0])],
-            [Tree(self, 650 - i * (stgs.SPACING + 300), 191, "large", 2) for i in range(stgs.WATER[f"level {str(self.level)}"][2])],
-            [Tree(self, 450 - i * (stgs.SPACING), 234, "small", 3) for i in range(stgs.WATER[f"level {str(self.level)}"][3])],
+            [Tree(self, 750 - i * (stgs.SPACING["lane 10"]), 104, "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
+            [[Turtle(self, 150 + j * 55 + i * stgs.SPACING["lane 9"], 147, 1) for j in range(stgs.TURTLES[f"level {self.level}"][0])] for i in range(stgs.WATER[f"level {self.level}"][1])],
+            [Tree(self, 650 - i * stgs.SPACING["lane 8"], 191, "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
+            [Tree(self, 450 - i * stgs.SPACING["lane 7"], 234, "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
+            [[Turtle(self, 250 + j * 55 + i * stgs.SPACING["lane 6"], 277, 4) for j in range(stgs.TURTLES[f"level {self.level}"][1])] for i in range(stgs.WATER[f"level {self.level}"][4])],
         ]
         
     def create_traffic(self) -> None:
         """ Creates traffic on the road. """
         self.traffic: list[Animation | pg.Surface] = [
-            [Truck(self, 700 - i * (stgs.SPACING + 100), 363) for i in range(stgs.STREET[f"level {str(self.level)}"][0])],
-            [RacingCar(self, 400 - i * stgs.SPACING, 407) for i in range(stgs.STREET[f"level {str(self.level)}"][1])],
-            [LargeCar(self, 800 - i * stgs.SPACING, 450) for i in range(stgs.STREET[f"level {str(self.level)}"][2])],
-            [Bulldozer(self, 400 - i * stgs.SPACING, 493) for i in range(stgs.STREET[f"level {str(self.level)}"][3])],
-            [SmallCar(self, 600 - i * stgs.SPACING, 536) for i in range(stgs.STREET[f"level {str(self.level)}"][4])],]
+            [Truck(self, 700 - i * stgs.SPACING["lane 5"], 363) for i in range(stgs.STREET[f"level {self.level}"][0])],
+            [RacingCar(self, 400 - i * stgs.SPACING["lane 4"], 407) for i in range(stgs.STREET[f"level {self.level}"][1])],
+            [LargeCar(self, 800 - i * stgs.SPACING["lane 3"], 450) for i in range(stgs.STREET[f"level {self.level}"][2])],
+            [Bulldozer(self, 400 - i * stgs.SPACING["lane 2"], 493) for i in range(stgs.STREET[f"level {self.level}"][3])],
+            [SmallCar(self, 600 - i * stgs.SPACING["lane 1"], 536) for i in range(stgs.STREET[f"level {self.level}"][4])],]
 
     def clear_houses(self) -> None:
         """ Clears the houses list. """
@@ -88,9 +91,14 @@ class Game:
                     self.frog.jump("east")
 
     def update_traffic(self, dt: float) -> None:
-        for lane in self.water_traffic:
+        for idx, lane in enumerate(self.water_traffic):
             for element in lane:
-                element.update(dt)
+                if idx != 1 and idx != 4:  # lane 1 and 4 are the turtles
+                    element.update(dt)
+                else:
+                    for turtle in element:
+                        turtle.update(dt)
+
         for lane in self.traffic:
             for vehicle in lane:
                 vehicle.update(dt)
@@ -107,9 +115,13 @@ class Game:
             for j in range(55):
                 self.screen.blit(self.images["stripe"], (-5 + j * 32, 384 + i * 43))
         # draw water traffic
-        for lane in self.water_traffic:
+        for idx, lane in enumerate(self.water_traffic):
             for element in lane:
-                element.render(self.screen)
+                if idx != 1 and idx != 4:  # lane 1 and 4 are the turtles
+                    element.render(self.screen)
+                else:
+                    for turtle in element:
+                        turtle.render(self.screen)
         # draw traffic
         for lane in self.traffic:
             for vehicle in lane:
