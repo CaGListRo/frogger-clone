@@ -38,7 +38,7 @@ class Game:
             "small_cars": load_images("small cars/", scale_factor=0.85),
             "stripe": load_image("objects/stripe.png", scale_factor=0.75),
             "frog/house": load_image("frog/house/frog.png"),
-            "test_turtle": Animation(load_images("turtle/", scale_factor=0.9), animation_duration=0.5)
+            "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=0.5)
         }
         
         # create a frog

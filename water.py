@@ -66,7 +66,9 @@ class Turtle:
         self.game: Game = game
         self.pos: tuple[int] = (x, y)
         self.speed: int = stgs.START_SPEED[f"level {self.game.level}"][lane]
-        self.animation: Animation = self.game.images["test_turtle"].copy()
+        self.sinking: bool = sinking  # the general ability to dive
+        self.diving: bool = False     # if it is actually diving
+        self.animation: Animation = self.game.images["turtle/swimming"].copy()
         image_to_blit: pg.Surface = self.animation.get_current_image()
         self.image: pg.Surface = pg.Surface(image_to_blit.get_size(), pg.SRCALPHA)
         self.image.fill(self.TRANSPARENT_COLOR)
