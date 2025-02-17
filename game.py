@@ -38,15 +38,19 @@ class Game:
             "small_cars": load_images("small cars/", scale_factor=0.85),
             "stripe": load_image("objects/stripe.png", scale_factor=0.75),
             "frog/house": load_image("frog/house/frog.png"),
-            "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=0.5)
+            "frog/test": load_image("frog/test frog.png", scale_factor=0.9),
+            "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1)
         }
+        self.direction_pressed: bool = False
         
-        # create a frog
-        self.frog: Frog = Frog(self, self.START_POS, self.FROG_SIZE)
-
         self.clear_houses()
         self.create_traffic()
         self.create_water_traffic()
+        self.create_frog()
+
+    def create_frog(self) -> None:
+        """ Creates a frog at the start position. """
+        self.frog: Frog = Frog(self, stgs.FROG_START_POS, (1,1))
 
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """
@@ -78,17 +82,33 @@ class Game:
             # handle quit event
             if event.type == pg.QUIT:
                 self.running = False
-
+            
             # check key events
             if event.type == pg.KEYDOWN:
+                
                 if event.key == pg.K_UP or event.key == pg.K_w:
-                    self.frog.jump("north")
+                    self.direction_pressed = True
                 if event.key == pg.K_DOWN or event.key == pg.K_s:
-                    self.frog.jump("south")
+                    self.direction_pressed = True
                 if event.key == pg.K_LEFT or event.key == pg.K_a:
-                    self.frog.jump("west")
+                    self.direction_pressed = True
                 if event.key == pg.K_RIGHT or event.key == pg.K_d:
+                    self.direction_pressed = True
+
+            if event.type == pg.KEYUP:
+                if (event.key == pg.K_UP or event.key == pg.K_w) and self.direction_pressed:
+                    self.frog.jump("north")
+                    self.direction_pressed = False
+                if (event.key == pg.K_DOWN or event.key == pg.K_s) and self.direction_pressed:
+                    self.frog.jump("south")
+                    self.direction_pressed = False
+                if (event.key == pg.K_LEFT or event.key == pg.K_a) and self.direction_pressed:
+                    self.frog.jump("west")
+                    self.direction_pressed = False
+                if (event.key == pg.K_RIGHT or event.key == pg.K_d) and self.direction_pressed:
                     self.frog.jump("east")
+                    self.direction_pressed = False
+                
 
     def update_traffic(self, dt: float) -> None:
         for idx, lane in enumerate(self.water_traffic):
@@ -98,7 +118,7 @@ class Game:
                 else:
                     for turtle in element:
                         turtle.update(dt)
-
+        self.frog.update(dt)
         for lane in self.traffic:
             for vehicle in lane:
                 vehicle.update(dt)
@@ -122,6 +142,8 @@ class Game:
                 else:
                     for turtle in element:
                         turtle.render(self.screen)
+        # draw frog
+        self.frog.render(self.screen)
         # draw traffic
         for lane in self.traffic:
             for vehicle in lane:

@@ -17,7 +17,6 @@ def load_image(img_name: str, scale_factor: int|float = 1) -> pg.Surface:
     try:
         img: pg.Surface = pg.image.load(img_path).convert_alpha()
         if scale_factor == 1:
-            print(img)
             return img
         else:
             return scale_image(image = img, scale_factor = scale_factor)
