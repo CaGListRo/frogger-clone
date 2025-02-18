@@ -2,7 +2,7 @@ from typing import Final
 
 WINDOW_SIZE: Final[tuple[int]] = (800, 600)
 
-FROG_START_POS: Final[tuple[int]] = (400, 579)
+FROG_START_POS: Final[tuple[int]] = (400, 559)
 
 WATER: Final[dict[list[int]]] = {
     "level 1": [3, 5, 2, 4, 4],  # [medium trunks, turtle pairs, large trunks, small trunks, turtle trios]

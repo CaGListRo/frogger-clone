@@ -38,7 +38,8 @@ class Game:
             "small_cars": load_images("small cars/", scale_factor=0.85),
             "stripe": load_image("objects/stripe.png", scale_factor=0.75),
             "frog/house": load_image("frog/house/frog.png"),
-            "frog/test": load_image("frog/test frog.png", scale_factor=0.9),
+            "frog/idle": Animation(load_images("frog/idle/", scale_factor=0.85), animation_duration=1),
+            "frog/jump": Animation(load_images("frog/jump/", scale_factor=0.85), animation_duration=1, loop=False),
             "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1)
         }
         self.direction_pressed: bool = False
@@ -50,7 +51,7 @@ class Game:
 
     def create_frog(self) -> None:
         """ Creates a frog at the start position. """
-        self.frog: Frog = Frog(self, stgs.FROG_START_POS, (1,1))
+        self.frog: Frog = Frog(self, stgs.FROG_START_POS)
 
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """

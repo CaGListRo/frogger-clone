@@ -2,29 +2,34 @@ import settings as stgs
 
 import pygame as pg
 
-from typing import TypeVar
+from typing import TypeVar, Final
 
 Game = TypeVar("Game")
+Animation = TypeVar("Animation")
 
 class Frog:
-    def __init__(self, game: Game, pos: tuple[int], size: tuple[int], direction: str = "north") -> None:
+    JUMP_DISTANCE: Final[int] = 43
+    def __init__(self, game: Game, pos: tuple[int], direction: str = "north") -> None:
         """
         Initialize a Frog object.
         Args:
         pos (tuple[int]): The initial position of the frog.
         size (tuple[int]): The size of the frog.
         direction (str): The initial direction of the frog. Defaults to "north".
-        """
+        """        
         self.game: Game = game
-        self.pos: pg.Vector2 = pg.Vector2(pos)
-        self.start_pos: pg.Vector2 = pg.Vector2(pos)
-        self.destination: pg.Vector2 = pg.Vector2()
-        self.direction: str = direction
-        self.jumping: bool = False
-        self.image: pg.Surface = pg.Surface(self.game.images["frog/test"].get_size(), pg.SRCALPHA)
-        self.image.blit(self.game.images["frog/test"], (0, 0))
-        self.rect: pg.Rect = self.image.get_rect(center=self.pos)
+        self.state: str = "idle"
+        self.animation: Animation = self.game.images[f"frog/{self.state}"].copy()
+        image_size: tuple[int] = self.animation.get_current_image().get_size()
+        frog_pos: tuple[int] = (int(pos[0] - image_size[0] / 2), pos[1])
+        self.pos: pg.Vector2 = pg.Vector2(frog_pos)
+        self.image: pg.Surface = pg.Surface(image_size, pg.SRCALPHA)
+        self.image.blit(self.animation.get_current_image(), (0, 0))
+        self.rect: pg.Rect = self.image.get_rect(topleft=self.pos)
         self.speed: int = 200
+        self.jumping: bool = False
+        self.direction: str = direction
+        self.destination: pg.Vector2 = pg.Vector2()
 
     def update(self, dt: float) -> None:
         """
@@ -32,6 +37,7 @@ class Frog:
         Args:
         dt (float): The time elapsed since the last update.
         """
+        self.animation.update(dt)
         if self.jumping:
             if self.direction == "north":
                 self.pos.y -= (self.speed * dt)
@@ -65,15 +71,14 @@ class Frog:
         direction (str): The direction to jump.
         """
         if not self.jumping:
-            self.start_pos = self.pos
             if direction == "north" and self.pos.y >= 100:
-                self.destination.y = self.pos.y - 42
+                self.destination.y = self.pos.y - self.JUMP_DISTANCE
             elif direction == "south" and self.pos.y <= 538:
-                self.destination.y = self.pos.y + 42
-            elif direction == "west" and self.pos.x > 42:
-                self.destination.x = self.pos.x - 42
-            elif direction == "east" and self.pos.y < stgs.WINDOW_SIZE[0] - 43:
-                self.destination.x = self.pos.x + 42
+                self.destination.y = self.pos.y + self.JUMP_DISTANCE
+            elif direction == "west" and self.pos.x > self.JUMP_DISTANCE:
+                self.destination.x = self.pos.x - self.JUMP_DISTANCE
+            elif direction == "east" and self.pos.x < stgs.WINDOW_SIZE[0] - self.JUMP_DISTANCE:
+                self.destination.x = self.pos.x + self.JUMP_DISTANCE
 
         self.direction = direction
         self.jumping = True          
