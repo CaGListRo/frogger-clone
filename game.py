@@ -27,7 +27,8 @@ class Game:
 
         # load images
         self.images: dict[pg.Surface] = {
-            "background": load_image("background/Game background.png"),
+            "background": load_image("background/game background.png"),
+            "houses": load_image("background/houses background.png"),
             "tree/large": load_images("objects/large trees/", scale_factor=0.9),
             "tree/medium": load_images("objects/medium trees/", scale_factor=0.9),
             "tree/small": load_images("objects/small trees/", scale_factor=0.9),
@@ -149,6 +150,8 @@ class Game:
         for lane in self.traffic:
             for vehicle in lane:
                 vehicle.render(self.screen)
+        # draw houses
+        self.screen.blit(self.images["houses"], (0, 0))
         # draw frogs in houses if they're at home
         for i in range(5):
             if self.houses[i]:
