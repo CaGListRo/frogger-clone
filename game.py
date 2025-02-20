@@ -3,10 +3,11 @@ from utils import Animation
 import settings as stgs
 from frog import Frog
 from vehicle import Truck, RacingCar, LargeCar, Bulldozer, SmallCar
-from water import Tree, Turtle
+from water import Tree, Turtle, Ripple
 
 import pygame as pg
 from time import perf_counter as pc
+from random import randint as ri
 import sys
 from typing import Final
 
@@ -41,7 +42,8 @@ class Game:
             "frog/house": load_image("frog/house/frog.png"),
             "frog/idle": Animation(load_images("frog/idle/", scale_factor=0.85), animation_duration=1),
             "frog/jump": Animation(load_images("frog/jump/", scale_factor=0.85), animation_duration=1, loop=False),
-            "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1)
+            "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1),
+            "ripple": load_images("water/", scale_factor=2),
         }
         self.direction_pressed: bool = False
         
@@ -49,6 +51,12 @@ class Game:
         self.create_traffic()
         self.create_water_traffic()
         self.create_frog()
+
+        self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(25, 258))) for i in range(100)]
+
+    def create_new_ripple(self) -> None:
+        """ Creates a new ripple at a random y-position. """
+        self.ripples.append(Ripple(self, pos=(-10, ri(25, 258))))
 
     def create_frog(self) -> None:
         """ Creates a frog at the start position. """
@@ -112,7 +120,11 @@ class Game:
                     self.direction_pressed = False
                 
 
-    def update_traffic(self, dt: float) -> None:
+    def update_objects(self, dt: float) -> None:
+        # update ripples
+        for ripple in self.ripples:
+            ripple.update(dt)
+        # update the water traffic
         for idx, lane in enumerate(self.water_traffic):
             for element in lane:
                 if idx != 1 and idx != 4:  # lane 1 and 4 are the turtles
@@ -120,7 +132,9 @@ class Game:
                 else:
                     for turtle in element:
                         turtle.update(dt)
+        # update the frog
         self.frog.update(dt)
+        # update the traffic on the street
         for lane in self.traffic:
             for vehicle in lane:
                 vehicle.update(dt)
@@ -132,6 +146,9 @@ class Game:
         self.screen.fill((0, 0, 0))
         # draw background
         self.screen.blit(self.images["background"], (0, 0))
+        # draw ripples
+        for ripple in self.ripples:
+            ripple.render(self.screen)
         # draw stripes
         for i in range(4):
             for j in range(55):
@@ -178,7 +195,7 @@ class Game:
                 fps_counter = 0
                 fps_timer = 0.0
 
-            self.update_traffic(dt)
+            self.update_objects(dt)
 
             # call the methods
             self.event_handler()

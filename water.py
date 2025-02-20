@@ -1,7 +1,7 @@
 import settings as stgs
 
 import pygame as pg
-from random import choice
+from random import choice, randint
 from typing import TypeVar, Final
 
 Animation = TypeVar("Animation")
@@ -108,3 +108,45 @@ class Turtle:
         surf (pg.Surface): The surface to render the turtle on.
         """
         surf.blit(self.image, self.rect)
+
+
+class Ripple:
+    def __init__(self, game: Game, pos: tuple[int]) -> None:
+        """
+        Initialize a ripple.
+        Args:
+        game (Game): The game instance.
+        pos (tuple[int]): The position of the ripple.
+        """
+        self.game: Game = game
+        self.pos: pg.Vector2 = pg.Vector2(pos)
+        self.image: pg.Surface = choice(self.game.images["ripple"])
+        self.speed: int = randint(30, 90)
+        self.timer: float = 0.0
+        self.change_time: float = 0.3
+
+    def update(self, dt: float) -> None:
+        """
+        Update the ripple's position.
+        Args:
+        dt (float): The time difference since the last update.
+        """
+        # system to change the image of the ripple for mor natural look
+        self.timer += dt
+        if self.timer >= self.change_time:
+            self.image = choice(self.game.images["ripple"])
+            self.timer = 0.0
+        # make it go right
+        self.pos.x += self.speed * dt
+        # delete it, if it is of screen
+        if self.pos.x > stgs.WINDOW_SIZE[0]:
+            self.game.ripples.remove(self)
+            self.game.create_new_ripple()
+
+    def render(self, surf: pg.Surface) -> None:
+        """
+        Render the ripple to the given surface.
+        Args:
+        surf (pg.Surface): The surface to render the ripple on.
+        """
+        surf.blit(self.image, (int(self.pos.x), int(self.pos.y)))
