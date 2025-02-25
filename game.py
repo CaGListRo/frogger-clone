@@ -41,7 +41,7 @@ class Game:
             "stripe": load_image("objects/stripe.png", scale_factor=0.75),
             "frog/house": load_image("frog/house/frog.png"),
             "frog/idle": Animation(load_images("frog/idle/", scale_factor=0.85), animation_duration=1),
-            "frog/jump": Animation(load_images("frog/jump/", scale_factor=0.85), animation_duration=1, loop=False),
+            "frog/jump": Animation(load_images("frog/jump/", scale_factor=0.85), animation_duration=0.4, loop=False),
             "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1),
             "ripple": load_images("water/", scale_factor=2),
         }
@@ -105,7 +105,7 @@ class Game:
                 if event.key == pg.K_RIGHT or event.key == pg.K_d:
                     self.direction_pressed = True
 
-            if event.type == pg.KEYUP:
+            if event.type == pg.KEYUP and not self.frog.jumping:
                 if (event.key == pg.K_UP or event.key == pg.K_w) and self.direction_pressed:
                     self.frog.jump("north")
                     self.direction_pressed = False
