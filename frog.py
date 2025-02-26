@@ -37,9 +37,11 @@ class Frog:
         self.old_direction: str = self.direction
         self.angle: int = 0
         self.rotate: bool = False
-        self.offset: tuple[int] = (14, 37)
-        self.rect_size: tuple[int] = (29, 37)
-        self.collision_rect: pg.Rect = pg.Rect(self.pos.x - self.offset[0], self.pos.y - self.offset[1], self.rect_size[0], self.rect_size[1])
+
+        # collision stuff
+        self.offset: tuple[int] = (-14, -37)     # collision rect offset
+        self.rect_size: tuple[int] = (29, 37)  # collision rect size
+        self.collision_rect: pg.Rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
 
     def fix_position(self) -> None:
         """ Fix the position of the frog after a change of direction. """
@@ -47,45 +49,77 @@ class Frog:
             match self.old_direction:
                 case "north":
                     self.pos.y -= 38
+                    self.offset = (-14, 0)
+                    self.collision_rect.y = self.pos.y + self.offset[1]
                 case "east":
                     self.pos.x += 19
                     self.pos.y -= 19
+                    self.offset = (37, 14)
+                    self.rect_size = (29, 37)
+                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
                 case "west":
                     self.pos.x -= 19
                     self.pos.y -= 19
+                    self.offset = (-14, -37)
+                    self.rect_size = (29, 37)
+                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
 
         elif self.direction == "north":
             match self.old_direction:
                 case "south":
                     self.pos.y += 38
+                    self.offset = (-14, -37)
+                    self.collision_rect.y = self.pos.y + self.offset[1]
                 case "east":
                     self.pos.x += 19
                     self.pos.y += 19
+                    self.offset = (-14, -37)
+                    self.rect_size = (29, 37)
+                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
                 case "west":
                     self.pos.x -= 19
                     self.pos.y += 19
+                    self.offset = (-14, -37)
+                    self.rect_size = (29, 37)
+                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
 
         elif self.direction == "west":
             match self.old_direction:
                 case "north":
                     self.pos.x += 19
                     self.pos.y -= 19
+                    self.offset = (-14, -37)
+                    self.rect_size = (37, 29)
+                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
                 case "south":
                     self.pos.x += 19
                     self.pos.y += 19
+                    self.offset = (-14, -37)
+                    self.rect_size = (37, 29)
+                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
                 case "east":
                     self.pos.x += 38
+                    self.offset = (-37, -14)
+                    self.collision_rect.x = self.pos.x + self.offset[0]
             
         elif self.direction == "east":
             match self.old_direction:
                 case "north":
                     self.pos.x -= 19
                     self.pos.y -= 19
+                    self.offset = (-14, -37)
+                    self.rect_size = (37, 29)
+                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
                 case "south":
                     self.pos.x -= 19
                     self.pos.y += 19    
+                    self.offset = (-14, -37)
+                    self.rect_size = (37, 29)
+                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
                 case "west":
                     self.pos.x -= 38
+                    self.offset = (0, -14)
+                    self.collision_rect.x = self.pos.x + self.offset[0]
         self.old_direction = self.direction
 
     def update(self, dt: float) -> None:
@@ -102,6 +136,7 @@ class Frog:
             if self.direction == "north":
                 self.pos.y -= (self.speed * dt)
                 self.angle = 0
+                self.collision_rect.y -= (self.speed * dt)
                 if self.pos.y <= self.destination.y:
                     self.pos.y = self.destination.y
                     self.jumping = False
@@ -109,6 +144,7 @@ class Frog:
             elif self.direction == "south":
                 self.pos.y += (self.speed * dt)
                 self.angle = 180
+                self.collision_rect.y += (self.speed * dt)
                 if self.pos.y >= self.destination.y:
                     self.pos.y = self.destination.y
                     self.jumping = False
@@ -116,6 +152,7 @@ class Frog:
             elif self.direction == "west":
                 self.pos.x -= (self.speed * dt)
                 self.angle = 90
+                self.collision_rect.x -= (self.speed * dt)
                 if self.pos.x <= self.destination.x:
                     self.pos.x = self.destination.x
                     self.jumping = False
@@ -123,6 +160,7 @@ class Frog:
             elif self.direction == "east":
                 self.pos.x += (self.speed * dt)
                 self.angle = 270
+                self.collision_rect.x += (self.speed * dt)
                 if self.pos.x >= self.destination.x:
                     self.pos.x = self.destination.x
                     self.jumping = False
