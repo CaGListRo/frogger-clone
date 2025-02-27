@@ -51,6 +51,7 @@ class Truck:
         surf (pg.Surface): The surface to render the truck on.
         """
         surf.blit(self.image, self.rect)
+        pg.draw.rect(surf, "red", self.rect, width=2)
 
 
 class RacingCar:
@@ -95,6 +96,7 @@ class RacingCar:
         surf (pg.Surface): The surface to render the racing car on.
         """
         surf.blit(self.image, self.rect)
+        pg.draw.rect(surf, "red", self.rect, width=2)
 
 
 class LargeCar:
@@ -140,6 +142,7 @@ class LargeCar:
         surf (pg.Surface): The surface to render the large car on.
         """
         surf.blit(self.image, self.rect)
+        pg.draw.rect(surf, "red", self.rect, width=2)
 
 
 class Bulldozer:
@@ -195,6 +198,7 @@ class Bulldozer:
         surf (pg.Surface): The surface to render the small car on.
         """
         surf.blit(self.image, self.rect)
+        pg.draw.rect(surf, "red", self.rect, width=2)
 
 
 class SmallCar:
@@ -240,4 +244,5 @@ class SmallCar:
         surf (pg.Surface): The surface to render the small car on.
         """
         surf.blit(self.image, self.rect)
+        pg.draw.rect(surf, "red", self.rect, width=2)
 

@@ -54,13 +54,13 @@ class Frog:
                 case "east":
                     self.pos.x += 19
                     self.pos.y -= 19
-                    self.offset = (37, 14)
+                    self.offset = (-14, 0)
                     self.rect_size = (29, 37)
                     self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
                 case "west":
                     self.pos.x -= 19
                     self.pos.y -= 19
-                    self.offset = (-14, -37)
+                    self.offset = (-14, 0)
                     self.rect_size = (29, 37)
                     self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
 
@@ -88,13 +88,13 @@ class Frog:
                 case "north":
                     self.pos.x += 19
                     self.pos.y -= 19
-                    self.offset = (-14, -37)
+                    self.offset = (-37, -14)
                     self.rect_size = (37, 29)
                     self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
                 case "south":
                     self.pos.x += 19
                     self.pos.y += 19
-                    self.offset = (-14, -37)
+                    self.offset = (-37, -14)
                     self.rect_size = (37, 29)
                     self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
                 case "east":
@@ -107,13 +107,13 @@ class Frog:
                 case "north":
                     self.pos.x -= 19
                     self.pos.y -= 19
-                    self.offset = (-14, -37)
+                    self.offset = (0, -14)
                     self.rect_size = (37, 29)
                     self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
                 case "south":
                     self.pos.x -= 19
                     self.pos.y += 19    
-                    self.offset = (-14, -37)
+                    self.offset = (0, -14)
                     self.rect_size = (37, 29)
                     self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
                 case "west":
@@ -136,7 +136,7 @@ class Frog:
             if self.direction == "north":
                 self.pos.y -= (self.speed * dt)
                 self.angle = 0
-                self.collision_rect.y -= (self.speed * dt)
+                self.collision_rect.top = self.image_rect.top + 3
                 if self.pos.y <= self.destination.y:
                     self.pos.y = self.destination.y
                     self.jumping = False
@@ -144,7 +144,7 @@ class Frog:
             elif self.direction == "south":
                 self.pos.y += (self.speed * dt)
                 self.angle = 180
-                self.collision_rect.y += (self.speed * dt)
+                self.collision_rect.bottom = self.image_rect.bottom - 3
                 if self.pos.y >= self.destination.y:
                     self.pos.y = self.destination.y
                     self.jumping = False
@@ -152,7 +152,7 @@ class Frog:
             elif self.direction == "west":
                 self.pos.x -= (self.speed * dt)
                 self.angle = 90
-                self.collision_rect.x -= (self.speed * dt)
+                self.collision_rect.left = self.image_rect.left + 3
                 if self.pos.x <= self.destination.x:
                     self.pos.x = self.destination.x
                     self.jumping = False
@@ -160,7 +160,7 @@ class Frog:
             elif self.direction == "east":
                 self.pos.x += (self.speed * dt)
                 self.angle = 270
-                self.collision_rect.x += (self.speed * dt)
+                self.collision_rect.right = self.image_rect.right - 3
                 if self.pos.x >= self.destination.x:
                     self.pos.x = self.destination.x
                     self.jumping = False

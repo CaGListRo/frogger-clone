@@ -24,7 +24,8 @@ class Game:
         self.running: bool = True
         self.fps: int = 0
 
-        self.level: int = 2
+        self.level: int = 1
+        self.frogs: int = 7
 
         # load images
         self.images: dict[pg.Surface] = {
@@ -42,6 +43,7 @@ class Game:
             "frog/house": load_image("frog/house/frog.png"),
             "frog/idle": Animation(load_images("frog/idle/", scale_factor=0.85), animation_duration=1),
             "frog/jump": Animation(load_images("frog/jump/", scale_factor=0.85), animation_duration=0.4, loop=False),
+            "frog/life": load_image("frog/idle/frog0001.png", scale_factor=0.7),
             "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1),
             "ripple": load_images("water/", scale_factor=2),
         }
@@ -61,6 +63,7 @@ class Game:
     def create_frog(self) -> None:
         """ Creates a frog at the start position. """
         self.frog: Frog = Frog(self, stgs.FROG_START_POS)
+        self.frogs -= 1
 
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """
@@ -85,6 +88,21 @@ class Game:
         """ Clears the houses list. """
         self.houses: list[int] = [False, False, False, False, False]
 
+    def new_frog_or_game_over(self) -> None:
+        """ Checks if a new frog can be created or if the game is over. """
+        if self.frogs > 0:
+            self.create_frog()
+        else:
+            raise NotImplementedError
+
+    def check_collisions(self) -> None:
+        """ Checks for collisions between the player and other objects. """
+        for lane in self.traffic:
+            for vehicle in lane:
+                if self.frog.collision_rect.colliderect(vehicle.rect):
+                    del self.frog
+                    self.new_frog_or_game_over()
+                    
     def event_handler(self) -> None:
         """ Handles events in the game. """
         # get events
@@ -119,7 +137,6 @@ class Game:
                     self.frog.jump("east")
                     self.direction_pressed = False
                 
-
     def update_objects(self, dt: float) -> None:
         # update ripples
         for ripple in self.ripples:
@@ -175,6 +192,9 @@ class Game:
                 multiplicand: int = 167 if i != 3 else 169
                 self.screen.blit(self.images["frog/house"], (35 + i * multiplicand, 26))
         
+        for i in range(self.frogs):
+            self.screen.blit(self.images["frog/life"], (10 + i * 32, 610))
+        
         pg.display.update()
 
     def main(self) -> None:
@@ -196,6 +216,7 @@ class Game:
                 fps_timer = 0.0
 
             self.update_objects(dt)
+            self.check_collisions()
 
             # call the methods
             self.event_handler()

@@ -51,6 +51,7 @@ class Tree:
         surf (pg.Surface): The surface to render the tree on.
         """
         surf.blit(self.image, self.rect)
+        pg.draw.rect(surf, "red", self.rect, width=2)
 
 
 class Turtle:
@@ -108,6 +109,7 @@ class Turtle:
         surf (pg.Surface): The surface to render the turtle on.
         """
         surf.blit(self.image, self.rect)
+        pg.draw.rect(surf, "red", self.rect, width=2)
 
 
 class Ripple:
