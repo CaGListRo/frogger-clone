@@ -19,7 +19,7 @@ class Tree:
         lane (int): The lane of the tree.
         """
         self.game: Game = game
-        self.pos: tuple[int] = (x, y)
+        self.pos: pg.Vector2 = pg.Vector2((x, y))
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][lane]
         self.image: pg.Surface = (choice(self.game.images[f"tree/{size}"]))
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
@@ -31,9 +31,9 @@ class Tree:
         Args:
         dt (float): The time difference since the last update.
         """
-        self.pos = (self.pos[0] + self.speed * dt, self.pos[1])
-        if self.pos[0] > stgs.WINDOW_SIZE[0] + self.half_image_width:
-            self.pos = (-self.half_image_width, self.pos[1])
+        self.pos.x += self.speed * dt
+        if self.pos.x > stgs.WINDOW_SIZE[0] + self.half_image_width:
+            self.pos.x = -self.half_image_width
         self.rect.center = self.pos
 
     def set_speed(self, speed: int) -> None:
@@ -65,7 +65,7 @@ class Turtle:
         y (int): The center y-coordinate of the turtle car.
         """
         self.game: Game = game
-        self.pos: tuple[int] = (x, y)
+        self.pos: pg.Vector2 = pg.Vector2((x, y))
         self.speed: int = stgs.START_SPEED[f"level {self.game.level}"][lane]
         self.sinking: bool = sinking  # the general ability to dive
         self.diving: bool = False     # if it is actually diving
@@ -89,9 +89,9 @@ class Turtle:
         image_to_blit: pg.Surface = self.animation.get_current_image()
         self.image.blit(image_to_blit, (0, 0))
 
-        self.pos = (self.pos[0] + self.speed * dt, self.pos[1])
-        if self.pos[0] < 0 - self.half_image_width:
-            self.pos = (stgs.WINDOW_SIZE[0] + self.half_image_width, self.pos[1])
+        self.pos.x += self.speed * dt
+        if self.pos.x < 0 - self.half_image_width:
+            self.pos.x = stgs.WINDOW_SIZE[0] + self.half_image_width
         self.rect.center = self.pos
 
     def set_speed(self, speed: int) -> None:
@@ -109,7 +109,7 @@ class Turtle:
         surf (pg.Surface): The surface to render the turtle on.
         """
         surf.blit(self.image, self.rect)
-        pg.draw.rect(surf, "red", self.rect, width=2)
+        # pg.draw.rect(surf, "red", self.rect, width=2)
 
 
 class Ripple:

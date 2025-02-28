@@ -95,13 +95,55 @@ class Game:
         else:
             raise NotImplementedError
 
+    def handle_water_traffic_collision(self, collision_object: object, lane_index, element_index, turtle_index=None) -> None:
+        """ Handles collision with water traffic. """
+        if turtle_index:
+            offset: int = self.distances[lane_index][element_index][turtle_index]
+        else: 
+            offset: int = self.distances[lane_index][element_index]
+        print(offset)
+        # offset: int = self.distances[lane_index][element_index][turtle_index] if turtle_index else self.distances[lane_index][element_index]
+        if self.frog.collision_rect.top <= collision_object.rect.bottom - 19 and self.frog.collision_rect.bottom >= collision_object.rect.top + 19:
+            if not self.frog.jumping:
+                self.frog.pos.x = collision_object.pos.x + offset            
+
+    def calculate_distances(self) -> None:
+        """ Checks the distances on the x axis from the frog to the water objects. """
+        self.distances: list[int] = []
+        for idx, lane in enumerate(self.water_traffic):
+            lane_list: list[int] = []
+            for element in lane:
+                if idx != 1 and idx != 4:  # lane 1 and 4 are the turtles
+                    lane_list.append(self.frog.pos.x - element.pos.x)
+                else:
+                    turtle_list: list[int] = []
+                    for turtle in element:
+                        turtle_list.append(self.frog.pos.x - turtle.pos.x)
+                    lane_list.append(turtle_list)
+            self.distances.append(lane_list)
+        # print(self.distances)
+
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
-        for lane in self.traffic:
-            for vehicle in lane:
-                if self.frog.collision_rect.colliderect(vehicle.rect):
-                    del self.frog
-                    self.new_frog_or_game_over()
+        # # collisions with traffic
+        # for lane in self.traffic:
+        #     for vehicle in lane:
+        #         if self.frog.collision_rect.colliderect(vehicle.rect):
+        #             del self.frog
+        #             self.new_frog_or_game_over()
+        
+        # collisions with water traffic
+        for lane_index, lane in enumerate(self.water_traffic):
+            for element_index, element in enumerate(lane):
+                if lane_index != 1 and lane_index != 4:  # lane 1 and 4 are the turtles
+                    if self.frog.collision_rect.colliderect(element.rect):
+                        self.handle_water_traffic_collision(element, lane_index, element_index)
+                        print(element, lane_index, element_index)
+                else:
+                    for turtle_index, turtle in enumerate(element):
+                        if self.frog.collision_rect.colliderect(turtle.rect):
+                            self.handle_water_traffic_collision(turtle, lane_index, element_index, turtle_index)
+                            print(turtle, lane_index, element_index, turtle_index)
                     
     def event_handler(self) -> None:
         """ Handles events in the game. """
@@ -199,6 +241,7 @@ class Game:
 
     def main(self) -> None:
         """ Runs the main game loop. """
+        self.calculate_distances()
         old_time: float = pc()
         fps_timer: float = 0.0
         fps_counter: int = 0
@@ -217,6 +260,8 @@ class Game:
 
             self.update_objects(dt)
             self.check_collisions()
+            if self.frog.pos.y <= 333:
+                self.calculate_distances()
 
             # call the methods
             self.event_handler()
