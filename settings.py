@@ -44,3 +44,5 @@ TURTLES: Final[dict[tuple[int]]] = {
 CROCS_IN_HOUSES: Final[list[bool]] = [False, True, True]
 
 SNAKES: Final[list[bool]] = [False, False, True]
+
+SNAKE_SPEED: Final[int] = 50

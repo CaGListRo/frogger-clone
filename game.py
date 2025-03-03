@@ -1,6 +1,7 @@
 from utils import load_image, load_images
 from utils import Animation
 import settings as stgs
+from snake import Snake
 from frog import Frog
 from vehicle import Truck, RacingCar, LargeCar, Bulldozer, SmallCar
 from water import Tree, Turtle, Ripple
@@ -46,6 +47,7 @@ class Game:
             "frog/life": load_image("frog/idle/frog0001.png", scale_factor=0.7),
             "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1),
             "ripple": load_images("water/", scale_factor=2),
+            "snake": Animation(load_images("snake/", scale_factor=0.8), animation_duration=0.6)
         }
         self.direction_pressed: bool = False
         
@@ -55,6 +57,9 @@ class Game:
         self.create_frog()
 
         self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(25, 258))) for i in range(100)]
+
+        # test snake
+        self.snake: Snake = Snake(self)
 
     def create_new_ripple(self) -> None:
         """ Creates a new ripple at a random y-position. """
@@ -183,6 +188,8 @@ class Game:
         # update ripples
         for ripple in self.ripples:
             ripple.update(dt)
+        # update test snake
+        self.snake.update(dt)
         # update the water traffic
         for idx, lane in enumerate(self.water_traffic):
             for element in lane:
@@ -226,6 +233,8 @@ class Game:
         for lane in self.traffic:
             for vehicle in lane:
                 vehicle.render(self.screen)
+        # draw snake
+        self.snake.render(self.screen)
         # draw houses
         self.screen.blit(self.images["houses"], (0, 0))
         # draw frogs in houses if they're at home
