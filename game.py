@@ -27,6 +27,10 @@ class Game:
 
         self.level: int = 1
         self.frogs: int = 7
+        self.score: int = 0
+
+        # fonts
+        self.score_font: pg.font.Font = pg.font.SysFont("Comic Sans", 32)
 
         # load images
         self.images: dict[pg.Surface] = {
@@ -49,6 +53,7 @@ class Game:
             "ripple": load_images("water/", scale_factor=2),
             "snake": Animation(load_images("snake/", scale_factor=0.8), animation_duration=0.6)
         }
+
         self.direction_pressed: bool = False
         
         self.clear_houses()
@@ -106,11 +111,10 @@ class Game:
             offset: int = self.distances[lane_index][element_index][turtle_index]
         else: 
             offset: int = self.distances[lane_index][element_index]
-        print(offset)
-        # offset: int = self.distances[lane_index][element_index][turtle_index] if turtle_index else self.distances[lane_index][element_index]
         if self.frog.collision_rect.top <= collision_object.rect.bottom - 19 and self.frog.collision_rect.bottom >= collision_object.rect.top + 19:
             if not self.frog.jumping:
-                self.frog.pos.x = collision_object.pos.x + offset            
+                self.frog.pos.x = collision_object.pos.x + offset
+                self.frog.fix_position()        
 
     def calculate_distances(self) -> None:
         """ Checks the distances on the x axis from the frog to the water objects. """
@@ -237,6 +241,11 @@ class Game:
         self.snake.render(self.screen)
         # draw houses
         self.screen.blit(self.images["houses"], (0, 0))
+        # render and blit score
+        score_shadow: pg.Surface = self.score_font.render(str(self.score), True, "black")
+        score_to_blit: pg.Surface = self.score_font.render(str(self.score), True, "white")
+        self.screen.blit(score_shadow, (12, 12))
+        self.screen.blit(score_to_blit, (10, 10))
         # draw frogs in houses if they're at home
         for i in range(5):
             if self.houses[i]:

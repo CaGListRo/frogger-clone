@@ -22,7 +22,7 @@ class Snake:
         self.image.fill(self.TRANSPARENT_COLOR)
         self.image.blit(image_to_blit, (0, 0))
         self.direction: int = choice([-1, 1])  # -1 = snake heading left, 1 = snake heading right
-        y_position: int = 320 if position is "green" else 234
+        y_position: int = 320 if position == "green" else 234
         x_position: int = -image_length if self.direction == 1 else stgs.WINDOW_SIZE[0]
         self.pos: pg.Vector2 = pg.Vector2((x_position, y_position))
         self.speed: int = stgs.SNAKE_SPEED
@@ -43,6 +43,8 @@ class Snake:
         surf (pg.Surface): The surface to render the snake onto.
         """
         image_to_blit: pg.Surface = self.animation.get_current_image()
+        flip: bool = True if self.direction == 1 else False
+        image_to_blit = pg.transform.flip(image_to_blit, flip, False)
         self.image.fill(self.TRANSPARENT_COLOR)
         self.image.blit(image_to_blit, (0, 0))
         surf.blit(self.image, (self.pos.x, self.pos.y - self.half_image_height))

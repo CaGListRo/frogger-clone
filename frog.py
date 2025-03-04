@@ -182,6 +182,7 @@ class Frog:
         """
         self.direction = direction
         if not self.jumping:
+            self.game.score += 20
             self.jumping = True 
             if direction == "north" and self.pos.y >= 100:
                 if self.old_direction != direction:
