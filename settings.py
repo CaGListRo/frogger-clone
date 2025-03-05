@@ -43,6 +43,18 @@ TURTLES: Final[dict[tuple[int]]] = {
 
 CROCS_IN_HOUSES: Final[list[bool]] = [False, True, True]
 
+HOUSE_SIZE: Final[tuple[int]] = (70, 57)
+
+HOUSE_TOP_LEFT: Final[list[tuple[int]]] = [(31, 25), (196, 25), (365, 25), (534, 25), (699, 25)]
+
 SNAKES: Final[list[bool]] = [False, False, True]
 
 SNAKE_SPEED: Final[int] = 50
+
+SCORE: Final[dict[int]] = {
+    "jump": 10,
+    "second": 20,
+    "frog in house": 50,
+    "frogs left": 100,
+    "finish level": 1000
+}

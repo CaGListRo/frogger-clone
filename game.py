@@ -62,6 +62,11 @@ class Game:
         self.create_frog()
 
         self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(25, 258))) for i in range(100)]
+        self.house_rects: list[pg.Rect] = [pg.Rect(stgs.HOUSE_TOP_LEFT[0][0], stgs.HOUSE_TOP_LEFT[0][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
+                                           pg.Rect(stgs.HOUSE_TOP_LEFT[1][0], stgs.HOUSE_TOP_LEFT[1][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
+                                           pg.Rect(stgs.HOUSE_TOP_LEFT[2][0], stgs.HOUSE_TOP_LEFT[2][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
+                                           pg.Rect(stgs.HOUSE_TOP_LEFT[3][0], stgs.HOUSE_TOP_LEFT[3][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
+                                           pg.Rect(stgs.HOUSE_TOP_LEFT[4][0], stgs.HOUSE_TOP_LEFT[4][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),]
 
         # test snake
         self.snake: Snake = Snake(self)
@@ -142,17 +147,23 @@ class Game:
         #             self.new_frog_or_game_over()
         
         # collisions with water traffic
-        for lane_index, lane in enumerate(self.water_traffic):
-            for element_index, element in enumerate(lane):
-                if lane_index != 1 and lane_index != 4:  # lane 1 and 4 are the turtles
-                    if self.frog.collision_rect.colliderect(element.rect):
-                        self.handle_water_traffic_collision(element, lane_index, element_index)
-                        print(element, lane_index, element_index)
-                else:
-                    for turtle_index, turtle in enumerate(element):
-                        if self.frog.collision_rect.colliderect(turtle.rect):
-                            self.handle_water_traffic_collision(turtle, lane_index, element_index, turtle_index)
-                            print(turtle, lane_index, element_index, turtle_index)
+        # for lane_index, lane in enumerate(self.water_traffic):
+        #     for element_index, element in enumerate(lane):
+        #         if lane_index != 1 and lane_index != 4:  # lane 1 and 4 are the turtles
+        #             if self.frog.collision_rect.colliderect(element.rect):
+        #                 self.handle_water_traffic_collision(element, lane_index, element_index)
+        #                 print(element, lane_index, element_index)
+        #         else:
+        #             for turtle_index, turtle in enumerate(element):
+        #                 if self.frog.collision_rect.colliderect(turtle.rect):
+        #                     self.handle_water_traffic_collision(turtle, lane_index, element_index, turtle_index)
+        #                     print(turtle, lane_index, element_index, turtle_index)
+        
+        # collision with the house rects
+        for idx, rect in enumerate(self.house_rects):
+            if self.frog.collision_rect.colliderect(rect):
+                self.houses[idx] = True
+                self.new_frog_or_game_over()
                     
     def event_handler(self) -> None:
         """ Handles events in the game. """
@@ -241,6 +252,9 @@ class Game:
         self.snake.render(self.screen)
         # draw houses
         self.screen.blit(self.images["houses"], (0, 0))
+        # draw house rects for test
+        for rect in self.house_rects:
+            pg.draw.rect(self.screen, "red", rect, width=1)
         # render and blit score
         score_shadow: pg.Surface = self.score_font.render(str(self.score), True, "black")
         score_to_blit: pg.Surface = self.score_font.render(str(self.score), True, "white")
