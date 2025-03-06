@@ -71,12 +71,20 @@ class Turtle:
         self.diving: bool = False     # if it is actually diving
         self.animation: Animation = self.game.images["turtle/swimming"].copy()
         image_to_blit: pg.Surface = self.animation.get_current_image()
-        self.image: pg.Surface = pg.Surface(image_to_blit.get_size(), pg.SRCALPHA)
+        self.image_size: tuple[int] = image_to_blit.get_size()
+        self.image: pg.Surface = pg.Surface(self.image_size, pg.SRCALPHA)
         self.image.fill(self.TRANSPARENT_COLOR)
-        
-        self.image.blit(image_to_blit, (0, 0))
-        self.rect: pg.Rect = self.image.get_rect(center=self.pos)
         self.half_image_width: int = int(image_to_blit.get_width() // 2)
+        self.half_image_height: int = int(image_to_blit.get_height() // 2)
+        self.image.blit(image_to_blit, (0, 0))
+        self.has_rect: bool = False
+        if lane == 0:  # short collision rect
+            self.rect: pg.Rect = pg.Rect(self.pos.x - self.half_image_width, self.pos.y - self.half_image_height, 105, self.image_size[1])
+            # for i in range(stgs.TURTLES[0])
+        else:  # long collision rect
+            self.rect: pg.Rect = pg.Rect(self.pos.x - self.half_image_width, self.pos.y - self.half_image_height, 160, self.image_size[1])
+            # for i in range(stgs.TURTLES[1])
+        
 
     def update(self, dt: float) -> None:
         """
@@ -92,7 +100,8 @@ class Turtle:
         self.pos.x += self.speed * dt
         if self.pos.x < 0 - self.half_image_width:
             self.pos.x = stgs.WINDOW_SIZE[0] + self.half_image_width
-        self.rect.center = self.pos
+        if self.has_rect:
+            self.rect.topleft = (self.pos.x - self.half_image_width, self.pos.y - self.half_image_height)
 
     def set_speed(self, speed: int) -> None:
         """
@@ -108,8 +117,8 @@ class Turtle:
         Args:
         surf (pg.Surface): The surface to render the turtle on.
         """
-        surf.blit(self.image, self.rect)
-        # pg.draw.rect(surf, "red", self.rect, width=2)
+        surf.blit(self.image, (self.pos.x - self.half_image_width, self.pos.y - self.half_image_height))
+        pg.draw.rect(surf, "red", self.rect, width=2)
 
 
 class Ripple:

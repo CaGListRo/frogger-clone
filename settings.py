@@ -35,19 +35,20 @@ START_SPEED: Final[dict[list[int]]] = {
     "level 2": [70, -30, 50, 70, -50, -50, 90, -50, 50, -40],
 }
 
-TURTLES: Final[dict[tuple[int]]] = {
-    "level 1": (2, 3),
-    "level 2": (2, 3),
-    "level 3": (2, 3),
-}
+TURTLES: Final[tuple[int]] = (2, 3)  # number of turtles that swim together (second lane = duos, fifth lane = trios)
 
-CROCS_IN_HOUSES: Final[list[bool]] = [False, True, True]
+TURTLE_SURFACE: Final[list[tuple[int]]] = [
+    (105, 38),  # second lane from top with the turtle duos
+    (160, 38)   # lowest lane of the water traffic with the turtle trios
+]
+
+CROCS_IN_HOUSES: Final[list[bool]] = [False, True, True]  # [level 1, level 2, level 3]
 
 HOUSE_SIZE: Final[tuple[int]] = (70, 57)
 
 HOUSE_TOP_LEFT: Final[list[tuple[int]]] = [(31, 25), (196, 25), (365, 25), (534, 25), (699, 25)]
 
-SNAKES: Final[list[bool]] = [False, False, True]
+SNAKES: Final[list[bool]] = [False, False, True]  # [level 1, level 2, level 3]
 
 SNAKE_SPEED: Final[int] = 50
 

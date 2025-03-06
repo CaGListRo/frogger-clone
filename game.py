@@ -6,6 +6,8 @@ from frog import Frog
 from vehicle import Truck, RacingCar, LargeCar, Bulldozer, SmallCar
 from water import Tree, Turtle, Ripple
 
+from icecream import ic
+
 import pygame as pg
 from time import perf_counter as pc
 from random import randint as ri
@@ -84,10 +86,10 @@ class Game:
         """ Creates water traffic. """
         self.water_traffic: list[Animation | pg.Surface] = [
             [Tree(self, 750 - i * (stgs.SPACING["lane 10"]), 104, "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
-            [[Turtle(self, 150 + j * 55 + i * stgs.SPACING["lane 9"], 147, 1) for j in range(stgs.TURTLES[f"level {self.level}"][0])] for i in range(stgs.WATER[f"level {self.level}"][1])],
+            # [Turtle(self, 150 + i * 55 + i * stgs.SPACING["lane 9"], 147, 1)  for i in range(stgs.WATER[f"level {self.level}"][1])],
             [Tree(self, 650 - i * stgs.SPACING["lane 8"], 191, "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
             [Tree(self, 450 - i * stgs.SPACING["lane 7"], 234, "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
-            [[Turtle(self, 250 + j * 55 + i * stgs.SPACING["lane 6"], 277, 4) for j in range(stgs.TURTLES[f"level {self.level}"][1])] for i in range(stgs.WATER[f"level {self.level}"][4])],
+            # [Turtle(self, 250 + i * 55 + i * stgs.SPACING["lane 6"], 277, 4) for i in range(stgs.WATER[f"level {self.level}"][4])],
         ]
         
     def create_traffic(self) -> None:
@@ -112,14 +114,16 @@ class Game:
 
     def handle_water_traffic_collision(self, collision_object: object, lane_index, element_index, turtle_index=None) -> None:
         """ Handles collision with water traffic. """
+        offset: list[float] = []
         if turtle_index:
-            offset: int = self.distances[lane_index][element_index][turtle_index]
+            offset.append(self.distances[lane_index][element_index][turtle_index])
         else: 
-            offset: int = self.distances[lane_index][element_index]
+            offset.append(self.distances[lane_index][element_index])
         if self.frog.collision_rect.top <= collision_object.rect.bottom - 19 and self.frog.collision_rect.bottom >= collision_object.rect.top + 19:
             if not self.frog.jumping:
-                self.frog.pos.x = collision_object.pos.x + offset
-                self.frog.fix_position()        
+                ic(offset)
+                self.frog.pos.x = collision_object.pos.x + offset[0]
+                self.frog.move_collision_rect()        
 
     def calculate_distances(self) -> None:
         """ Checks the distances on the x axis from the frog to the water objects. """
@@ -135,7 +139,7 @@ class Game:
                         turtle_list.append(self.frog.pos.x - turtle.pos.x)
                     lane_list.append(turtle_list)
             self.distances.append(lane_list)
-        # print(self.distances)
+        ic(self.distances)
 
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
@@ -147,17 +151,18 @@ class Game:
         #             self.new_frog_or_game_over()
         
         # collisions with water traffic
-        # for lane_index, lane in enumerate(self.water_traffic):
-        #     for element_index, element in enumerate(lane):
-        #         if lane_index != 1 and lane_index != 4:  # lane 1 and 4 are the turtles
-        #             if self.frog.collision_rect.colliderect(element.rect):
-        #                 self.handle_water_traffic_collision(element, lane_index, element_index)
-        #                 print(element, lane_index, element_index)
-        #         else:
-        #             for turtle_index, turtle in enumerate(element):
-        #                 if self.frog.collision_rect.colliderect(turtle.rect):
-        #                     self.handle_water_traffic_collision(turtle, lane_index, element_index, turtle_index)
-        #                     print(turtle, lane_index, element_index, turtle_index)
+        for lane_index, lane in enumerate(self.water_traffic):
+            for element_index, element in enumerate(lane):
+                if lane_index != 1 and lane_index != 4:  # lane 1 and 4 are the turtles
+                    if self.frog.collision_rect.colliderect(element.rect):
+                        self.handle_water_traffic_collision(element, lane_index, element_index)
+                        # ic(element, lane_index, element_index)
+                else:
+                    for turtle_index, turtle in enumerate(element):
+                        if turtle.has_rect:
+                            if self.frog.collision_rect.colliderect(turtle.rect):
+                                self.handle_water_traffic_collision(turtle, lane_index, element_index, turtle_index)
+                                ic(turtle, lane_index, element_index, turtle_index)
         
         # collision with the house rects
         for idx, rect in enumerate(self.house_rects):
