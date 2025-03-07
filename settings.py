@@ -18,10 +18,10 @@ STREET: Final[dict[list[int]]] = {
 
 SPACING: Final[dict[int]] = {
     "lane 10": 350,  # medium trunk
-    "lane 9": 160,   # turtle pairs
+    "lane 9": 190,   # turtle pairs
     "lane 8": 550,   # large trunks
     "lane 7": 250,   # small trunks
-    "lane 6": 200,   # turtle trios
+    "lane 6": 240,   # turtle trios
     "lane 5": 350,   # trucks
     "lane 4": 250,   # racing cars
     "lane 3": 250,   # large cars
@@ -41,6 +41,8 @@ TURTLE_SURFACE: Final[list[tuple[int]]] = [
     (105, 38),  # second lane from top with the turtle duos
     (160, 38)   # lowest lane of the water traffic with the turtle trios
 ]
+
+TURTLE_SPACING: Final[int] = 55
 
 CROCS_IN_HOUSES: Final[list[bool]] = [False, True, True]  # [level 1, level 2, level 3]
 

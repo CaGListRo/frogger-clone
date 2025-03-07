@@ -3,6 +3,7 @@ import settings as stgs
 import pygame as pg
 from random import choice, randint
 from typing import TypeVar, Final
+from icecream import ic
 
 Animation = TypeVar("Animation")
 Game = TypeVar("Game")
@@ -56,35 +57,31 @@ class Tree:
 
 class Turtle:
     TRANSPARENT_COLOR: Final[tuple[int]] = (0, 0, 0, 0)
-    def __init__(self, game: Game, x: int, y: int, lane: int, sinking: bool = False) -> None:
+    def __init__(self, game: Game, x: int, y: int, lane: int, sinkable: bool = False) -> None:
         """
-        Initialize a turtle car object.
+        Initialize a turtle object.
         Args:
         game (Game): The game object.
-        x (int): The center x-coordinate of the turtle car.
-        y (int): The center y-coordinate of the turtle car.
+        x (int): The center x-coordinate of the turtle.
+        y (int): The center y-coordinate of the turtle.
+        lane (int): The lane of the turtle.
+        sinkable (bool): Whether the turtle can dive. Defaults to False.
         """
         self.game: Game = game
         self.pos: pg.Vector2 = pg.Vector2((x, y))
         self.speed: int = stgs.START_SPEED[f"level {self.game.level}"][lane]
-        self.sinking: bool = sinking  # the general ability to dive
+        self.sinkable: bool = sinkable  # the general ability to dive
         self.diving: bool = False     # if it is actually diving
         self.animation: Animation = self.game.images["turtle/swimming"].copy()
-        image_to_blit: pg.Surface = self.animation.get_current_image()
-        self.image_size: tuple[int] = image_to_blit.get_size()
-        self.image: pg.Surface = pg.Surface(self.image_size, pg.SRCALPHA)
-        self.image.fill(self.TRANSPARENT_COLOR)
-        self.half_image_width: int = int(image_to_blit.get_width() // 2)
-        self.half_image_height: int = int(image_to_blit.get_height() // 2)
-        self.image.blit(image_to_blit, (0, 0))
-        self.has_rect: bool = False
-        if lane == 0:  # short collision rect
-            self.rect: pg.Rect = pg.Rect(self.pos.x - self.half_image_width, self.pos.y - self.half_image_height, 105, self.image_size[1])
-            # for i in range(stgs.TURTLES[0])
-        else:  # long collision rect
-            self.rect: pg.Rect = pg.Rect(self.pos.x - self.half_image_width, self.pos.y - self.half_image_height, 160, self.image_size[1])
-            # for i in range(stgs.TURTLES[1])
         
+        image_to_blit: pg.Surface = self.animation.get_current_image()
+        surface_selector: int = 0 if lane == 1 else 1
+        self.turtles_selector: int = 0 if lane == 1 else 1
+        self.image_size: tuple[int] = stgs.TURTLE_SURFACE[surface_selector]
+        self.image: pg.Surface = pg.Surface(self.image_size, pg.SRCALPHA)
+        self.draw_image(image_to_blit=image_to_blit)
+        
+        self.rect: pg.Rect = self.image.get_rect(center=self.pos)
 
     def update(self, dt: float) -> None:
         """
@@ -95,13 +92,13 @@ class Turtle:
         self.animation.update(dt)
         self.image.fill(self.TRANSPARENT_COLOR)
         image_to_blit: pg.Surface = self.animation.get_current_image()
-        self.image.blit(image_to_blit, (0, 0))
+        self.draw_image(image_to_blit=image_to_blit)
 
         self.pos.x += self.speed * dt
-        if self.pos.x < 0 - self.half_image_width:
-            self.pos.x = stgs.WINDOW_SIZE[0] + self.half_image_width
-        if self.has_rect:
-            self.rect.topleft = (self.pos.x - self.half_image_width, self.pos.y - self.half_image_height)
+        if self.pos.x < 0 - self.image_size[0] // 2:
+            self.pos.x = stgs.WINDOW_SIZE[0] + self.image_size[0] // 2
+
+        self.rect.center = self.pos
 
     def set_speed(self, speed: int) -> None:
         """
@@ -111,13 +108,19 @@ class Turtle:
         """
         self.speed = speed
 
+    def draw_image(self, image_to_blit: pg.Surface) -> None:
+        """ Draw the turtle's image. """
+        self.image.fill(self.TRANSPARENT_COLOR)
+        for i in range(stgs.TURTLES[self.turtles_selector]):
+            self.image.blit(image_to_blit, (0 + i * stgs.TURTLE_SPACING, 0))
+        
     def render(self, surf: pg.Surface) -> None:
         """
         Render the turtle to the given surface.
         Args:
         surf (pg.Surface): The surface to render the turtle on.
         """
-        surf.blit(self.image, (self.pos.x - self.half_image_width, self.pos.y - self.half_image_height))
+        surf.blit(self.image, self.rect)
         pg.draw.rect(surf, "red", self.rect, width=2)
 
 

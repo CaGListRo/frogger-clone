@@ -124,7 +124,6 @@ class Frog:
 
     def move_collision_rect(self) -> None:
         """ Moves the collision rect. """
-        ic()
         self.collision_rect.x = self.pos.x + self.offset[0]
         self.collision_rect.y = self.pos.y + self.offset[1]
 
