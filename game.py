@@ -44,15 +44,19 @@ class Game:
             "trucks": load_images("trucks/"),
             "racing_cars": load_images("racing cars/", scale_factor=0.8),
             "large_cars": load_images("large cars/", scale_factor=0.9),            
-            "bulldozer": Animation(load_images("bulldozer/", scale_factor=0.9), animation_duration=0.4),
             "small_cars": load_images("small cars/", scale_factor=0.85),
             "stripe": load_image("objects/stripe.png", scale_factor=0.75),
             "frog/house": load_image("frog/house/frog.png"),
+            "frog/life": load_image("frog/idle/frog0001.png", scale_factor=0.7),
+            "ripple": load_images("water/", scale_factor=2),
+        }
+
+        # create animations
+        self.animations: dict[Animation] = {
+            "bulldozer": Animation(load_images("bulldozer/", scale_factor=0.9), animation_duration=0.4),
             "frog/idle": Animation(load_images("frog/idle/", scale_factor=0.85), animation_duration=1),
             "frog/jump": Animation(load_images("frog/jump/", scale_factor=0.85), animation_duration=0.4, loop=False),
-            "frog/life": load_image("frog/idle/frog0001.png", scale_factor=0.7),
             "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1),
-            "ripple": load_images("water/", scale_factor=2),
             "snake": Animation(load_images("snake/", scale_factor=0.8), animation_duration=0.6)
         }
 
@@ -85,21 +89,21 @@ class Game:
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """
         self.water_traffic: list[Animation | pg.Surface] = [
-            [Tree(self, 750 - i * stgs.SPACING["lane 10"], 104, "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
-            [Turtle(self, 150 + i * stgs.SPACING["lane 9"], 147, 1)  for i in range(stgs.WATER[f"level {self.level}"][1])],
-            [Tree(self, 650 - i * stgs.SPACING["lane 8"], 191, "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
-            [Tree(self, 450 - i * stgs.SPACING["lane 7"], 234, "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
-            [Turtle(self, 250 + i * stgs.SPACING["lane 6"], 277, 4) for i in range(stgs.WATER[f"level {self.level}"][4])],
+            [Tree(self, 750 - i * stgs.SPACING["lane 10"], stgs.LANE_HEIGHTS["lane 10"], "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
+            [Turtle(self, 150 + i * stgs.SPACING["lane 9"], stgs.LANE_HEIGHTS["lane 9"], 1)  for i in range(stgs.WATER[f"level {self.level}"][1])],
+            [Tree(self, 650 - i * stgs.SPACING["lane 8"], stgs.LANE_HEIGHTS["lane 8"], "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
+            [Tree(self, 450 - i * stgs.SPACING["lane 7"], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
+            [Turtle(self, 250 + i * stgs.SPACING["lane 6"], stgs.LANE_HEIGHTS["lane 6"], 4) for i in range(stgs.WATER[f"level {self.level}"][4])],
         ]
         
     def create_traffic(self) -> None:
         """ Creates traffic on the road. """
         self.traffic: list[Animation | pg.Surface] = [
-            [Truck(self, 700 - i * stgs.SPACING["lane 5"], 363) for i in range(stgs.STREET[f"level {self.level}"][0])],
-            [RacingCar(self, 400 - i * stgs.SPACING["lane 4"], 407) for i in range(stgs.STREET[f"level {self.level}"][1])],
-            [LargeCar(self, 800 - i * stgs.SPACING["lane 3"], 450) for i in range(stgs.STREET[f"level {self.level}"][2])],
-            [Bulldozer(self, 400 - i * stgs.SPACING["lane 2"], 493) for i in range(stgs.STREET[f"level {self.level}"][3])],
-            [SmallCar(self, 600 - i * stgs.SPACING["lane 1"], 536) for i in range(stgs.STREET[f"level {self.level}"][4])],]
+            [Truck(self, 700 - i * stgs.SPACING["lane 5"], stgs.LANE_HEIGHTS["lane 5"]) for i in range(stgs.STREET[f"level {self.level}"][0])],
+            [RacingCar(self, 400 - i * stgs.SPACING["lane 4"], stgs.LANE_HEIGHTS["lane 4"]) for i in range(stgs.STREET[f"level {self.level}"][1])],
+            [LargeCar(self, 800 - i * stgs.SPACING["lane 3"], stgs.LANE_HEIGHTS["lane 3"]) for i in range(stgs.STREET[f"level {self.level}"][2])],
+            [Bulldozer(self, 400 - i * stgs.SPACING["lane 2"], stgs.LANE_HEIGHTS["lane 2"]) for i in range(stgs.STREET[f"level {self.level}"][3])],
+            [SmallCar(self, 600 - i * stgs.SPACING["lane 1"], stgs.LANE_HEIGHTS["lane 1"]) for i in range(stgs.STREET[f"level {self.level}"][4])],]
 
     def clear_houses(self) -> None:
         """ Clears the houses list. """
@@ -113,7 +117,13 @@ class Game:
             raise NotImplementedError
 
     def handle_water_traffic_collision(self, collision_object: object, lane_index, element_index) -> None:
-        """ Handles collision with water traffic. """       
+        """
+        Handles collision with water traffic.
+        Args:
+        collision_object: The object that collided with the frog.
+        lane_index: The index of the lane where the collision occurred.
+        element_index: The index of the element in the lane where the collision occurred.
+        """
         offset: float = self.distances[lane_index][element_index]
         if self.frog.collision_rect.top <= collision_object.rect.bottom - 19 and self.frog.collision_rect.bottom >= collision_object.rect.top + 19:
             if not self.frog.jumping:
@@ -147,8 +157,11 @@ class Game:
         # collision with the house rects
         for idx, rect in enumerate(self.house_rects):
             if self.frog.collision_rect.colliderect(rect):
-                self.houses[idx] = True
-                self.new_frog_or_game_over()
+                if not self.houses[idx]:
+                    self.houses[idx] = True
+                    self.new_frog_or_game_over()
+                else:
+                    self.new_frog_or_game_over()  # needs to be changed when there is a dying animation
                     
     def event_handler(self) -> None:
         """ Handles events in the game. """
@@ -207,15 +220,17 @@ class Game:
         pg.display.set_caption(f"     F R O G G E R - C L O N E          FPS:{self.fps}")
         # clear the screen
         self.screen.fill((0, 0, 0))
+        # draw houses to have a background behind the background
+        self.screen.blit(self.images["houses"], (0, 0))
         # draw background
-        self.screen.blit(self.images["background"], (0, 0))
+        self.screen.blit(self.images["background"], (0, 26))
         # draw ripples
         for ripple in self.ripples:
             ripple.render(self.screen)
         # draw stripes
         for i in range(4):
             for j in range(55):
-                self.screen.blit(self.images["stripe"], (-5 + j * 32, 384 + i * 43))
+                self.screen.blit(self.images["stripe"], (stgs.STRIPES["x start"] + j * stgs.STRIPES["x spacing"], stgs.STRIPES["y start"] + i * stgs.STRIPES["y spacing"]))
         # draw water traffic
         for lane in self.water_traffic:
             for element in lane:
@@ -230,23 +245,23 @@ class Game:
         # draw snake
         self.snake.render(self.screen)
         # draw houses
-        self.screen.blit(self.images["houses"], (0, 0))
+        self.screen.blit(self.images["houses"], (0, 26))
         # draw house rects for test
         for rect in self.house_rects:
             pg.draw.rect(self.screen, "red", rect, width=1)
         # render and blit score
-        score_shadow: pg.Surface = self.score_font.render(str(self.score), True, "black")
-        score_to_blit: pg.Surface = self.score_font.render(str(self.score), True, "white")
-        self.screen.blit(score_shadow, (12, 12))
-        self.screen.blit(score_to_blit, (10, 10))
+        score_shadow: pg.Surface = self.score_font.render(f"Score: {str(self.score)}", True, "black")
+        score_to_blit: pg.Surface = self.score_font.render(f"Score: {str(self.score)}", True, "white")
+        self.screen.blit(score_shadow, (12, 2))
+        self.screen.blit(score_to_blit, (10, 0))
         # draw frogs in houses if they're at home
         for i in range(5):
             if self.houses[i]:
                 multiplicand: int = 167 if i != 3 else 169
-                self.screen.blit(self.images["frog/house"], (35 + i * multiplicand, 26))
-        
+                self.screen.blit(self.images["frog/house"], (35 + i * multiplicand, 52))
+        # draw the remaining frogs
         for i in range(self.frogs):
-            self.screen.blit(self.images["frog/life"], (10 + i * 32, 610))
+            self.screen.blit(self.images["frog/life"], (10 + i * 32, stgs.FROG_DRAW_HEIGHT))
         
         pg.display.update()
 

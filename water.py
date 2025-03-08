@@ -72,7 +72,7 @@ class Turtle:
         self.speed: int = stgs.START_SPEED[f"level {self.game.level}"][lane]
         self.sinkable: bool = sinkable  # the general ability to dive
         self.diving: bool = False     # if it is actually diving
-        self.animation: Animation = self.game.images["turtle/swimming"].copy()
+        self.animation: Animation = self.game.animations["turtle/swimming"].copy()
         
         image_to_blit: pg.Surface = self.animation.get_current_image()
         surface_selector: int = 0 if lane == 1 else 1

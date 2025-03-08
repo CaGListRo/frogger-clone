@@ -13,7 +13,7 @@ class Snake:
     TRANSPARENT_COLOR: Final[tuple[int]] = (0, 0, 0, 0)
     def __init__(self, game: Game, position: str = "green") -> None:
         """ Initializes an snake object. """
-        self.animation: Animation = game.images["snake"].copy()
+        self.animation: Animation = game.animations["snake"].copy()
         image_to_blit: pg.Surface = self.animation.get_current_image()
         image_size: tuple[int] = image_to_blit.get_size()
         self.half_image_height: int = int(image_size[1] / 2)
@@ -22,7 +22,7 @@ class Snake:
         self.image.fill(self.TRANSPARENT_COLOR)
         self.image.blit(image_to_blit, (0, 0))
         self.direction: int = choice([-1, 1])  # -1 = snake heading left, 1 = snake heading right
-        y_position: int = 320 if position == "green" else 234
+        y_position: int = stgs.SNAKE_LANE if position == "green" else stgs.LANE_HEIGHTS["lane 7"]
         x_position: int = -image_length if self.direction == 1 else stgs.WINDOW_SIZE[0]
         self.pos: pg.Vector2 = pg.Vector2((x_position, y_position))
         self.speed: int = stgs.SNAKE_SPEED

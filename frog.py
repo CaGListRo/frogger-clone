@@ -20,7 +20,7 @@ class Frog:
         self.game: Game = game
         # image stuff
         self.state: str = "idle"
-        self.animation: Animation = self.game.images[f"frog/{self.state}"].copy()
+        self.animation: Animation = self.game.animations[f"frog/{self.state}"].copy()
         image_size: tuple[int] = self.animation.get_current_image().get_size()
         self.image: pg.Surface = pg.Surface(image_size, pg.SRCALPHA)
         self.image.blit(self.animation.get_current_image(), (0, 0))
@@ -176,7 +176,7 @@ class Frog:
             self.rotate = True
         
         if old_state != self.state:
-            self.animation: Animation = self.game.images[f"frog/{self.state}"].copy()
+            self.animation: Animation = self.game.animations[f"frog/{self.state}"].copy()
         self.animation.update(dt)
 
     def jump(self, direction: str) -> None:
