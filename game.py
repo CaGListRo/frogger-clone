@@ -5,6 +5,7 @@ from snake import Snake
 from frog import Frog
 from vehicle import Truck, RacingCar, LargeCar, Bulldozer, SmallCar
 from water import Tree, Turtle, Ripple
+from time_bar import TimeBar
 
 from icecream import ic
 
@@ -66,8 +67,10 @@ class Game:
         self.create_traffic()
         self.create_water_traffic()
         self.create_frog()
+        self.create_time_bar()
 
-        self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(25, 258))) for i in range(100)]
+        self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(50, 284))) for i in range(100)]
+
         self.house_rects: list[pg.Rect] = [pg.Rect(stgs.HOUSE_TOP_LEFT[0][0], stgs.HOUSE_TOP_LEFT[0][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
                                            pg.Rect(stgs.HOUSE_TOP_LEFT[1][0], stgs.HOUSE_TOP_LEFT[1][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
                                            pg.Rect(stgs.HOUSE_TOP_LEFT[2][0], stgs.HOUSE_TOP_LEFT[2][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
@@ -76,6 +79,10 @@ class Game:
 
         # test snake
         self.snake: Snake = Snake(self)
+
+    def calculate_time_score(self) -> None:
+        """ Calculates the score for the remaining time. """
+        self.score += self.time_bar.get_time() * 10
 
     def create_new_ripple(self) -> None:
         """ Creates a new ripple at a random y-position. """
@@ -95,7 +102,11 @@ class Game:
             [Tree(self, 450 - i * stgs.SPACING["lane 7"], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
             [Turtle(self, 250 + i * stgs.SPACING["lane 6"], stgs.LANE_HEIGHTS["lane 6"], 4) for i in range(stgs.WATER[f"level {self.level}"][4])],
         ]
-        
+
+    def create_time_bar(self) -> None:
+        """ Creates a time bar at the bottom of the screen. """
+        self.time_bar: TimeBar = TimeBar(self)
+
     def create_traffic(self) -> None:
         """ Creates traffic on the road. """
         self.traffic: list[Animation | pg.Surface] = [
@@ -113,8 +124,15 @@ class Game:
         """ Checks if a new frog can be created or if the game is over. """
         if self.frogs > 0:
             self.create_frog()
+            self.calculate_time_score()
+            self.handle_time_bar()
         else:
             raise NotImplementedError
+
+    def handle_time_bar(self) -> None:
+        """ Deletes the old time bar and creates a new one. """
+        del self.time_bar
+        self.create_time_bar()
 
     def handle_water_traffic_collision(self, collision_object: object, lane_index, element_index) -> None:
         """
@@ -126,9 +144,12 @@ class Game:
         """
         offset: float = self.distances[lane_index][element_index]
         if self.frog.collision_rect.top <= collision_object.rect.bottom - 19 and self.frog.collision_rect.bottom >= collision_object.rect.top + 19:
-            if not self.frog.jumping:
-                self.frog.pos.x = collision_object.pos.x + offset
-                self.frog.move_collision_rect()        
+            if self.frog.collision_rect.left >= collision_object.rect.left - 10 and self.frog.collision_rect.right <= collision_object.rect.right + 10:
+                if not self.frog.jumping:
+                    self.frog.pos.x = collision_object.pos.x + offset
+                    self.frog.move_collision_rect()
+            # else:
+            #     self.new_frog_or_game_over()  # needs to be changed when there is a dying animation
 
     def calculate_distances(self) -> None:
         """ Checks the distances on the x axis from the frog to the water objects. """
@@ -141,12 +162,13 @@ class Game:
 
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
-        # # collisions with traffic
-        # for lane in self.traffic:
-        #     for vehicle in lane:
-        #         if self.frog.collision_rect.colliderect(vehicle.rect):
-        #             del self.frog
-        #             self.new_frog_or_game_over()
+        # collisions with traffic on the street
+        for lane in self.traffic:
+            for vehicle in lane:
+                if self.frog.collision_rect.colliderect(vehicle.rect):
+                    del self.frog
+                    self.new_frog_or_game_over()
+
         
         # collisions with water traffic
         for lane_index, lane in enumerate(self.water_traffic):
@@ -162,7 +184,11 @@ class Game:
                     self.new_frog_or_game_over()
                 else:
                     self.new_frog_or_game_over()  # needs to be changed when there is a dying animation
-                    
+
+    def time_up(self) -> None:
+        """ Is called from the time bar object, if the time is up. """
+        self.new_frog_or_game_over()
+
     def event_handler(self) -> None:
         """ Handles events in the game. """
         # get events
@@ -198,6 +224,13 @@ class Game:
                     self.direction_pressed = False
                 
     def update_objects(self, dt: float) -> None:
+        """
+        Updates all objects in the game.
+        Args:
+        dt (float): The time since the last update.
+        """
+        # update time bar
+        self.time_bar.update(dt)
         # update ripples
         for ripple in self.ripples:
             ripple.update(dt)
@@ -262,6 +295,9 @@ class Game:
         # draw the remaining frogs
         for i in range(self.frogs):
             self.screen.blit(self.images["frog/life"], (10 + i * 32, stgs.FROG_DRAW_HEIGHT))
+
+        # draw time bar
+        self.time_bar.render(self.screen)
         
         pg.display.update()
 

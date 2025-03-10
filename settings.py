@@ -16,7 +16,7 @@ STREET: Final[dict[list[int]]] = {
     "level 3": [3, 2, 5, 4, 4],
 }
 
-STRIPES: Final[dict[int]] = {
+STRIPES: Final[dict[int]] = {  # the yellow stripes on the street
     "rows": 4,
     "columns": 55,
     "x start": -5,
@@ -80,10 +80,18 @@ SNAKE_SPEED: Final[int] = 50
 
 SCORE: Final[dict[int]] = {
     "jump": 10,
-    "second": 20,
+    "second": 10,
     "frog in house": 50,
     "frogs left": 100,
     "finish level": 1000
+}
+
+TIME_BAR: Final[dict[int]] = {
+    "x pos": 590,  # top right
+    "y pos": 650,  # top right
+    "length": 300,
+    "height": 20,
+    "time": 60.0
 }
 
 FROG_DRAW_HEIGHT: Final[int] = 630  # the y value to draw the remaining frogs
