@@ -134,7 +134,7 @@ class Game:
         del self.time_bar
         self.create_time_bar()
 
-    def handle_water_traffic_collision(self, collision_object: object, lane_index, element_index) -> None:
+    def handle_water_traffic_collision(self, collision_object: object, lane_index, element_index) -> bool:
         """
         Handles collision with water traffic.
         Args:
@@ -142,14 +142,17 @@ class Game:
         lane_index: The index of the lane where the collision occurred.
         element_index: The index of the element in the lane where the collision occurred.
         """
+        collided: bool = False
         offset: float = self.distances[lane_index][element_index]
-        if self.frog.collision_rect.top <= collision_object.rect.bottom - 19 and self.frog.collision_rect.bottom >= collision_object.rect.top + 19:
-            if self.frog.collision_rect.left >= collision_object.rect.left - 10 and self.frog.collision_rect.right <= collision_object.rect.right + 10:
+        if self.frog.collision_rect.left >= collision_object.rect.left - 10 and self.frog.collision_rect.right <= collision_object.rect.right + 10:
+            collided = True
+            if self.frog.collision_rect.top <= collision_object.rect.bottom - 19 and self.frog.collision_rect.bottom >= collision_object.rect.top + 19:
+                ic(self.frog.collision_rect.left, collision_object.rect.left, self.frog.collision_rect.right, collision_object.rect.right)
+                ic(collided)
                 if not self.frog.jumping:
                     self.frog.pos.x = collision_object.pos.x + offset
                     self.frog.move_collision_rect()
-            # else:
-            #     self.new_frog_or_game_over()  # needs to be changed when there is a dying animation
+        return collided
 
     def calculate_distances(self) -> None:
         """ Checks the distances on the x axis from the frog to the water objects. """
@@ -166,14 +169,18 @@ class Game:
         for lane in self.traffic:
             for vehicle in lane:
                 if self.frog.collision_rect.colliderect(vehicle.rect):
+                    ic("traffic")
                     del self.frog
                     self.new_frog_or_game_over()
 
         
         # collisions with water traffic
+        collided_list: list[bool] = []
         for lane_index, lane in enumerate(self.water_traffic):
             for element_index, element in enumerate(lane):
-                if self.frog.collision_rect.colliderect(element.rect):
+                collided: bool = self.frog.collision_rect.colliderect(element.rect)
+                collided_list.append(collided)
+                if collided:
                     self.handle_water_traffic_collision(element, lane_index, element_index)
         
         # collision with the house rects
@@ -184,6 +191,9 @@ class Game:
                     self.new_frog_or_game_over()
                 else:
                     self.new_frog_or_game_over()  # needs to be changed when there is a dying animation
+
+        if self.frog.pos.y < 300 and True not in collided_list:
+            ic(self.new_frog_or_game_over())  # needs to be changed when there is a dying animation
 
     def time_up(self) -> None:
         """ Is called from the time bar object, if the time is up. """
