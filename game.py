@@ -17,8 +17,6 @@ from typing import Final
 
 
 class Game:
-    START_POS: Final[tuple[int]] = (579, 300)
-    FROG_SIZE: Final[tuple[int]] = (32, 32)
     def __init__(self) -> None:
         """ Initializes the game class. """
         pg.init()
@@ -147,8 +145,6 @@ class Game:
         if self.frog.collision_rect.left >= collision_object.rect.left - 10 and self.frog.collision_rect.right <= collision_object.rect.right + 10:
             collided = True
             if self.frog.collision_rect.top <= collision_object.rect.bottom - 19 and self.frog.collision_rect.bottom >= collision_object.rect.top + 19:
-                ic(self.frog.collision_rect.left, collision_object.rect.left, self.frog.collision_rect.right, collision_object.rect.right)
-                ic(collided)
                 if not self.frog.jumping:
                     self.frog.pos.x = collision_object.pos.x + offset
                     self.frog.move_collision_rect()
@@ -169,11 +165,9 @@ class Game:
         for lane in self.traffic:
             for vehicle in lane:
                 if self.frog.collision_rect.colliderect(vehicle.rect):
-                    ic("traffic")
                     del self.frog
                     self.new_frog_or_game_over()
-
-        
+ 
         # collisions with water traffic
         collided_list: list[bool] = []
         for lane_index, lane in enumerate(self.water_traffic):

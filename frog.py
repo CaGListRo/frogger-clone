@@ -8,7 +8,6 @@ Game = TypeVar("Game")
 Animation = TypeVar("Animation")
 
 class Frog:
-    JUMP_DISTANCE: Final[int] = 43
     def __init__(self, game: Game, pos: tuple[int], direction: str = "north") -> None:
         """
         Initialize a Frog object.
@@ -39,93 +38,12 @@ class Frog:
         self.rotate: bool = False
 
         # collision stuff
-        self.offset: tuple[int] = (-14, -37)     # collision rect offset
-        self.rect_size: tuple[int] = (29, 37)  # collision rect size
-        self.collision_rect: pg.Rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
-
-    def fix_position(self) -> None:
-        """ Fix the position of the frog after a change of direction. """
-        if self.direction == "south":
-            match self.old_direction:
-                case "north":
-                    self.pos.y -= 38
-                    self.offset = (-14, 0)
-                    self.collision_rect.y = self.pos.y + self.offset[1]
-                case "east":
-                    self.pos.x += 19
-                    self.pos.y -= 19
-                    self.offset = (-14, 0)
-                    self.rect_size = (29, 37)
-                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
-                case "west":
-                    self.pos.x -= 19
-                    self.pos.y -= 19
-                    self.offset = (-14, 0)
-                    self.rect_size = (29, 37)
-                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
-
-        elif self.direction == "north":
-            match self.old_direction:
-                case "south":
-                    self.pos.y += 38
-                    self.offset = (-14, -37)
-                    self.collision_rect.y = self.pos.y + self.offset[1]
-                case "east":
-                    self.pos.x += 19
-                    self.pos.y += 19
-                    self.offset = (-14, -37)
-                    self.rect_size = (29, 37)
-                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
-                case "west":
-                    self.pos.x -= 19
-                    self.pos.y += 19
-                    self.offset = (-14, -37)
-                    self.rect_size = (29, 37)
-                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
-
-        elif self.direction == "west":
-            match self.old_direction:
-                case "north":
-                    self.pos.x += 19
-                    self.pos.y -= 19
-                    self.offset = (-37, -14)
-                    self.rect_size = (37, 29)
-                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
-                case "south":
-                    self.pos.x += 19
-                    self.pos.y += 19
-                    self.offset = (-37, -14)
-                    self.rect_size = (37, 29)
-                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
-                case "east":
-                    self.pos.x += 38
-                    self.offset = (-37, -14)
-                    self.collision_rect.x = self.pos.x + self.offset[0]
-            
-        elif self.direction == "east":
-            match self.old_direction:
-                case "north":
-                    self.pos.x -= 19
-                    self.pos.y -= 19
-                    self.offset = (0, -14)
-                    self.rect_size = (37, 29)
-                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
-                case "south":
-                    self.pos.x -= 19
-                    self.pos.y += 19    
-                    self.offset = (0, -14)
-                    self.rect_size = (37, 29)
-                    self.collision_rect = pg.Rect(self.pos.x + self.offset[0], self.pos.y + self.offset[1], self.rect_size[0], self.rect_size[1])
-                case "west":
-                    self.pos.x -= 38
-                    self.offset = (0, -14)
-                    self.collision_rect.x = self.pos.x + self.offset[0]
-        self.old_direction = self.direction
+        self.rect_size: tuple[int] = stgs.FROG_COLLISION_RECT
+        self.collision_rect: pg.Rect = pg.Rect(self.pos.x - self.rect_size[0] // 2, self.pos.y + self.rect_size[1] // 2, self.rect_size[0], self.rect_size[1])
 
     def move_collision_rect(self) -> None:
         """ Moves the collision rect. """
-        self.collision_rect.x = self.pos.x + self.offset[0]
-        self.collision_rect.y = self.pos.y + self.offset[1]
+        self.collision_rect.center = self.pos
 
     def update(self, dt: float) -> None:
         """
@@ -141,7 +59,6 @@ class Frog:
             if self.direction == "north":
                 self.pos.y -= (self.speed * dt)
                 self.angle = 0
-                self.collision_rect.top = self.image_rect.top + 3
                 if self.pos.y <= self.destination.y:
                     self.pos.y = self.destination.y
                     self.jumping = False
@@ -149,7 +66,6 @@ class Frog:
             elif self.direction == "south":
                 self.pos.y += (self.speed * dt)
                 self.angle = 180
-                self.collision_rect.bottom = self.image_rect.bottom - 3
                 if self.pos.y >= self.destination.y:
                     self.pos.y = self.destination.y
                     self.jumping = False
@@ -157,7 +73,6 @@ class Frog:
             elif self.direction == "west":
                 self.pos.x -= (self.speed * dt)
                 self.angle = 90
-                self.collision_rect.left = self.image_rect.left + 3
                 if self.pos.x <= self.destination.x:
                     self.pos.x = self.destination.x
                     self.jumping = False
@@ -165,10 +80,10 @@ class Frog:
             elif self.direction == "east":
                 self.pos.x += (self.speed * dt)
                 self.angle = 270
-                self.collision_rect.right = self.image_rect.right - 3
                 if self.pos.x >= self.destination.x:
                     self.pos.x = self.destination.x
                     self.jumping = False
+            self.move_collision_rect()
         else:
             self.state = "idle"
 
@@ -189,22 +104,14 @@ class Frog:
         if not self.jumping:
             self.game.score += stgs.SCORE["jump"]
             self.jumping = True 
-            if direction == "north" and self.pos.y >= 100:
-                if self.old_direction != direction:
-                    self.fix_position()
-                self.destination.y = self.pos.y - self.JUMP_DISTANCE
-            elif direction == "south" and self.pos.y <= 538:
-                if self.old_direction != direction:
-                    self.fix_position()
-                self.destination.y = self.pos.y + self.JUMP_DISTANCE
-            elif direction == "west" and self.pos.x > self.JUMP_DISTANCE:
-                if self.old_direction != direction:
-                    self.fix_position()
-                self.destination.x = self.pos.x - self.JUMP_DISTANCE
-            elif direction == "east" and self.pos.x < stgs.WINDOW_SIZE[0] - self.JUMP_DISTANCE:
-                if self.old_direction != direction:
-                    self.fix_position()
-                self.destination.x = self.pos.x + self.JUMP_DISTANCE
+            if direction == "north" and self.pos.y >= stgs.FROG_LIMITS["top"]:
+                self.destination.y = self.pos.y - stgs.FROG_JUMP_DISTANCE
+            elif direction == "south" and self.pos.y <= stgs.FROG_LIMITS["bottom"]:
+                self.destination.y = self.pos.y + stgs.FROG_JUMP_DISTANCE
+            elif direction == "west" and self.pos.x > stgs.FROG_LIMITS["left"]:
+                self.destination.x = self.pos.x - stgs.FROG_JUMP_DISTANCE
+            elif direction == "east" and self.pos.x < stgs.FROG_LIMITS["right"]:
+                self.destination.x = self.pos.x + stgs.FROG_JUMP_DISTANCE
 
     def render(self, surf: pg.Surface) -> None:
         """

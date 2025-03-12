@@ -2,7 +2,20 @@ from typing import Final
 
 WINDOW_SIZE: Final[tuple[int]] = (800, 700)
 
-FROG_START_POS: Final[tuple[int]] = (400, 623)
+FROG_START_POS: Final[tuple[int]] = (400, 605)
+
+FROG_COLLISION_RECT: Final[tuple[int]] = (34, 34)
+
+FROG_HALF_RECT_SIZE: Final[int] = int(FROG_COLLISION_RECT[0] / 2)
+
+FROG_JUMP_DISTANCE: Final[int] = 43
+
+FROG_LIMITS: Final[dict[int]] = {
+    "top": 100,
+    "bottom": 564,
+    "left": FROG_HALF_RECT_SIZE + FROG_JUMP_DISTANCE,
+    "right": WINDOW_SIZE[0] - FROG_HALF_RECT_SIZE - FROG_JUMP_DISTANCE
+}
 
 WATER: Final[dict[list[int]]] = {
     "level 1": [3, 5, 2, 4, 4],  # [medium trunks, turtle pairs, large trunks, small trunks, turtle trios]
