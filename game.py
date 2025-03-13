@@ -56,7 +56,11 @@ class Game:
             "frog/idle": Animation(load_images("frog/idle/", scale_factor=0.85), animation_duration=1),
             "frog/jump": Animation(load_images("frog/jump/", scale_factor=0.85), animation_duration=0.4, loop=False),
             "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1),
-            "snake": Animation(load_images("snake/", scale_factor=0.8), animation_duration=0.6)
+            "snake": Animation(load_images("snake/", scale_factor=0.8), animation_duration=0.6),
+            "fly/idle": Animation(load_images("fly/idle/", scale_factor=0.8), animation_duration=0.6),
+            "fly/walk": Animation(load_images("fly/walk/", scale_factor=0.8), animation_duration=0.6),
+            "fly/walk/flutter": Animation(load_images("fly/walk flutter/", scale_factor=0.8), animation_duration=0.6),
+            "fly/flutter": Animation(load_images("fly/flutter/", scale_factor=0.8), animation_duration=0.6),
         }
 
         self.direction_pressed: bool = False
@@ -187,7 +191,7 @@ class Game:
                     self.new_frog_or_game_over()  # needs to be changed when there is a dying animation
 
         if self.frog.pos.y < 300 and True not in collided_list:
-            ic(self.new_frog_or_game_over())  # needs to be changed when there is a dying animation
+            self.new_frog_or_game_over()  # needs to be changed when there is a dying animation
 
     def time_up(self) -> None:
         """ Is called from the time bar object, if the time is up. """
@@ -299,6 +303,9 @@ class Game:
         # draw the remaining frogs
         for i in range(self.frogs):
             self.screen.blit(self.images["frog/life"], (10 + i * 32, stgs.FROG_DRAW_HEIGHT))
+
+        # drawe testfly
+        self.screen.blit(self.images["testfly"], (300, 300))
 
         # draw time bar
         self.time_bar.render(self.screen)
