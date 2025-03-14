@@ -104,4 +104,5 @@ class Animation:
         if not self.done:
             return self.images[self.image_index]
         else:
-            return self.images[0]
+            self.done = True
+            return self.done

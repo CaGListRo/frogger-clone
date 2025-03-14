@@ -164,3 +164,7 @@ class Ripple:
         surf (pg.Surface): The surface to render the ripple on.
         """
         surf.blit(self.image, (int(self.pos.x), int(self.pos.y)))
+
+
+class Crocodile:
+    pass

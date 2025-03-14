@@ -17,6 +17,14 @@ FROG_LIMITS: Final[dict[int]] = {
     "right": WINDOW_SIZE[0] - FROG_HALF_RECT_SIZE - FROG_JUMP_DISTANCE
 }
 
+FLY_HOUSE_CENTER_POS: Final[list[tuple[int]]] = [
+    (66, 80),
+    (231, 80),
+    (400, 80),
+    (569, 80),
+    (734, 80)
+]
+
 WATER: Final[dict[list[int]]] = {
     "level 1": [3, 5, 2, 4, 4],  # [medium trunks, turtle pairs, large trunks, small trunks, turtle trios]
     "level 2": [3, 5, 2, 4, 4],  # [medium trunks/one crocodile, turtle pairs, large trunks, small trunks, turtle trios]

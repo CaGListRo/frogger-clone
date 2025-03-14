@@ -36,6 +36,7 @@ class Game:
         # load images
         self.images: dict[pg.Surface] = {
             "background": load_image("background/game background.png"),
+            "house crocodile": load_image("crocodile/house/crocodile.png"),
             "houses": load_image("background/houses background.png"),
             "tree/large": load_images("objects/large trees/", scale_factor=0.9),
             "tree/medium": load_images("objects/medium trees/", scale_factor=0.9),
@@ -53,14 +54,16 @@ class Game:
         # create animations
         self.animations: dict[Animation] = {
             "bulldozer": Animation(load_images("bulldozer/", scale_factor=0.9), animation_duration=0.4),
-            "frog/idle": Animation(load_images("frog/idle/", scale_factor=0.85), animation_duration=1),
-            "frog/jump": Animation(load_images("frog/jump/", scale_factor=0.85), animation_duration=0.4, loop=False),
-            "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1),
-            "snake": Animation(load_images("snake/", scale_factor=0.8), animation_duration=0.6),
+            "crocodile/closed": Animation(load_images("crocodile/swimming closed", scale_factor=0.8), animation_duration=1),
+            "crocodile/open": Animation(load_images("crocodile/swimming open", scale_factor=0.8), animation_duration=1),
             "fly/idle": Animation(load_images("fly/idle/", scale_factor=0.8), animation_duration=0.6),
             "fly/walk": Animation(load_images("fly/walk/", scale_factor=0.8), animation_duration=0.6),
             "fly/walk/flutter": Animation(load_images("fly/walk flutter/", scale_factor=0.8), animation_duration=0.6),
             "fly/flutter": Animation(load_images("fly/flutter/", scale_factor=0.8), animation_duration=0.6),
+            "frog/idle": Animation(load_images("frog/idle/", scale_factor=0.85), animation_duration=1),
+            "frog/jump": Animation(load_images("frog/jump/", scale_factor=0.85), animation_duration=0.4, loop=False),
+            "snake": Animation(load_images("snake/", scale_factor=0.8), animation_duration=0.6),
+            "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1),
         }
 
         self.direction_pressed: bool = False
@@ -304,8 +307,6 @@ class Game:
         for i in range(self.frogs):
             self.screen.blit(self.images["frog/life"], (10 + i * 32, stgs.FROG_DRAW_HEIGHT))
 
-        # drawe testfly
-        self.screen.blit(self.images["testfly"], (300, 300))
 
         # draw time bar
         self.time_bar.render(self.screen)
