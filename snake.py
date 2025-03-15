@@ -21,11 +21,19 @@ class Snake:
         self.image: pg.Surface = pg.Surface(image_size, pg.SRCALPHA)
         self.image.fill(self.TRANSPARENT_COLOR)
         self.image.blit(image_to_blit, (0, 0))
-        self.direction: int = choice([-1, 1])  # -1 = snake heading left, 1 = snake heading right
+        self.direction: str = choice(["left", "right"])
         y_position: int = stgs.SNAKE_LANE if position == "green" else stgs.LANE_HEIGHTS["lane 7"]
-        x_position: int = -image_length if self.direction == 1 else stgs.WINDOW_SIZE[0]
+        x_position: int = -image_length if self.direction == "right" else stgs.WINDOW_SIZE[0]
         self.pos: pg.Vector2 = pg.Vector2((x_position, y_position))
         self.speed: int = stgs.SNAKE_SPEED
+        self.create_head_rect()
+
+    def create_head_rect(self) -> None:
+        """ Creates a rectangle for the snake's head. """
+        self.head_rect: pg.Rect = pg.Rect(self.pos.x + stgs.SNAKE_HEAD_RECT[self.direction][0], 
+                                          self.pos.y - stgs.SNAKE_HEAD_RECT[self.direction][1], 
+                                          stgs.SNAKE_HEAD_RECT[self.direction][2], 
+                                          stgs.SNAKE_HEAD_RECT[self.direction][3])
 
     def update(self, dt: float) -> None:
         """
@@ -34,7 +42,9 @@ class Snake:
         dt (float): The time since the last frame.
         """
         self.animation.update(dt)
-        self.pos.x += self.speed * self.direction * dt
+        multiplicand: int = 1 if self.direction == "right" else -1  # -1 = snake heading left, 1 = snake heading right
+        self.pos.x += self.speed * multiplicand * dt
+        self.head_rect.x = self.pos.x + stgs.SNAKE_HEAD_RECT[self.direction][0]
 
     def render(self, surf: pg.Surface) -> None:
         """
@@ -43,8 +53,9 @@ class Snake:
         surf (pg.Surface): The surface to render the snake onto.
         """
         image_to_blit: pg.Surface = self.animation.get_current_image()
-        flip: bool = True if self.direction == 1 else False
+        flip: bool = True if self.direction == "right" else False
         image_to_blit = pg.transform.flip(image_to_blit, flip, False)
         self.image.fill(self.TRANSPARENT_COLOR)
         self.image.blit(image_to_blit, (0, 0))
         surf.blit(self.image, (self.pos.x, self.pos.y - self.half_image_height))
+        pg.draw.rect(surf, "red", self.head_rect, width=2)

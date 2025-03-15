@@ -172,8 +172,13 @@ class Game:
         for lane in self.traffic:
             for vehicle in lane:
                 if self.frog.collision_rect.colliderect(vehicle.rect):
-                    del self.frog
+                    # del self.frog
                     self.new_frog_or_game_over()
+
+        # collision with the snake head
+        if self.snake != None:
+            if self.frog.collision_rect.colliderect(self.snake.head_rect):
+                self.new_frog_or_game_over()
  
         # collisions with water traffic
         collided_list: list[bool] = []
@@ -193,6 +198,7 @@ class Game:
                 else:
                     self.new_frog_or_game_over()  # needs to be changed when there is a dying animation
 
+        # collision with the water
         if self.frog.pos.y < 300 and True not in collided_list:
             self.new_frog_or_game_over()  # needs to be changed when there is a dying animation
 

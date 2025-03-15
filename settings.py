@@ -95,6 +95,11 @@ HOUSE_TOP_LEFT: Final[list[tuple[int]]] = [(31, 51), (196, 51), (365, 51), (534,
 
 SNAKES: Final[list[bool]] = [False, False, True]  # [level 1, level 2, level 3]
 
+SNAKE_HEAD_RECT: Final[dict[tuple[int]]] = {  # Only the head of the snake is deadly for the frog
+    "left": (0, 4, 14, 8),
+    "right": (67, 4, 14, 8)
+    }
+
 SNAKE_LANE: Final[int] = 346
 
 SNAKE_SPEED: Final[int] = 50
