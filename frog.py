@@ -36,6 +36,8 @@ class Frog:
         self.old_direction: str = self.direction
         self.angle: int = 0
         self.rotate: bool = False
+        self.dead: bool = False
+        self.dead_timer: float = 0.0
 
         # collision stuff
         self.rect_size: tuple[int] = stgs.FROG_COLLISION_RECT
@@ -44,6 +46,13 @@ class Frog:
     def new_animation(self) -> None:
         """ Copies the animation from self.game.animations. """
         self.animation: Animation = self.game.animations[f"frog/{self.state}"].copy()
+
+    def set_dead(self, kind: str) -> None:
+        """ Sets the frog to be dead. """
+        self.dead = True
+        self.image = self.game.animations["frog/dead/" + kind]
+        print(self.image)
+        self.image_rect = self.image.get_rect(center=self.pos)
 
     def move_collision_rect(self) -> None:
         """ Moves the collision rect. """
@@ -94,7 +103,6 @@ class Frog:
         if old_angle != self.angle:
             self.rotate = True
         
-        
         self.animation.update(dt)
         if self.animation.update(dt):
             self.state = "idle"
@@ -102,6 +110,12 @@ class Frog:
             self.animation.update(dt)
         if old_state != self.state:
             self.new_animation()
+
+        if self.dead:
+            self.dead_timer += dt
+            if self.dead_timer >= stgs.FROG_DEAD_TIME:
+                self.dead = False
+                self.game.new_frog_or_game_over()
         
     def jump(self, direction: str) -> None:
         """
@@ -128,9 +142,10 @@ class Frog:
         Args:
         surf (pg.Surface): The surface to render the frog on.
         """
-
-        self.image_to_blit = pg.transform.rotate(self.animation.get_current_image(), self.angle)
-
-        self.image_rect = self.image_to_blit.get_rect(center=self.pos)
-        surf.blit(self.image_to_blit, self.image_rect)
+        if not self.dead:
+            self.image_to_blit = pg.transform.rotate(self.animation.get_current_image(), self.angle)
+            self.image_rect = self.image_to_blit.get_rect(center=self.pos)
+            surf.blit(self.image_to_blit, self.image_rect)
+        else:
+            surf.blit(self.image, self.image_rect)
         pg.draw.rect(surf, "red", self.collision_rect, width=1)

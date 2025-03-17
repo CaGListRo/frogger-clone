@@ -17,6 +17,8 @@ FROG_LIMITS: Final[dict[int]] = {
     "right": WINDOW_SIZE[0] - FROG_HALF_RECT_SIZE - FROG_JUMP_DISTANCE
 }
 
+FROG_DEAD_TIME: Final[float] = 0.6
+
 FLY_HOUSE_CENTER_POS: Final[list[tuple[int]]] = [
     (66, 80),
     (231, 80),

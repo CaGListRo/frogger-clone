@@ -62,6 +62,7 @@ class Game:
             "fly/flutter": Animation(load_images("fly/flutter/", scale_factor=0.8), animation_duration=0.6),
             "frog/idle": Animation(load_images("frog/idle/", scale_factor=0.85), animation_duration=1),
             "frog/jump": Animation(load_images("frog/jump/", scale_factor=0.85), animation_duration=0.4, loop=False),
+            "frog/dead/street": Animation(load_images("frog/dead/street/"), animation_duration=stgs.FROG_DEAD_TIME, loop=False),
             "snake": Animation(load_images("snake/", scale_factor=0.8), animation_duration=0.6),
             "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1),
         }
@@ -172,8 +173,7 @@ class Game:
         for lane in self.traffic:
             for vehicle in lane:
                 if self.frog.collision_rect.colliderect(vehicle.rect):
-                    # del self.frog
-                    self.new_frog_or_game_over()
+                    self.frog.set_dead("street")
 
         # collision with the snake head
         if self.snake != None:
