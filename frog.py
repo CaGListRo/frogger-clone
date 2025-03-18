@@ -50,9 +50,8 @@ class Frog:
     def set_dead(self, kind: str) -> None:
         """ Sets the frog to be dead. """
         self.dead = True
-        self.image = self.game.animations["frog/dead/" + kind]
-        print(self.image)
-        self.image_rect = self.image.get_rect(center=self.pos)
+        self.state = f"dead/{kind}"
+        self.new_animation()
 
     def move_collision_rect(self) -> None:
         """ Moves the collision rect. """
@@ -64,57 +63,58 @@ class Frog:
         Args:
         dt (float): The time elapsed since the last update.
         """
-        old_angle: int = self.angle
-        old_state: str = self.state
-        
-        if self.jumping:
-            self.state = "jump"
-            if self.direction == "north":
-                self.pos.y -= (self.speed * dt)
-                self.angle = 0
-                if self.pos.y <= self.destination.y:
-                    self.pos.y = self.destination.y
-                    self.jumping = False
+        if not self.dead:
+            old_angle: int = self.angle
+            old_state: str = self.state
+            
+            if self.jumping:
+                self.state = "jump"
+                if self.direction == "north":
+                    self.pos.y -= (self.speed * dt)
+                    self.angle = 0
+                    if self.pos.y <= self.destination.y:
+                        self.pos.y = self.destination.y
+                        self.jumping = False
 
-            elif self.direction == "south":
-                self.pos.y += (self.speed * dt)
-                self.angle = 180
-                if self.pos.y >= self.destination.y:
-                    self.pos.y = self.destination.y
-                    self.jumping = False
+                elif self.direction == "south":
+                    self.pos.y += (self.speed * dt)
+                    self.angle = 180
+                    if self.pos.y >= self.destination.y:
+                        self.pos.y = self.destination.y
+                        self.jumping = False
 
-            elif self.direction == "west":
-                self.pos.x -= (self.speed * dt)
-                self.angle = 90
-                if self.pos.x <= self.destination.x:
-                    self.pos.x = self.destination.x
-                    self.jumping = False
+                elif self.direction == "west":
+                    self.pos.x -= (self.speed * dt)
+                    self.angle = 90
+                    if self.pos.x <= self.destination.x:
+                        self.pos.x = self.destination.x
+                        self.jumping = False
 
-            elif self.direction == "east":
-                self.pos.x += (self.speed * dt)
-                self.angle = 270
-                if self.pos.x >= self.destination.x:
-                    self.pos.x = self.destination.x
-                    self.jumping = False
-            self.move_collision_rect()
-        else:
-            self.state = "idle"
+                elif self.direction == "east":
+                    self.pos.x += (self.speed * dt)
+                    self.angle = 270
+                    if self.pos.x >= self.destination.x:
+                        self.pos.x = self.destination.x
+                        self.jumping = False
+                self.move_collision_rect()
+            else:
+                self.state = "idle"
 
-        if old_angle != self.angle:
-            self.rotate = True
-        
-        self.animation.update(dt)
-        if self.animation.update(dt):
-            self.state = "idle"
-            self.new_animation()
+            if old_angle != self.angle:
+                self.rotate = True
+            
             self.animation.update(dt)
-        if old_state != self.state:
-            self.new_animation()
+            if self.animation.update(dt):
+                self.state = "idle"
+                self.new_animation()
+                self.animation.update(dt)
+            if old_state != self.state:
+                self.new_animation()
 
-        if self.dead:
+        else:
             self.dead_timer += dt
+            self.animation.update(dt)
             if self.dead_timer >= stgs.FROG_DEAD_TIME:
-                self.dead = False
                 self.game.new_frog_or_game_over()
         
     def jump(self, direction: str) -> None:
@@ -142,10 +142,7 @@ class Frog:
         Args:
         surf (pg.Surface): The surface to render the frog on.
         """
-        if not self.dead:
-            self.image_to_blit = pg.transform.rotate(self.animation.get_current_image(), self.angle)
-            self.image_rect = self.image_to_blit.get_rect(center=self.pos)
-            surf.blit(self.image_to_blit, self.image_rect)
-        else:
-            surf.blit(self.image, self.image_rect)
+        self.image_to_blit = pg.transform.rotate(self.animation.get_current_image(), self.angle)
+        self.image_rect = self.image_to_blit.get_rect(center=self.pos)
+        surf.blit(self.image_to_blit, self.image_rect)
         pg.draw.rect(surf, "red", self.collision_rect, width=1)

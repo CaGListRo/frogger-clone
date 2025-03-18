@@ -54,8 +54,8 @@ class Game:
         # create animations
         self.animations: dict[Animation] = {
             "bulldozer": Animation(load_images("bulldozer/", scale_factor=0.9), animation_duration=0.4),
-            "crocodile/closed": Animation(load_images("crocodile/swimming closed", scale_factor=0.8), animation_duration=1),
-            "crocodile/open": Animation(load_images("crocodile/swimming open", scale_factor=0.8), animation_duration=1),
+            "crocodile/closed": Animation(load_images("crocodile/swimming closed/", scale_factor=0.8), animation_duration=1),
+            "crocodile/open": Animation(load_images("crocodile/swimming open/", scale_factor=0.8), animation_duration=1),
             "fly/idle": Animation(load_images("fly/idle/", scale_factor=0.8), animation_duration=0.6),
             "fly/walk": Animation(load_images("fly/walk/", scale_factor=0.8), animation_duration=0.6),
             "fly/walk/flutter": Animation(load_images("fly/walk flutter/", scale_factor=0.8), animation_duration=0.6),
@@ -63,6 +63,7 @@ class Game:
             "frog/idle": Animation(load_images("frog/idle/", scale_factor=0.85), animation_duration=1),
             "frog/jump": Animation(load_images("frog/jump/", scale_factor=0.85), animation_duration=0.4, loop=False),
             "frog/dead/street": Animation(load_images("frog/dead/street/"), animation_duration=stgs.FROG_DEAD_TIME, loop=False),
+            "frog/dead/water": Animation(load_images("frog/dead/water/"), animation_duration=stgs.FROG_DEAD_TIME, loop=False),
             "snake": Animation(load_images("snake/", scale_factor=0.8), animation_duration=0.6),
             "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1),
         }
@@ -128,10 +129,9 @@ class Game:
 
     def new_frog_or_game_over(self) -> None:
         """ Checks if a new frog can be created or if the game is over. """
-        if self.frogs > 0:
-            self.create_frog()
-            self.calculate_time_score()
+        if self.frogs > 0:  
             self.handle_time_bar()
+            self.create_frog()
         else:
             raise NotImplementedError
 
@@ -178,7 +178,7 @@ class Game:
         # collision with the snake head
         if self.snake != None:
             if self.frog.collision_rect.colliderect(self.snake.head_rect):
-                self.new_frog_or_game_over()
+                self.frog.set_dead("water")
  
         # collisions with water traffic
         collided_list: list[bool] = []
@@ -194,13 +194,14 @@ class Game:
             if self.frog.collision_rect.colliderect(rect):
                 if not self.houses[idx]:
                     self.houses[idx] = True
+                    self.calculate_time_score()
                     self.new_frog_or_game_over()
                 else:
-                    self.new_frog_or_game_over()  # needs to be changed when there is a dying animation
+                    self.frog.set_dead("water")
 
         # collision with the water
         if self.frog.pos.y < 300 and True not in collided_list:
-            self.new_frog_or_game_over()  # needs to be changed when there is a dying animation
+            self.frog.set_dead("water")
 
     def time_up(self) -> None:
         """ Is called from the time bar object, if the time is up. """
