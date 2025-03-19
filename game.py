@@ -11,6 +11,7 @@ from icecream import ic
 
 import pygame as pg
 from time import perf_counter as pc
+from random import choice
 from random import randint as ri
 import sys
 from typing import Final
@@ -70,11 +71,7 @@ class Game:
 
         self.direction_pressed: bool = False
         
-        self.clear_houses()
-        self.create_traffic()
-        self.create_water_traffic()
-        self.create_frog()
-        self.create_time_bar()
+        self.initialize_game()
 
         self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(50, 284))) for i in range(100)]
 
@@ -86,6 +83,32 @@ class Game:
 
         # test snake
         self.snake: Snake = Snake(self)
+
+    def initialize_game(self) -> None:
+        """ Initializes the game. """
+        self.clear_houses()
+        self.create_traffic()
+        self.create_water_traffic()
+        self.create_frog()
+        self.create_time_bar()
+        if stgs.CROCOS_IN_HOUSES[self.level - 1]:
+            self.get_crocodile_time()
+        if stgs.SNAKES[self.level - 1]:
+            self.get_snake_time()
+        self.get_fly_time()
+
+
+    def get_crocodile_time(self) -> None:
+        """ Sets the time of the next appearance of a crocodile in a house. """
+        self.snake_time: int | float = ri(15, 30)
+
+    def get_snake_time(self) -> None:
+        """ Sets the time of the next appearance of the snake. """
+        self.snake_time: int | float = ri(15, 30)
+
+    def get_fly_time(self) -> None:
+        """ Sets the time of the next appearance of the fly. """
+        self.fly_time: int | float = ri(10, 30)
 
     def calculate_time_score(self) -> None:
         """ Calculates the score for the remaining time. """
@@ -200,7 +223,7 @@ class Game:
                     self.frog.set_dead("water")
 
         # collision with the water
-        if self.frog.pos.y < 300 and True not in collided_list:
+        if self.frog.pos.y <= stgs.FROG_WATER_COLLISION_HEIGHT and True not in collided_list:
             self.frog.set_dead("water")
 
     def time_up(self) -> None:

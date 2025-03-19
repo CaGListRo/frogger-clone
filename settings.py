@@ -19,6 +19,8 @@ FROG_LIMITS: Final[dict[int]] = {
 
 FROG_DEAD_TIME: Final[float] = 0.6
 
+FROG_WATER_COLLISION_HEIGHT: Final[int] = 308
+
 FLY_HOUSE_CENTER_POS: Final[list[tuple[int]]] = [
     (66, 80),
     (231, 80),
@@ -31,12 +33,16 @@ WATER: Final[dict[list[int]]] = {
     "level 1": [3, 5, 2, 4, 4],  # [medium trunks, turtle pairs, large trunks, small trunks, turtle trios]
     "level 2": [3, 5, 2, 4, 4],  # [medium trunks/one crocodile, turtle pairs, large trunks, small trunks, turtle trios]
     "level 3": [2, 5, 1, 4, 4],
+    "level 4": [1, 4, 1, 3, 3],
+    "level 5": [1, 3, 1, 2, 2],
 }
 
 STREET: Final[dict[list[int]]] = {
     "level 1": [2, 1, 3, 3, 3],  # [trucks, racing cars, big cars, bulldozer, small cars]
     "level 2": [3, 2, 4, 4, 4],
-    "level 3": [3, 2, 5, 4, 4],
+    "level 3": [3, 3, 4, 4, 4],
+    "level 4": [4, 3, 5, 5, 5],
+    "level 5": [4, 4, 6, 5, 6],
 }
 
 STRIPES: Final[dict[int]] = {  # the yellow stripes on the street
@@ -77,7 +83,10 @@ SPACING: Final[dict[int]] = {
 START_SPEED: Final[dict[list[int]]] = {
     # [trunks, turtles, trunks, trunks, turtles, trucks, racing cars, cars, bulldozer, cars]
     "level 1": [50, -40, 90, 30, -40, -40, 50, -30, 40, -25],
-    "level 2": [70, -30, 50, 70, -50, -50, 90, -50, 50, -40],
+    "level 2": [70, -30, 50, 70, -50, -55, 90, -50, 50, -40],
+    "level 3": [50, -50, 60, 40, -60, -40, 100, -60, 40, -70],
+    "level 4": [80, -60, 30, 70, -40, -60, 110, -70, 30, -60],
+    "level 5": [90, -70, 70, 90, -70, -75, 130, -80, 60, -90],
 }
 
 TURTLES: Final[tuple[int]] = (2, 3)  # number of turtles that swim together (second lane = duos, fifth lane = trios)
@@ -89,13 +98,15 @@ TURTLE_SURFACE: Final[list[tuple[int]]] = [
 
 TURTLE_SPACING: Final[int] = 55
 
-CROCS_IN_HOUSES: Final[list[bool]] = [False, True, True]  # [level 1, level 2, level 3]
+CROCOS_IN_HOUSES: Final[list[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3]
+
+CROCOS_SWIMMING: Final[list[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3]
 
 HOUSE_SIZE: Final[tuple[int]] = (70, 57)
 
 HOUSE_TOP_LEFT: Final[list[tuple[int]]] = [(31, 51), (196, 51), (365, 51), (534, 51), (699, 51)]
 
-SNAKES: Final[list[bool]] = [False, False, True]  # [level 1, level 2, level 3]
+SNAKES: Final[list[bool]] = [False, False, True, True, True]  # [level 1, level 2, level 3]
 
 SNAKE_HEAD_RECT: Final[dict[tuple[int]]] = {  # Only the head of the snake is deadly for the frog
     "left": (0, 4, 14, 8),
