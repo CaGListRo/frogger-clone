@@ -68,16 +68,16 @@ LANE_HEIGHTS: Final[dict[int]] = {
 }
 
 SPACING: Final[dict[int]] = {
-    "lane 10": 350,  # medium trunk
-    "lane 9": 190,   # turtle pairs
-    "lane 8": 550,   # large trunks
-    "lane 7": 250,   # small trunks
-    "lane 6": 240,   # turtle trios
-    "lane 5": 350,   # trucks
-    "lane 4": 250,   # racing cars
-    "lane 3": 250,   # large cars
-    "lane 2": 250,   # bulldozer
-    "lane 1": 250,   # small cars
+    "lane 10": [350, 350, 400, 400, 450],  # medium trunk
+    "lane 9": [190, 190, 190, 230, 270],   # turtle pairs
+    "lane 8": [550, 550, 650, 650, 650],   # large trunks
+    "lane 7": [250, 250, 250, 300, 350],   # small trunks
+    "lane 6": [240, 240, 240, 290, 340],   # turtle trios
+    "lane 5": [350, 320, 300, 280, 260],   # trucks
+    "lane 4": [100, 100, 100, 100, 100],   # racing cars
+    "lane 3": [250, 200, 200, 150, 110],   # large cars
+    "lane 2": [250, 200, 200, 150, 130],   # bulldozer
+    "lane 1": [250, 200, 200, 150, 120],   # small cars
 }
 
 START_SPEED: Final[dict[list[int]]] = {

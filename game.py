@@ -28,7 +28,6 @@ class Game:
         self.fps: int = 0
 
         self.level: int = 1
-        self.frogs: int = 7
         self.score: int = 0
 
         # fonts
@@ -86,6 +85,7 @@ class Game:
 
     def initialize_game(self) -> None:
         """ Initializes the game. """
+        self.frogs: int = 7
         self.clear_houses()
         self.create_traffic()
         self.create_water_traffic()
@@ -126,11 +126,11 @@ class Game:
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """
         self.water_traffic: list[Animation | pg.Surface] = [
-            [Tree(self, 750 - i * stgs.SPACING["lane 10"], stgs.LANE_HEIGHTS["lane 10"], "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
-            [Turtle(self, 150 + i * stgs.SPACING["lane 9"], stgs.LANE_HEIGHTS["lane 9"], 1)  for i in range(stgs.WATER[f"level {self.level}"][1])],
-            [Tree(self, 650 - i * stgs.SPACING["lane 8"], stgs.LANE_HEIGHTS["lane 8"], "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
-            [Tree(self, 450 - i * stgs.SPACING["lane 7"], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
-            [Turtle(self, 250 + i * stgs.SPACING["lane 6"], stgs.LANE_HEIGHTS["lane 6"], 4) for i in range(stgs.WATER[f"level {self.level}"][4])],
+            [Tree(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
+            [Turtle(self, 150 + i * stgs.SPACING["lane 9"][self.level - 1], stgs.LANE_HEIGHTS["lane 9"], 1)  for i in range(stgs.WATER[f"level {self.level}"][1])],
+            [Tree(self, 650 - i * stgs.SPACING["lane 8"][self.level - 1], stgs.LANE_HEIGHTS["lane 8"], "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
+            [Tree(self, 450 - i * stgs.SPACING["lane 7"][self.level - 1], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
+            [Turtle(self, 250 + i * stgs.SPACING["lane 6"][self.level - 1], stgs.LANE_HEIGHTS["lane 6"], 4) for i in range(stgs.WATER[f"level {self.level}"][4])],
         ]
 
     def create_time_bar(self) -> None:
@@ -140,11 +140,11 @@ class Game:
     def create_traffic(self) -> None:
         """ Creates traffic on the road. """
         self.traffic: list[Animation | pg.Surface] = [
-            [Truck(self, 700 - i * stgs.SPACING["lane 5"], stgs.LANE_HEIGHTS["lane 5"]) for i in range(stgs.STREET[f"level {self.level}"][0])],
-            [RacingCar(self, 400 - i * stgs.SPACING["lane 4"], stgs.LANE_HEIGHTS["lane 4"]) for i in range(stgs.STREET[f"level {self.level}"][1])],
-            [LargeCar(self, 800 - i * stgs.SPACING["lane 3"], stgs.LANE_HEIGHTS["lane 3"]) for i in range(stgs.STREET[f"level {self.level}"][2])],
-            [Bulldozer(self, 400 - i * stgs.SPACING["lane 2"], stgs.LANE_HEIGHTS["lane 2"]) for i in range(stgs.STREET[f"level {self.level}"][3])],
-            [SmallCar(self, 600 - i * stgs.SPACING["lane 1"], stgs.LANE_HEIGHTS["lane 1"]) for i in range(stgs.STREET[f"level {self.level}"][4])],]
+            [Truck(self, 700 - i * stgs.SPACING["lane 5"][self.level - 1], stgs.LANE_HEIGHTS["lane 5"]) for i in range(stgs.STREET[f"level {self.level}"][0])],
+            [RacingCar(self, 400 - i * stgs.SPACING["lane 4"][self.level - 1], stgs.LANE_HEIGHTS["lane 4"]) for i in range(stgs.STREET[f"level {self.level}"][1])],
+            [LargeCar(self, 800 - i * stgs.SPACING["lane 3"][self.level - 1], stgs.LANE_HEIGHTS["lane 3"]) for i in range(stgs.STREET[f"level {self.level}"][2])],
+            [Bulldozer(self, 400 - i * stgs.SPACING["lane 2"][self.level - 1], stgs.LANE_HEIGHTS["lane 2"]) for i in range(stgs.STREET[f"level {self.level}"][3])],
+            [SmallCar(self, 600 - i * stgs.SPACING["lane 1"][self.level - 1], stgs.LANE_HEIGHTS["lane 1"]) for i in range(stgs.STREET[f"level {self.level}"][4])],]
 
     def clear_houses(self) -> None:
         """ Clears the houses list. """
@@ -218,13 +218,24 @@ class Game:
                 if not self.houses[idx]:
                     self.houses[idx] = True
                     self.calculate_time_score()
-                    self.new_frog_or_game_over()
+                    if False in self.houses:
+                        self.new_frog_or_game_over()
+                    else:
+                        self.proceed_level()
                 else:
                     self.frog.set_dead("water")
 
         # collision with the water
         if self.frog.pos.y <= stgs.FROG_WATER_COLLISION_HEIGHT and True not in collided_list:
             self.frog.set_dead("water")
+
+    def proceed_level(self) -> None:
+        """ Proceeds to the next level. """
+        if self.level < 5:
+            self.level += 1
+            self.initialize_game()
+        else:
+            raise NotImplementedError
 
     def time_up(self) -> None:
         """ Is called from the time bar object, if the time is up. """

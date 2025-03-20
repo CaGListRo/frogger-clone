@@ -142,7 +142,8 @@ class Frog:
         Args:
         surf (pg.Surface): The surface to render the frog on.
         """
-        self.image_to_blit = pg.transform.rotate(self.animation.get_current_image(), self.angle)
-        self.image_rect = self.image_to_blit.get_rect(center=self.pos)
-        surf.blit(self.image_to_blit, self.image_rect)
+        if isinstance(self.animation.get_current_image(), pg.Surface):
+            self.image_to_blit = pg.transform.rotate(self.animation.get_current_image(), self.angle)
+            self.image_rect = self.image_to_blit.get_rect(center=self.pos)
+            surf.blit(self.image_to_blit, self.image_rect)
         pg.draw.rect(surf, "red", self.collision_rect, width=1)

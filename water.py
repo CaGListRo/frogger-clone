@@ -166,5 +166,15 @@ class Ripple:
         surf.blit(self.image, (int(self.pos.x), int(self.pos.y)))
 
 
-class Crocodile:
+class LaneCrocodile:
     pass
+
+
+class HouseCrocodile:
+    def __init__(self, game: Game, house: int) -> None:
+        """
+        Initialize a house crocodile object.
+        Args:
+        game (Game): The game instance.
+        house (int): The number of the house in which the crocodile should appear.
+        """
