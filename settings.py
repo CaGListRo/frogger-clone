@@ -21,6 +21,8 @@ FROG_DEAD_TIME: Final[float] = 0.6
 
 FROG_WATER_COLLISION_HEIGHT: Final[int] = 308
 
+SHOW_FROG_TIME: Final[float] = 3.0
+
 FLY_HOUSE_CENTER_POS: Final[list[tuple[int]]] = [
     (66, 80),
     (231, 80),

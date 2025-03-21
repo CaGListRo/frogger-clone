@@ -28,6 +28,9 @@ class Game:
         self.fps: int = 0
 
         self.level: int = 1
+        self.frog_time: int = 0                      # this ist the time one frog needed from the start to "his" house
+        self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
+        self.show_time: float = stgs.SHOW_FROG_TIME  # how long the frog time is shown
         self.score: int = 0
 
         # fonts
@@ -219,6 +222,8 @@ class Game:
                     self.houses[idx] = True
                     self.calculate_time_score()
                     if False in self.houses:
+                        self.frog_time = 60 - self.time_bar.get_time()
+                        self.show_frog_time = True
                         self.new_frog_or_game_over()
                     else:
                         self.proceed_level()
@@ -300,6 +305,19 @@ class Game:
             for vehicle in lane:
                 vehicle.update(dt)
 
+    def update_variables(self, dt: float) -> None:
+        """
+        Updates all variables in the game.
+        Args:
+        dt (float): The time since the last update.
+        """
+        # update frog time
+        if self.show_frog_time:
+            self.show_time -= dt
+            if self.show_time <= 0:
+                self.show_frog_time = False
+                self.show_time = stgs.SHOW_FROG_TIME
+
     def draw_screen(self) -> None:
         """ Draws the game screen. """
         pg.display.set_caption(f"     F R O G G E R - C L O N E          FPS:{self.fps}")
@@ -315,12 +333,19 @@ class Game:
         # draw stripes
         for i in range(4):
             for j in range(55):
-                self.screen.blit(self.images["stripe"], (stgs.STRIPES["x start"] + j * stgs.STRIPES["x spacing"], stgs.STRIPES["y start"] + i * stgs.STRIPES["y spacing"]))
+                pos: tuple[int] = (stgs.STRIPES["x start"] + j * stgs.STRIPES["x spacing"], 
+                                   stgs.STRIPES["y start"] + i * stgs.STRIPES["y spacing"])
+                self.screen.blit(self.images["stripe"], pos)
         # draw water traffic
         for lane in self.water_traffic:
             for element in lane:
                 element.render(self.screen)
-
+        # draw frog time
+        if self.show_frog_time:
+            time_to_blit: pg.Surface = self.score_font.render(f"{int(self.frog_time)} Seconds", True, "white", "black")
+            pos: tuple[int] = (int(stgs.WINDOW_SIZE[0] // 2 - time_to_blit.get_width() // 2), 
+                               int(stgs.WINDOW_SIZE[1] // 2 - time_to_blit.get_height() // 2))
+            self.screen.blit(time_to_blit, pos)
         # draw frog
         self.frog.render(self.screen)
         # draw traffic
@@ -373,6 +398,7 @@ class Game:
                 fps_counter = 0
                 fps_timer = 0.0
 
+            self.update_variables(dt)
             self.update_objects(dt)
             self.check_collisions()
             if self.frog.pos.y <= 333:
