@@ -4,7 +4,7 @@ WINDOW_SIZE: Final[tuple[int]] = (800, 700)
 
 FROG_START_POS: Final[tuple[int]] = (400, 605)
 
-FROG_COLLISION_RECT: Final[tuple[int]] = (34, 34)
+FROG_COLLISION_RECT: Final[tuple[int]] = (32, 32)
 
 FROG_HALF_RECT_SIZE: Final[int] = int(FROG_COLLISION_RECT[0] / 2)
 
@@ -107,6 +107,8 @@ CROCOS_SWIMMING: Final[list[bool]] = [False, True, True, True, True]  # [level 1
 HOUSE_SIZE: Final[tuple[int]] = (70, 57)
 
 HOUSE_TOP_LEFT: Final[list[tuple[int]]] = [(31, 51), (196, 51), (365, 51), (534, 51), (699, 51)]
+
+GRAS_RECTS: Final[list[tuple]] = [(0, 99, 31, 9), (102, 99, 93, 9), (266, 99, 97, 9), (436, 99 ,97, 9), (605, 99, 93, 9), (770, 99, 800, 9)]
 
 SNAKES: Final[list[bool]] = [False, False, True, True, True]  # [level 1, level 2, level 3]
 

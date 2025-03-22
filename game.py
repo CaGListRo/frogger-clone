@@ -75,13 +75,13 @@ class Game:
         
         self.initialize_game()
 
-        self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(50, 284))) for i in range(100)]
-
         self.house_rects: list[pg.Rect] = [pg.Rect(stgs.HOUSE_TOP_LEFT[0][0], stgs.HOUSE_TOP_LEFT[0][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
                                            pg.Rect(stgs.HOUSE_TOP_LEFT[1][0], stgs.HOUSE_TOP_LEFT[1][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
                                            pg.Rect(stgs.HOUSE_TOP_LEFT[2][0], stgs.HOUSE_TOP_LEFT[2][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
                                            pg.Rect(stgs.HOUSE_TOP_LEFT[3][0], stgs.HOUSE_TOP_LEFT[3][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
                                            pg.Rect(stgs.HOUSE_TOP_LEFT[4][0], stgs.HOUSE_TOP_LEFT[4][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),]
+        
+        self.gras_rects: list[pg.Rect] = [pg.Rect(element) for element in stgs.GRAS_RECTS]
 
         # test snake
         self.snake: Snake = Snake(self)
@@ -90,6 +90,7 @@ class Game:
         """ Initializes the game. """
         self.frogs: int = 7
         self.clear_houses()
+        self.create_ripples()
         self.create_traffic()
         self.create_water_traffic()
         self.create_frog()
@@ -99,7 +100,6 @@ class Game:
         if stgs.SNAKES[self.level - 1]:
             self.get_snake_time()
         self.get_fly_time()
-
 
     def get_crocodile_time(self) -> None:
         """ Sets the time of the next appearance of a crocodile in a house. """
@@ -120,6 +120,10 @@ class Game:
     def create_new_ripple(self) -> None:
         """ Creates a new ripple at a random y-position. """
         self.ripples.append(Ripple(self, pos=(-10, ri(25, 258))))
+
+    def create_ripples(self) -> None:
+        """ Creates a list of ripples. """
+        self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(50, 284))) for i in range(100)]
 
     def create_frog(self) -> None:
         """ Creates a frog at the start position. """
@@ -215,9 +219,14 @@ class Game:
                 if collided:
                     self.handle_water_traffic_collision(element, lane_index, element_index)
         
+        # collision with the gras around the houses -> death of one frog
+        for gras_rect in self.gras_rects:
+            if self.frog.collision_rect.colliderect(gras_rect):
+                self.frog.set_dead("water")
+
         # collision with the house rects
         for idx, rect in enumerate(self.house_rects):
-            if self.frog.collision_rect.colliderect(rect):
+            if self.frog.collision_rect.colliderect(rect) and not self.frog.dead:
                 if not self.houses[idx]:
                     self.houses[idx] = True
                     self.calculate_time_score()
@@ -373,6 +382,9 @@ class Game:
         for i in range(self.frogs):
             self.screen.blit(self.images["frog/life"], (10 + i * 32, stgs.FROG_DRAW_HEIGHT))
 
+        # showing gras rects for testing
+        for gras_rect in self.gras_rects:
+            pg.draw.rect(self.screen, "darkorange", gras_rect, width=1)
 
         # draw time bar
         self.time_bar.render(self.screen)
