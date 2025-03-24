@@ -4,7 +4,7 @@ WINDOW_SIZE: Final[tuple[int]] = (800, 700)
 
 FROG_START_POS: Final[tuple[int]] = (400, 605)
 
-FROG_COLLISION_RECT: Final[tuple[int]] = (32, 32)
+FROG_COLLISION_RECT: Final[tuple[int]] = (30, 30)
 
 FROG_HALF_RECT_SIZE: Final[int] = int(FROG_COLLISION_RECT[0] / 2)
 
