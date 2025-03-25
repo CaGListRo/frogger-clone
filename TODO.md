@@ -1,6 +1,6 @@
 - more levels in settings.py. Highest level 5? **(Done, but needs testing)**
 
-- check for collisions with the gras around the houses -> "death" of one frog
+- check for collisions with the gras around the houses -> "death" of one frog **done**
 
 - make the snake appear continuously in the middle zone (level 3 or higher)
 - make snakes appear on tree trunks on lane 7 (or 8?) (level 3 or higher)

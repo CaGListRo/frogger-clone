@@ -69,6 +69,7 @@ class Game:
             "frog/dead/water": Animation(load_images("frog/dead/water/"), animation_duration=stgs.FROG_DEAD_TIME, loop=False),
             "snake": Animation(load_images("snake/", scale_factor=0.8), animation_duration=0.6),
             "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1),
+            "turtle/diving": Animation(load_images("turtle/diving/", scale_factor=0.9), animation_duration=3, loop=False),
         }
 
         self.direction_pressed: bool = False
@@ -132,12 +133,15 @@ class Game:
 
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """
+        sinking_pair: int = ri(0, stgs.WATER[f"level {self.level}"][1] - 1)
+        sinking_trio: int = ri(0, stgs.WATER[f"level {self.level}"][4] - 1)
+
         self.water_traffic: list[Animation | pg.Surface] = [
             [Tree(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
-            [Turtle(self, 150 + i * stgs.SPACING["lane 9"][self.level - 1], stgs.LANE_HEIGHTS["lane 9"], 1)  for i in range(stgs.WATER[f"level {self.level}"][1])],
+            [Turtle(self, 150 + i * stgs.SPACING["lane 9"][self.level - 1], stgs.LANE_HEIGHTS["lane 9"], 1, True if i == sinking_pair else False)  for i in range(stgs.WATER[f"level {self.level}"][1])],
             [Tree(self, 650 - i * stgs.SPACING["lane 8"][self.level - 1], stgs.LANE_HEIGHTS["lane 8"], "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
             [Tree(self, 450 - i * stgs.SPACING["lane 7"][self.level - 1], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
-            [Turtle(self, 250 + i * stgs.SPACING["lane 6"][self.level - 1], stgs.LANE_HEIGHTS["lane 6"], 4) for i in range(stgs.WATER[f"level {self.level}"][4])],
+            [Turtle(self, 250 + i * stgs.SPACING["lane 6"][self.level - 1], stgs.LANE_HEIGHTS["lane 6"], 4, True if i == sinking_trio else False) for i in range(stgs.WATER[f"level {self.level}"][4])],
         ]
 
     def create_time_bar(self) -> None:

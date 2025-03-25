@@ -71,8 +71,9 @@ class Turtle:
         self.pos: pg.Vector2 = pg.Vector2((x, y))
         self.speed: int = stgs.START_SPEED[f"level {self.game.level}"][lane]
         self.sinkable: bool = sinkable  # the general ability to dive
+        self.state: str = "swimming"
         self.diving: bool = False     # if it is actually diving
-        self.animation: Animation = self.game.animations["turtle/swimming"].copy()
+        self.get_new_animation()
         
         image_to_blit: pg.Surface = self.animation.get_current_image()
         surface_selector: int = 0 if lane == 1 else 1
@@ -83,13 +84,37 @@ class Turtle:
         
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
 
+        if self.sinkable:
+            self.dive_timer: int | float = stgs.TURTLE_DIVE_TIME[self.game.level - 1]
+            self.carry_timer: int | float = stgs.TURTLE_FROG_CARRY_TIME
+
+    def get_new_animation(self) -> None:
+        """ Get a new animation for the turtle. """
+        self.animation: Animation = self.game.animations[f"turtle/{self.state}"].copy()
+
     def update(self, dt: float) -> None:
         """
         Update the turtle's position.
         Args:
         dt (float): The time difference since the last update.
         """
-        self.animation.update(dt)
+        old_state: str = self.state
+        if self.sinkable:
+            self.dive_timer -= dt
+            if self.dive_timer <= 0:
+                self.state = "diving"
+                self.carry_timer -= dt
+                if self.carry_timer <= 0:
+                    self.diving = True if not self.diving else False
+                    self.carry_timer = stgs.TURTLE_FROG_CARRY_TIME
+        
+        if self.animation.update(dt):
+            self.state = "swimming"
+            self.diving = False
+            self.dive_timer = stgs.TURTLE_DIVE_TIME[self.game.level - 1]
+        if old_state != self.state:
+            self.get_new_animation()
+
         self.image.fill(self.TRANSPARENT_COLOR)
         image_to_blit: pg.Surface = self.animation.get_current_image()
         self.draw_image(image_to_blit=image_to_blit)
@@ -121,7 +146,7 @@ class Turtle:
         surf (pg.Surface): The surface to render the turtle on.
         """
         surf.blit(self.image, self.rect)
-        pg.draw.rect(surf, "red", self.rect, width=2)
+        #pg.draw.rect(surf, "red", self.rect, width=2)
 
 
 class Ripple:

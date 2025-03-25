@@ -100,9 +100,13 @@ TURTLE_SURFACE: Final[list[tuple[int]]] = [
 
 TURTLE_SPACING: Final[int] = 55
 
-CROCOS_IN_HOUSES: Final[list[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3]
+TURTLE_DIVE_TIME: Final[list[int]] = [7, 6, 5, 4, 3]  # in seconds  # [level 1, level 2, level 3, level 4, level 5]
 
-CROCOS_SWIMMING: Final[list[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3]
+TURTLE_FROG_CARRY_TIME: Final[int] = 1
+
+CROCOS_IN_HOUSES: Final[list[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
+
+CROCOS_SWIMMING: Final[list[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
 
 HOUSE_SIZE: Final[tuple[int]] = (70, 57)
 
@@ -110,7 +114,7 @@ HOUSE_TOP_LEFT: Final[list[tuple[int]]] = [(31, 51), (196, 51), (365, 51), (534,
 
 GRAS_RECTS: Final[list[tuple]] = [(0, 99, 31, 9), (102, 99, 93, 9), (266, 99, 97, 9), (436, 99 ,97, 9), (605, 99, 93, 9), (770, 99, 800, 9)]
 
-SNAKES: Final[list[bool]] = [False, False, True, True, True]  # [level 1, level 2, level 3]
+SNAKES: Final[list[bool]] = [False, False, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
 
 SNAKE_HEAD_RECT: Final[dict[tuple[int]]] = {  # Only the head of the snake is deadly for the frog
     "left": (0, 4, 14, 8),
