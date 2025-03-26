@@ -86,7 +86,7 @@ class Turtle:
 
         if self.sinkable:
             self.dive_timer: int | float = stgs.TURTLE_DIVE_TIME[self.game.level - 1]
-            self.carry_timer: int | float = stgs.TURTLE_FROG_CARRY_TIME
+            self.carry_timer: int | float = stgs.TURTLE_FROG_CARRY_TIME[0]
 
     def get_new_animation(self) -> None:
         """ Get a new animation for the turtle. """
@@ -106,7 +106,8 @@ class Turtle:
                 self.carry_timer -= dt
                 if self.carry_timer <= 0:
                     self.diving = True if not self.diving else False
-                    self.carry_timer = stgs.TURTLE_FROG_CARRY_TIME
+                    time_selector: int = 1 if self.diving else 0
+                    self.carry_timer = stgs.TURTLE_FROG_CARRY_TIME[time_selector]
         
         if self.animation.update(dt):
             self.state = "swimming"
@@ -146,7 +147,8 @@ class Turtle:
         surf (pg.Surface): The surface to render the turtle on.
         """
         surf.blit(self.image, self.rect)
-        #pg.draw.rect(surf, "red", self.rect, width=2)
+        if not self.diving:
+            pg.draw.rect(surf, "red", self.rect, width=2)
 
 
 class Ripple:

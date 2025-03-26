@@ -218,8 +218,13 @@ class Game:
         collided_list: list[bool] = []
         for lane_index, lane in enumerate(self.water_traffic):
             for element_index, element in enumerate(lane):
-                collided: bool = self.frog.collision_rect.colliderect(element.rect)
-                collided_list.append(collided)
+                if lane_index == 1 or lane_index == 4:  # lane_index 1 and 4 are the turtles
+                    if not element.diving:
+                        collided: bool = self.frog.collision_rect.colliderect(element.rect)
+                        collided_list.append(collided)
+                else:
+                    collided: bool = self.frog.collision_rect.colliderect(element.rect)
+                    collided_list.append(collided)
                 if collided:
                     self.handle_water_traffic_collision(element, lane_index, element_index)
         

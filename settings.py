@@ -102,7 +102,7 @@ TURTLE_SPACING: Final[int] = 55
 
 TURTLE_DIVE_TIME: Final[list[int]] = [7, 6, 5, 4, 3]  # in seconds  # [level 1, level 2, level 3, level 4, level 5]
 
-TURTLE_FROG_CARRY_TIME: Final[int] = 1
+TURTLE_FROG_CARRY_TIME: Final[tuple[float]] = (0.75, 1.5)
 
 CROCOS_IN_HOUSES: Final[list[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
 
