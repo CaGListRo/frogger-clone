@@ -31,6 +31,10 @@ FLY_HOUSE_CENTER_POS: Final[list[tuple[int]]] = [
     (734, 80)
 ]
 
+FLY_STATE_TIMER: Final[float] = 1.0
+
+FLY_STAY_TIME: Final[float] = 5.0
+
 WATER: Final[dict[list[int]]] = {
     "level 1": [3, 5, 2, 4, 4],  # [medium trunks, turtle pairs, large trunks, small trunks, turtle trios]
     "level 2": [3, 5, 2, 4, 4],  # [medium trunks/one crocodile, turtle pairs, large trunks, small trunks, turtle trios]

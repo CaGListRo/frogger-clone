@@ -2,6 +2,7 @@ from utils import load_image, load_images
 from utils import Animation
 import settings as stgs
 from snake import Snake
+from fly import HouseFly
 from frog import Frog
 from vehicle import Truck, RacingCar, LargeCar, Bulldozer, SmallCar
 from water import Tree, Turtle, Ripple
@@ -84,8 +85,9 @@ class Game:
         
         self.gras_rects: list[pg.Rect] = [pg.Rect(element) for element in stgs.GRAS_RECTS]
 
-        # test snake
-        self.snake: Snake = Snake(self)
+        # entities
+        self.snake: Snake = None
+        self.house_fly: HouseFly = None
 
     def initialize_game(self) -> None:
         """ Initializes the game. """
@@ -112,7 +114,8 @@ class Game:
 
     def get_fly_time(self) -> None:
         """ Sets the time of the next appearance of the fly. """
-        self.fly_time: int | float = ri(10, 30)
+        self.fly_time: int | float = ri(5, 6)
+        ic(self.fly_time)
 
     def calculate_time_score(self) -> None:
         """ Calculates the score for the remaining time. """
@@ -125,6 +128,10 @@ class Game:
     def create_ripples(self) -> None:
         """ Creates a list of ripples. """
         self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(50, 284))) for i in range(100)]
+
+    def create_fly(self) -> None:
+        """ Creates a fly in a random house. """
+        self.house_fly = HouseFly(self, stgs.FLY_HOUSE_CENTER_POS[ri(0, 4)])
 
     def create_frog(self) -> None:
         """ Creates a frog at the start position. """
@@ -310,11 +317,15 @@ class Game:
         for ripple in self.ripples:
             ripple.update(dt)
         # update test snake
-        self.snake.update(dt)
+        if self.snake:
+            self.snake.update(dt)
         # update the water traffic
         for lane in self.water_traffic:
             for element in lane:
                 element.update(dt)
+        # update house fly
+        if self.house_fly:
+            self.house_fly.update(dt)
 
         # update the frog
         self.frog.update(dt)
@@ -335,6 +346,13 @@ class Game:
             if self.show_time <= 0:
                 self.show_frog_time = False
                 self.show_time = stgs.SHOW_FROG_TIME
+
+        # update fly time
+        ic(self.fly_time)
+        self.fly_time -= dt
+        if self.fly_time <= 0:
+            self.create_fly()
+            self.get_fly_time()
 
     def draw_screen(self) -> None:
         """ Draws the game screen. """
@@ -364,6 +382,9 @@ class Game:
             pos: tuple[int] = (int(stgs.WINDOW_SIZE[0] // 2 - time_to_blit.get_width() // 2), 
                                int(stgs.WINDOW_SIZE[1] // 2 - time_to_blit.get_height() // 2))
             self.screen.blit(time_to_blit, pos)
+        # draw house fly
+        if self.house_fly:
+            self.house_fly.render(self.screen)
         # draw frog
         self.frog.render(self.screen)
         # draw traffic
@@ -371,7 +392,8 @@ class Game:
             for vehicle in lane:
                 vehicle.render(self.screen)
         # draw snake
-        self.snake.render(self.screen)
+        if self.snake:
+            self.snake.render(self.screen)
         # draw houses
         self.screen.blit(self.images["houses"], (0, 26))
         # draw house rects for test
