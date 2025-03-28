@@ -8,6 +8,7 @@ from icecream import ic
 Animation = TypeVar("Animation")
 Game = TypeVar("Game")
 
+
 class Tree:
     def __init__(self, game: Game, x: int, y: int, size: str, lane: int) -> None:
         """
@@ -203,5 +204,11 @@ class HouseCrocodile:
         Initialize a house crocodile object.
         Args:
         game (Game): The game instance.
-        house (int): The number of the house in which the crocodile should appear.
+        house (int): The number of the house in which the crocodile should appear (0-4).
         """
+        self.image: pg.Surface = game.images["house crocodile"]
+        self.pos: pg.Vector2 = pg.Vector2(stgs.HOUSE_CROCO_POS[house][0], stgs.HOUSE_CROCO_POS[house][1])
+        self.end_pos: int = stgs.HOUSE_CROCO_POS[house][2]
+        self.waiting_time: float = stgs.HOUSE_CROCO_WAITING_TIME[game.level - 1]
+        self.staying_time: float = stgs.HOUSE_CROCO_STAYING_TIME[game.level - 1]
+        self.rect: pg.Rect = pg.Rect(self.pos[0] - 25, self.pos[1] - 22, 50, 44)

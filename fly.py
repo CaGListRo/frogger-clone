@@ -40,7 +40,6 @@ class HouseFly:
         self.get_current_image()
         self.stay_time -= dt
         if self.stay_time <= 0:
-            #del self
             self.game.house_fly = None
         
     def get_animation(self) -> None:

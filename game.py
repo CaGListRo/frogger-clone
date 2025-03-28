@@ -1,11 +1,11 @@
 from utils import load_image, load_images
 from utils import Animation
 import settings as stgs
-from snake import Snake
+from snake import MiddleSnake
 from fly import HouseFly
 from frog import Frog
 from vehicle import Truck, RacingCar, LargeCar, Bulldozer, SmallCar
-from water import Tree, Turtle, Ripple
+from water import Tree, Turtle, Ripple, HouseCrocodile, LaneCrocodile
 from time_bar import TimeBar
 
 from icecream import ic
@@ -60,10 +60,10 @@ class Game:
             "bulldozer": Animation(load_images("bulldozer/", scale_factor=0.9), animation_duration=0.4),
             "crocodile/closed": Animation(load_images("crocodile/swimming closed/", scale_factor=0.8), animation_duration=1),
             "crocodile/open": Animation(load_images("crocodile/swimming open/", scale_factor=0.8), animation_duration=1),
-            "fly/idle": Animation(load_images("fly/idle/", scale_factor=0.8), animation_duration=0.6),
-            "fly/walk": Animation(load_images("fly/walk/", scale_factor=0.8), animation_duration=0.6),
-            "fly/walk/flutter": Animation(load_images("fly/walk flutter/", scale_factor=0.8), animation_duration=0.6),
-            "fly/flutter": Animation(load_images("fly/flutter/", scale_factor=0.8), animation_duration=0.6),
+            "fly/idle": Animation(load_images("fly/idle/", scale_factor=0.8), animation_duration=0.8),
+            "fly/walk": Animation(load_images("fly/walk/", scale_factor=0.8), animation_duration=0.8),
+            "fly/walk/flutter": Animation(load_images("fly/walk flutter/", scale_factor=0.8), animation_duration=0.8),
+            "fly/flutter": Animation(load_images("fly/flutter/", scale_factor=0.8), animation_duration=0.8),
             "frog/idle": Animation(load_images("frog/idle/", scale_factor=0.85), animation_duration=1),
             "frog/jump": Animation(load_images("frog/jump/", scale_factor=0.85), animation_duration=0.4, loop=False),
             "frog/dead/street": Animation(load_images("frog/dead/street/"), animation_duration=stgs.FROG_DEAD_TIME, loop=False),
@@ -86,9 +86,10 @@ class Game:
         self.gras_rects: list[pg.Rect] = [pg.Rect(element) for element in stgs.GRAS_RECTS]
 
         # entities
-        self.snake: Snake = None
-        self.house_fly: HouseFly = None
-
+        self.house_crocodile: None | HouseCrocodile = None
+        self.house_fly: None | HouseFly = None
+        self.middle_snake: None | MiddleSnake = None
+        
     def initialize_game(self) -> None:
         """ Initializes the game. """
         self.frogs: int = 7
@@ -216,7 +217,7 @@ class Game:
                     self.frog.set_dead("street")
 
         # collision with the snake head
-        if self.snake != None:
+        if self.middle_snake != None:
             if self.frog.collision_rect.colliderect(self.snake.head_rect):
                 self.frog.set_dead("water")
  
@@ -319,8 +320,8 @@ class Game:
         for ripple in self.ripples:
             ripple.update(dt)
         # update test snake
-        if self.snake:
-            self.snake.update(dt)
+        if self.middle_snake:
+            self.middle_snake.update(dt)
         # update the water traffic
         for lane in self.water_traffic:
             for element in lane:
@@ -393,13 +394,14 @@ class Game:
             for vehicle in lane:
                 vehicle.render(self.screen)
         # draw snake
-        if self.snake:
-            self.snake.render(self.screen)
+        if self.middle_snake:
+            self.middle_snake.render(self.screen)
         # draw houses
         self.screen.blit(self.images["houses"], (0, 26))
         # draw house rects for test
         for rect in self.house_rects:
             pg.draw.rect(self.screen, "red", rect, width=1)
+
         # render and blit score
         score_shadow: pg.Surface = self.score_font.render(f"Score: {str(self.score)}", True, "black")
         score_to_blit: pg.Surface = self.score_font.render(f"Score: {str(self.score)}", True, "white")
@@ -417,7 +419,7 @@ class Game:
         # showing gras rects for testing
         for gras_rect in self.gras_rects:
             pg.draw.rect(self.screen, "darkorange", gras_rect, width=1)
-
+            
         # draw time bar
         self.time_bar.render(self.screen)
         

@@ -9,10 +9,14 @@ Game = TypeVar("Game")
 Animation = TypeVar("Animation")
 
 
-class Snake:
+class MiddleSnake:
     TRANSPARENT_COLOR: Final[tuple[int]] = (0, 0, 0, 0)
     def __init__(self, game: Game, position: str = "green") -> None:
-        """ Initializes an snake object. """
+        """
+        Initializes an snake object.
+        Args:
+        game: The game object.
+        """
         self.animation: Animation = game.animations["snake"].copy()
         image_to_blit: pg.Surface = self.animation.get_current_image()
         image_size: tuple[int] = image_to_blit.get_size()

@@ -117,6 +117,18 @@ CROCOS_IN_HOUSES: Final[list[bool]] = [False, True, True, True, True]  # [level 
 
 CROCOS_SWIMMING: Final[list[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
 
+HOUSE_CROCO_POS: Final[list[tuple[int]]] = [
+    (-39, 80, 66),
+    (166, 80, 231),
+    (335, 80, 400),
+    (504, 80, 569),
+    (669, 80, 734),
+]
+
+HOUSE_CROCO_WAITING_TIME: Final[list[float]] = [2.5, 2.0, 1.5, 1.0, 0.5]  # [level 1, level 2, level 3, level 4, level 5]
+
+HOUSE_CROCO_STAYING_TIME: Final[list[float]] = [3.0, 3.5, 4.0, 4.5, 5.0]  # [level 1, level 2, level 3, level 4, level 5]
+
 HOUSE_SIZE: Final[tuple[int]] = (70, 57)
 
 HOUSE_TOP_LEFT: Final[list[tuple[int]]] = [(31, 51), (196, 51), (365, 51), (534, 51), (699, 51)]
