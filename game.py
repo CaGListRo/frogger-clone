@@ -114,8 +114,7 @@ class Game:
 
     def get_fly_time(self) -> None:
         """ Sets the time of the next appearance of the fly. """
-        self.fly_time: int | float = ri(5, 6)
-        ic(self.fly_time)
+        self.fly_time: int | float = ri(10, 30)
 
     def calculate_time_score(self) -> None:
         """ Calculates the score for the remaining time. """
@@ -246,8 +245,11 @@ class Game:
                 if not self.houses[idx]:
                     self.houses[idx] = True
                     self.calculate_time_score()
+                    if self.house_fly:
+                        if self.house_rects[idx].colliderect(self.house_fly.rect):
+                            self.score += stgs.FLY_SCORES["house fly"]
                     if False in self.houses:
-                        self.frog_time = 60 - self.time_bar.get_time()
+                        self.frog_time = 60 - self.time_bar.get_time()  # the time the frog needed to get home
                         self.show_frog_time = True
                         self.new_frog_or_game_over()
                     else:
@@ -348,7 +350,6 @@ class Game:
                 self.show_time = stgs.SHOW_FROG_TIME
 
         # update fly time
-        ic(self.fly_time)
         self.fly_time -= dt
         if self.fly_time <= 0:
             self.create_fly()
