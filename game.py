@@ -28,7 +28,7 @@ class Game:
         self.running: bool = True
         self.fps: int = 0
 
-        self.level: int = 1
+        self.level: int = 2
         self.frog_time: int = 0                      # this ist the time one frog needed from the start to "his" house
         self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
         self.show_time: float = stgs.SHOW_FROG_TIME  # how long the frog time is shown
@@ -107,7 +107,7 @@ class Game:
 
     def get_crocodile_time(self) -> None:
         """ Sets the time of the next appearance of a crocodile in a house. """
-        self.snake_time: int | float = ri(15, 30)
+        self.crocodile_time: int | float = ri(15, 30)
 
     def get_snake_time(self) -> None:
         """ Sets the time of the next appearance of the snake. """
@@ -129,7 +129,11 @@ class Game:
         """ Creates a list of ripples. """
         self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(50, 284))) for i in range(100)]
 
-    def create_fly(self) -> None:
+    def create_house_crocodile(self) -> None:
+        """ Creates a crocodile in a random house. """
+        self.house_crocodile = HouseCrocodile(self, ri(0, 4))
+
+    def create_house_fly(self) -> None:
         """ Creates a fly in a random house. """
         self.house_fly = HouseFly(self, stgs.FLY_HOUSE_CENTER_POS[ri(0, 4)])
 
@@ -329,6 +333,9 @@ class Game:
         # update house fly
         if self.house_fly:
             self.house_fly.update(dt)
+        # update house crocodile
+        if self.house_crocodile:
+            self.house_crocodile.update(dt)
 
         # update the frog
         self.frog.update(dt)
@@ -353,8 +360,15 @@ class Game:
         # update fly time
         self.fly_time -= dt
         if self.fly_time <= 0:
-            self.create_fly()
+            self.create_house_fly()
             self.get_fly_time()
+
+        # update crocodile time if there is a crocodile in the level
+        if stgs.CROCOS_IN_HOUSES[self.level - 1]:
+            self.crocodile_time -= dt
+            if self.crocodile_time <= 0:
+                self.create_house_crocodile()
+                self.get_crocodile_time()
 
     def draw_screen(self) -> None:
         """ Draws the game screen. """
@@ -384,6 +398,9 @@ class Game:
             pos: tuple[int] = (int(stgs.WINDOW_SIZE[0] // 2 - time_to_blit.get_width() // 2), 
                                int(stgs.WINDOW_SIZE[1] // 2 - time_to_blit.get_height() // 2))
             self.screen.blit(time_to_blit, pos)
+        # draw house crocodile
+        if self.house_crocodile:
+            self.house_crocodile.render(self.screen)
         # draw house fly
         if self.house_fly:
             self.house_fly.render(self.screen)

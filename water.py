@@ -206,9 +206,55 @@ class HouseCrocodile:
         game (Game): The game instance.
         house (int): The number of the house in which the crocodile should appear (0-4).
         """
+        self.game: Game = game
+        self.house: int = house
         self.image: pg.Surface = game.images["house crocodile"]
-        self.pos: pg.Vector2 = pg.Vector2(stgs.HOUSE_CROCO_POS[house][0], stgs.HOUSE_CROCO_POS[house][1])
-        self.end_pos: int = stgs.HOUSE_CROCO_POS[house][2]
-        self.waiting_time: float = stgs.HOUSE_CROCO_WAITING_TIME[game.level - 1]
-        self.staying_time: float = stgs.HOUSE_CROCO_STAYING_TIME[game.level - 1]
-        self.rect: pg.Rect = pg.Rect(self.pos[0] - 25, self.pos[1] - 22, 50, 44)
+        self.pos: pg.Vector2 = pg.Vector2(stgs.HOUSE_CROCO_POS[self.house][0], stgs.HOUSE_CROCO_POS[self.house][1])
+        self.end_pos: int = stgs.HOUSE_CROCO_POS[self.house][2]
+
+        self.waiting_time: float = stgs.HOUSE_CROCO_WAITING_TIME[self.game.level - 2]  # -2 because the level starts with 1
+        self.staying_time: float = stgs.HOUSE_CROCO_STAYING_TIME[self.game.level - 2]  # the list starts with 0
+        self.speed: int          = stgs.HOUSE_CROCO_SPEED[self.game.level - 2]         # but in the list level 2 is first
+
+        self.rect: pg.Rect = pg.Rect(self.pos.x + 20, self.pos.y, 40, 44)
+        self.state: str = "waiting"
+
+    def update(self, dt: float) -> None:
+        """
+        Update the house crocodile's position.
+        Args:
+        dt (float): The time difference since the last update.
+        """
+        if self.state == "waiting":
+            self.waiting_time -= dt
+            if self.waiting_time <= 0:
+                self.state = "move in"
+            
+        elif self.state == "staying":
+            self.staying_time -= dt
+            if self.staying_time <= 0:
+                self.state = "move out"
+
+        elif self.state == "move in":
+            self.pos.x += self.speed * dt
+            self.rect.x = self.pos.x + 20
+            if self.pos.x >= self.end_pos:
+                self.pos.x = self.end_pos
+                self.state = "staying"
+
+        elif self.state == "move out":
+            self.pos.x -= self.speed * dt
+            self.rect.x = self.pos.x + 20
+            if self.pos.x <= stgs.HOUSE_CROCO_POS[self.house][0]:
+                self.game.house_crocodile = None
+        
+
+        
+    def render(self, surf: pg.Surface) -> None:
+        """
+        Render the house crocodile to the given surface.
+        Args:
+        surf (pg.Surface): The surface to render the house crocodile on.
+        """
+        surf.blit(self.image, self.pos)
+        pg.draw.rect(surf, "red", self.rect, width=1)
