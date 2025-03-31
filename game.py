@@ -214,57 +214,61 @@ class Game:
 
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
-        # collisions with traffic on the street
-        for lane in self.traffic:
-            for vehicle in lane:
-                if self.frog.collision_rect.colliderect(vehicle.rect):
-                    self.frog.set_dead("street")
+        # # collisions with traffic on the street
+        # for lane in self.traffic:
+        #     for vehicle in lane:
+        #         if self.frog.collision_rect.colliderect(vehicle.rect):
+        #             self.frog.set_dead("street")
 
-        # collision with the snake head
-        if self.middle_snake != None:
-            if self.frog.collision_rect.colliderect(self.snake.head_rect):
-                self.frog.set_dead("water")
+        # # collision with the snake head
+        # if self.middle_snake != None:
+        #     if self.frog.collision_rect.colliderect(self.snake.head_rect):
+        #         self.frog.set_dead("water")
  
-        # collisions with water traffic
-        collided_list: list[bool] = []
-        for lane_index, lane in enumerate(self.water_traffic):
-            for element_index, element in enumerate(lane):
-                if lane_index == 1 or lane_index == 4:  # lane_index 1 and 4 are the turtles
-                    if not element.diving:
-                        collided: bool = self.frog.collision_rect.colliderect(element.rect)
-                        collided_list.append(collided)
-                else:
-                    collided: bool = self.frog.collision_rect.colliderect(element.rect)
-                    collided_list.append(collided)
-                if collided:
-                    self.handle_water_traffic_collision(element, lane_index, element_index)
+        # # collisions with water traffic
+        # collided_list: list[bool] = []
+        # for lane_index, lane in enumerate(self.water_traffic):
+        #     for element_index, element in enumerate(lane):
+        #         if lane_index == 1 or lane_index == 4:  # lane_index 1 and 4 are the turtles
+        #             if not element.diving:
+        #                 collided: bool = self.frog.collision_rect.colliderect(element.rect)
+        #                 collided_list.append(collided)
+        #         else:
+        #             collided: bool = self.frog.collision_rect.colliderect(element.rect)
+        #             collided_list.append(collided)
+        #         if collided:
+        #             self.handle_water_traffic_collision(element, lane_index, element_index)
         
-        # collision with the gras around the houses -> death of one frog
-        for gras_rect in self.gras_rects:
-            if self.frog.collision_rect.colliderect(gras_rect):
-                self.frog.set_dead("water")
+        # # collision with the gras around the houses -> death of one frog
+        # for gras_rect in self.gras_rects:
+        #     if self.frog.collision_rect.colliderect(gras_rect):
+        #         self.frog.set_dead("water")
 
         # collision with the house rects
         for idx, rect in enumerate(self.house_rects):
             if self.frog.collision_rect.colliderect(rect) and not self.frog.dead:
-                if not self.houses[idx]:
-                    self.houses[idx] = True
-                    self.calculate_time_score()
-                    if self.house_fly:
-                        if self.house_rects[idx].colliderect(self.house_fly.rect):
-                            self.score += stgs.FLY_SCORES["house fly"]
-                    if False in self.houses:
-                        self.frog_time = 60 - self.time_bar.get_time()  # the time the frog needed to get home
-                        self.show_frog_time = True
-                        self.new_frog_or_game_over()
-                    else:
-                        self.proceed_level()
+                if self.house_crocodile:
+                    if self.house_rects[idx].colliderect(self.house_crocodile.rect):
+                        self.frog.set_dead("water")
                 else:
-                    self.frog.set_dead("water")
+                    if not self.houses[idx]:
+                        self.houses[idx] = True
+                        self.calculate_time_score()
+                        if self.house_fly:
+                            if self.house_rects[idx].colliderect(self.house_fly.rect):
+                                self.score += stgs.FLY_SCORES["house fly"]
+                        if False in self.houses:
+                            self.frog_time = 60 - self.time_bar.get_time()  # the time the frog needed to get home
+                            self.show_frog_time = True
+                            self.new_frog_or_game_over()
+                        else:
+                            self.proceed_level()
+                    else:
+                        self.frog.set_dead("water")
 
-        # collision with the water
-        if self.frog.pos.y <= stgs.FROG_WATER_COLLISION_HEIGHT and True not in collided_list:
-            self.frog.set_dead("water")
+        # # collision with the water
+        # if self.frog.pos.y <= stgs.FROG_WATER_COLLISION_HEIGHT and True not in collided_list:
+        #     self.frog.set_dead("water")
 
     def proceed_level(self) -> None:
         """ Proceeds to the next level. """
