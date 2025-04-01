@@ -58,8 +58,8 @@ class Game:
         # create animations
         self.animations: dict[Animation] = {
             "bulldozer": Animation(load_images("bulldozer/", scale_factor=0.9), animation_duration=0.4),
-            "crocodile/closed": Animation(load_images("crocodile/swimming closed/", scale_factor=0.8), animation_duration=1),
-            "crocodile/open": Animation(load_images("crocodile/swimming open/", scale_factor=0.8), animation_duration=1),
+            "crocodile/closed": Animation(load_images("crocodile/swimming closed/", scale_factor=0.9), animation_duration=1),
+            "crocodile/open": Animation(load_images("crocodile/swimming open/", scale_factor=0.9), animation_duration=1),
             "fly/idle": Animation(load_images("fly/idle/", scale_factor=0.8), animation_duration=0.8),
             "fly/walk": Animation(load_images("fly/walk/", scale_factor=0.8), animation_duration=0.8),
             "fly/walk/flutter": Animation(load_images("fly/walk flutter/", scale_factor=0.8), animation_duration=0.8),
@@ -144,11 +144,15 @@ class Game:
 
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """
+        crocodile: int = 10  # choose a high number to never get a crocodile if in the level is no crocodile
+        if stgs.CROCOS_SWIMMING[self.level - 1]:
+            crocodile = ri(0, stgs.WATER[f"level {self.level}"][0])
         sinking_pair: int = ri(0, stgs.WATER[f"level {self.level}"][1] - 1)
         sinking_trio: int = ri(0, stgs.WATER[f"level {self.level}"][4] - 1)
 
+
         self.water_traffic: list[Animation | pg.Surface] = [
-            [Tree(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
+            [Tree(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], "medium", 0) if i == crocodile else LaneCrocodile(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
             [Turtle(self, 150 + i * stgs.SPACING["lane 9"][self.level - 1], stgs.LANE_HEIGHTS["lane 9"], 1, True if i == sinking_pair else False)  for i in range(stgs.WATER[f"level {self.level}"][1])],
             [Tree(self, 650 - i * stgs.SPACING["lane 8"][self.level - 1], stgs.LANE_HEIGHTS["lane 8"], "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
             [Tree(self, 450 - i * stgs.SPACING["lane 7"][self.level - 1], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
@@ -214,35 +218,35 @@ class Game:
 
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
-        # # collisions with traffic on the street
-        # for lane in self.traffic:
-        #     for vehicle in lane:
-        #         if self.frog.collision_rect.colliderect(vehicle.rect):
-        #             self.frog.set_dead("street")
+        # collisions with traffic on the street
+        for lane in self.traffic:
+            for vehicle in lane:
+                if self.frog.collision_rect.colliderect(vehicle.rect):
+                    self.frog.set_dead("street")
 
-        # # collision with the snake head
-        # if self.middle_snake != None:
-        #     if self.frog.collision_rect.colliderect(self.snake.head_rect):
-        #         self.frog.set_dead("water")
+        # collision with the snake head
+        if self.middle_snake != None:
+            if self.frog.collision_rect.colliderect(self.snake.head_rect):
+                self.frog.set_dead("water")
  
-        # # collisions with water traffic
-        # collided_list: list[bool] = []
-        # for lane_index, lane in enumerate(self.water_traffic):
-        #     for element_index, element in enumerate(lane):
-        #         if lane_index == 1 or lane_index == 4:  # lane_index 1 and 4 are the turtles
-        #             if not element.diving:
-        #                 collided: bool = self.frog.collision_rect.colliderect(element.rect)
-        #                 collided_list.append(collided)
-        #         else:
-        #             collided: bool = self.frog.collision_rect.colliderect(element.rect)
-        #             collided_list.append(collided)
-        #         if collided:
-        #             self.handle_water_traffic_collision(element, lane_index, element_index)
+        # collisions with water traffic
+        collided_list: list[bool] = []
+        for lane_index, lane in enumerate(self.water_traffic):
+            for element_index, element in enumerate(lane):
+                if lane_index == 1 or lane_index == 4:  # lane_index 1 and 4 are the turtles
+                    if not element.diving:
+                        collided: bool = self.frog.collision_rect.colliderect(element.rect)
+                        collided_list.append(collided)
+                else:
+                    collided: bool = self.frog.collision_rect.colliderect(element.rect)
+                    collided_list.append(collided)
+                if collided:
+                    self.handle_water_traffic_collision(element, lane_index, element_index)
         
-        # # collision with the gras around the houses -> death of one frog
-        # for gras_rect in self.gras_rects:
-        #     if self.frog.collision_rect.colliderect(gras_rect):
-        #         self.frog.set_dead("water")
+        # collision with the gras around the houses -> death of one frog
+        for gras_rect in self.gras_rects:
+            if self.frog.collision_rect.colliderect(gras_rect):
+                self.frog.set_dead("water")
 
         # collision with the house rects
         for idx, rect in enumerate(self.house_rects):
@@ -266,9 +270,9 @@ class Game:
                     else:
                         self.frog.set_dead("water")
 
-        # # collision with the water
-        # if self.frog.pos.y <= stgs.FROG_WATER_COLLISION_HEIGHT and True not in collided_list:
-        #     self.frog.set_dead("water")
+        # collision with the water
+        if self.frog.pos.y <= stgs.FROG_WATER_COLLISION_HEIGHT and True not in collided_list:
+            self.frog.set_dead("water")
 
     def proceed_level(self) -> None:
         """ Proceeds to the next level. """

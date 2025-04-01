@@ -195,8 +195,59 @@ class Ripple:
 
 
 class LaneCrocodile:
-    pass
+    def __init__(self, game: Game, x: int, y: int, lane: int) -> None:
+        """
+        Initialize a lane crocodile.
+        Args:
+        game (Game): The game instance.
+        """
+        self.game: Game = game
+        self.pos: pg.Vector2 = pg.Vector2((x, y))
+        self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][lane]
+        self.state: str = "closed"
+        self.get_animation()
+        self.get_image()
+        self.get_timer()
+        self.half_image_width: int = int(self.image.get_width() // 2)
+        self.rect: pg.Rect = self.image.get_rect(center=self.pos)
 
+    def get_timer(self) -> None:
+        """ Get's the time for the timer to open and close the mouth from the settings.py. """
+        self.oc_timer: float = stgs.LANE_CROCO_TIMER[self.game.level - 2]
+
+    def get_animation(self) -> None:
+        """ Get the animation of the lane crocodile. """
+        self.animation: Animation = self.game.animations[f"crocodile/{self.state}"].copy()
+
+    def get_image(self) -> None:
+        """ Get the current image of the lane crocodile. """
+        self.image: pg.Surface = self.animation.get_current_image()
+
+    def update(self, dt: float) -> None:
+        """
+        Update the lane crocodile's animation and state.
+        Args:
+        dt (float): The time difference since the last update.
+        """
+        self.oc_timer -= dt
+        if self.oc_timer <= 0:
+            self.state = "open" if self.state == "closed" else "closed"
+            self.get_animation()
+            self.get_timer()
+        self.animation.update(dt)
+        self.get_image()
+        self.pos.x += self.speed * dt
+        if self.pos.x > stgs.WINDOW_SIZE[0] + self.half_image_width:
+            self.pos.x = -self.half_image_width
+        self.rect.center = self.pos
+
+    def render(self, surf: pg.Surface) -> None:
+        """
+        Render the lane crocodile to the given surface.
+        Args:
+        surf (pg.Surface): The surface to render the lane crocodile on.
+        """
+        surf.blit(self.image, self.rect)
 
 class HouseCrocodile:
     def __init__(self, game: Game, house: int) -> None:
@@ -247,7 +298,7 @@ class HouseCrocodile:
             self.rect.x = self.pos.x + 20
             if self.pos.x <= stgs.HOUSE_CROCO_POS[self.house][0]:
                 self.game.house_crocodile = None
-                      
+
     def render(self, surf: pg.Surface) -> None:
         """
         Render the house crocodile to the given surface.

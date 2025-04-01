@@ -131,6 +131,8 @@ HOUSE_CROCO_STAYING_TIME: Final[list[float]] = [3.5, 4.0, 4.5, 5.0]  # [level 2,
 
 HOUSE_CROCO_SPEED: Final[list[int]] = [50, 60, 70, 80]  # [level 2, level 3, level 4, level 5]
 
+LANE_CROCO_TIMER: Final[list[float]] = [5.0, 4.0, 3.0, 2.0]  # [level 2, level 3, level 4, level 5]
+
 HOUSE_SIZE: Final[tuple[int]] = (70, 57)
 
 HOUSE_TOP_LEFT: Final[list[tuple[int]]] = [(31, 51), (196, 51), (365, 51), (534, 51), (699, 51)]
