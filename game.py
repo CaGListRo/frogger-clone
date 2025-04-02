@@ -28,7 +28,7 @@ class Game:
         self.running: bool = True
         self.fps: int = 0
 
-        self.level: int = 2
+        self.level: int = 3
         self.frog_time: int = 0                      # this ist the time one frog needed from the start to "his" house
         self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
         self.show_time: float = stgs.SHOW_FROG_TIME  # how long the frog time is shown
@@ -107,11 +107,11 @@ class Game:
 
     def get_crocodile_time(self) -> None:
         """ Sets the time of the next appearance of a crocodile in a house. """
-        self.crocodile_time: int | float = ri(15, 30)
+        self.crocodile_time: int | float = ri(10, 30)
 
     def get_snake_time(self) -> None:
         """ Sets the time of the next appearance of the snake. """
-        self.snake_time: int | float = ri(15, 30)
+        self.snake_time: int | float = ri(5, 10)
 
     def get_fly_time(self) -> None:
         """ Sets the time of the next appearance of the fly. """
@@ -141,6 +141,10 @@ class Game:
         """ Creates a frog at the start position. """
         self.frog: Frog = Frog(self, stgs.FROG_START_POS)
         self.frogs -= 1
+
+    def create_middle_snake(self) -> None:
+        """ Creates a snake that crawls over the green in the middle of the screen. """
+        self.middle_snake = MiddleSnake(self)
 
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """
@@ -226,7 +230,7 @@ class Game:
 
         # collision with the snake head
         if self.middle_snake != None:
-            if self.frog.collision_rect.colliderect(self.snake.head_rect):
+            if self.frog.collision_rect.colliderect(self.middle_snake.head_rect):
                 self.frog.set_dead("water")
  
         # collisions with water traffic
@@ -261,6 +265,7 @@ class Game:
                         if self.house_fly:
                             if self.house_rects[idx].colliderect(self.house_fly.rect):
                                 self.score += stgs.FLY_SCORES["house fly"]
+                                self.get_fly_time()
                         if False in self.houses:
                             self.frog_time = 60 - self.time_bar.get_time()  # the time the frog needed to get home
                             self.show_frog_time = True
@@ -328,25 +333,31 @@ class Game:
         """
         # update time bar
         self.time_bar.update(dt)
+
         # update ripples
         for ripple in self.ripples:
             ripple.update(dt)
-        # update test snake
-        if self.middle_snake:
-            self.middle_snake.update(dt)
+
         # update the water traffic
         for lane in self.water_traffic:
             for element in lane:
                 element.update(dt)
+
         # update house fly
         if self.house_fly:
             self.house_fly.update(dt)
+
         # update house crocodile
         if self.house_crocodile:
             self.house_crocodile.update(dt)
 
+        # update middle snake
+        if self.middle_snake:
+            self.middle_snake.update(dt)
+
         # update the frog
         self.frog.update(dt)
+
         # update the traffic on the street
         for lane in self.traffic:
             for vehicle in lane:
@@ -357,7 +368,7 @@ class Game:
         Updates all variables in the game.
         Args:
         dt (float): The time since the last update.
-        """
+        """  
         # update frog time
         if self.show_frog_time:
             self.show_time -= dt
@@ -367,16 +378,20 @@ class Game:
 
         # update fly time
         self.fly_time -= dt
-        if self.fly_time <= 0:
+        if self.fly_time <= 0 and self.house_fly == None:
             self.create_house_fly()
-            self.get_fly_time()
+
+        # update snake time
+        if stgs.SNAKES[self.level - 1] and self.middle_snake == None:
+            self.snake_time -= dt
+            if self.snake_time <= 0:
+                self.create_middle_snake()
 
         # update crocodile time if there is a crocodile in the level
-        if stgs.CROCOS_IN_HOUSES[self.level - 1]:
+        if stgs.CROCOS_IN_HOUSES[self.level - 1] and self.house_crocodile == None:
             self.crocodile_time -= dt
             if self.crocodile_time <= 0:
                 self.create_house_crocodile()
-                self.get_crocodile_time()
 
     def draw_screen(self) -> None:
         """ Draws the game screen. """

@@ -40,8 +40,9 @@ class HouseFly:
         self.get_current_image()
         self.stay_time -= dt
         if self.stay_time <= 0:
+            self.game.get_fly_time()
             self.game.house_fly = None
-        
+            
     def get_animation(self) -> None:
         """ Gets a copy of the current animation from self.games.animations. """
         self.animation: Animation = self.game.animations[f"fly/{self.state}"]

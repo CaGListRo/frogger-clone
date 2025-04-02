@@ -297,8 +297,9 @@ class HouseCrocodile:
             self.pos.x -= self.speed * dt
             self.rect.x = self.pos.x + 20
             if self.pos.x <= stgs.HOUSE_CROCO_POS[self.house][0]:
+                self.game.get_crocodile_time()
                 self.game.house_crocodile = None
-
+                
     def render(self, surf: pg.Surface) -> None:
         """
         Render the house crocodile to the given surface.
