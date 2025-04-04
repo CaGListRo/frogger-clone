@@ -33,6 +33,7 @@ class Game:
         self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
         self.show_time: float = stgs.SHOW_FROG_TIME  # how long the frog time is shown
         self.score: int = 0
+        self.game_state: str = "menu"
 
         # fonts
         self.score_font: pg.font.Font = pg.font.SysFont("Comic Sans", 32)
@@ -75,7 +76,7 @@ class Game:
 
         self.direction_pressed: bool = False
         
-        self.initialize_game()
+        self.initialize_game()  # <------------------------------------------ MOVE WHEN GAME STATES GET IMPLEMENTED
 
         self.house_rects: list[pg.Rect] = [pg.Rect(stgs.HOUSE_TOP_LEFT[0][0], stgs.HOUSE_TOP_LEFT[0][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
                                            pg.Rect(stgs.HOUSE_TOP_LEFT[1][0], stgs.HOUSE_TOP_LEFT[1][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
@@ -150,13 +151,13 @@ class Game:
         """ Creates water traffic. """
         crocodile: int = 10  # choose a high number to never get a crocodile if in the level is no crocodile
         if stgs.CROCOS_SWIMMING[self.level - 1]:
-            crocodile = ri(0, stgs.WATER[f"level {self.level}"][0])
+            crocodile = ri(0, stgs.WATER[f"level {self.level}"][0] - 1)
+
         sinking_pair: int = ri(0, stgs.WATER[f"level {self.level}"][1] - 1)
         sinking_trio: int = ri(0, stgs.WATER[f"level {self.level}"][4] - 1)
 
-
         self.water_traffic: list[Animation | pg.Surface] = [
-            [Tree(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], "medium", 0) if i == crocodile else LaneCrocodile(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
+            [LaneCrocodile(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], 0) if i == crocodile else Tree(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
             [Turtle(self, 150 + i * stgs.SPACING["lane 9"][self.level - 1], stgs.LANE_HEIGHTS["lane 9"], 1, True if i == sinking_pair else False)  for i in range(stgs.WATER[f"level {self.level}"][1])],
             [Tree(self, 650 - i * stgs.SPACING["lane 8"][self.level - 1], stgs.LANE_HEIGHTS["lane 8"], "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
             [Tree(self, 450 - i * stgs.SPACING["lane 7"][self.level - 1], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
@@ -299,31 +300,32 @@ class Game:
             if event.type == pg.QUIT:
                 self.running = False
             
-            # check key events
-            if event.type == pg.KEYDOWN:
-                
-                if event.key == pg.K_UP or event.key == pg.K_w:
-                    self.direction_pressed = True
-                if event.key == pg.K_DOWN or event.key == pg.K_s:
-                    self.direction_pressed = True
-                if event.key == pg.K_LEFT or event.key == pg.K_a:
-                    self.direction_pressed = True
-                if event.key == pg.K_RIGHT or event.key == pg.K_d:
-                    self.direction_pressed = True
+            # check key events while playing the game
+            if self.game_state == "play":
+                if event.type == pg.KEYDOWN:
+                    
+                    if event.key == pg.K_UP or event.key == pg.K_w:
+                        self.direction_pressed = True
+                    if event.key == pg.K_DOWN or event.key == pg.K_s:
+                        self.direction_pressed = True
+                    if event.key == pg.K_LEFT or event.key == pg.K_a:
+                        self.direction_pressed = True
+                    if event.key == pg.K_RIGHT or event.key == pg.K_d:
+                        self.direction_pressed = True
 
-            if event.type == pg.KEYUP and not self.frog.jumping:
-                if (event.key == pg.K_UP or event.key == pg.K_w) and self.direction_pressed:
-                    self.frog.jump("north")
-                    self.direction_pressed = False
-                if (event.key == pg.K_DOWN or event.key == pg.K_s) and self.direction_pressed:
-                    self.frog.jump("south")
-                    self.direction_pressed = False
-                if (event.key == pg.K_LEFT or event.key == pg.K_a) and self.direction_pressed:
-                    self.frog.jump("west")
-                    self.direction_pressed = False
-                if (event.key == pg.K_RIGHT or event.key == pg.K_d) and self.direction_pressed:
-                    self.frog.jump("east")
-                    self.direction_pressed = False
+                if event.type == pg.KEYUP and not self.frog.jumping:
+                    if (event.key == pg.K_UP or event.key == pg.K_w) and self.direction_pressed:
+                        self.frog.jump("north")
+                        self.direction_pressed = False
+                    if (event.key == pg.K_DOWN or event.key == pg.K_s) and self.direction_pressed:
+                        self.frog.jump("south")
+                        self.direction_pressed = False
+                    if (event.key == pg.K_LEFT or event.key == pg.K_a) and self.direction_pressed:
+                        self.frog.jump("west")
+                        self.direction_pressed = False
+                    if (event.key == pg.K_RIGHT or event.key == pg.K_d) and self.direction_pressed:
+                        self.frog.jump("east")
+                        self.direction_pressed = False
                 
     def update_objects(self, dt: float) -> None:
         """
@@ -393,11 +395,8 @@ class Game:
             if self.crocodile_time <= 0:
                 self.create_house_crocodile()
 
-    def draw_screen(self) -> None:
-        """ Draws the game screen. """
-        pg.display.set_caption(f"     F R O G G E R - C L O N E          FPS:{self.fps}")
-        # clear the screen
-        self.screen.fill((0, 0, 0))
+    def render_game(self) -> None:
+        """ Renders the game while playing. """
         # draw houses to have a background behind the background
         self.screen.blit(self.images["houses"], (0, 0))
         # draw background
@@ -462,7 +461,15 @@ class Game:
             
         # draw time bar
         self.time_bar.render(self.screen)
-        
+
+    def draw_screen(self) -> None:
+        """ Draws the game screen. """
+        pg.display.set_caption(f"     F R O G G E R - C L O N E          FPS:{self.fps}")
+        # clear the screen
+        self.screen.fill((0, 0, 0))
+        if self.game_state == "play":
+            self.render_game()
+                
         pg.display.update()
 
     def main(self) -> None:
@@ -484,14 +491,16 @@ class Game:
                 fps_counter = 0
                 fps_timer = 0.0
 
-            self.update_variables(dt)
-            self.update_objects(dt)
-            self.check_collisions()
-            if self.frog.pos.y <= 333:
-                self.calculate_distances()
+            if self.game_state == "play":
+                self.update_variables(dt)
+                self.update_objects(dt)
+                self.check_collisions()
+                if self.frog.pos.y <= 333:
+                    self.calculate_distances()
 
             # call the methods
             self.event_handler()
+            
             self.draw_screen()
 
             # fps break

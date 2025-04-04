@@ -48,7 +48,11 @@ class Frog:
         self.animation: Animation = self.game.animations[f"frog/{self.state}"].copy()
 
     def set_dead(self, kind: str) -> None:
-        """ Sets the frog to be dead. """
+        """
+        Sets the frog to be dead.
+        Args:
+        kind (str): The kind of death. 'street' or 'water'.
+        """
         self.dead = True
         self.state = f"dead/{kind}"
         self.new_animation()
@@ -125,16 +129,19 @@ class Frog:
         """
         self.direction = direction
         if not self.jumping:
-            self.game.score += stgs.SCORE["jump"]
             self.jumping = True 
             if direction == "north" and self.pos.y >= stgs.FROG_LIMITS["top"]:
                 self.destination.y = self.pos.y - stgs.FROG_JUMP_DISTANCE
+                self.game.score += stgs.SCORE["jump"]
             elif direction == "south" and self.pos.y <= stgs.FROG_LIMITS["bottom"]:
                 self.destination.y = self.pos.y + stgs.FROG_JUMP_DISTANCE
+                self.game.score += stgs.SCORE["jump"]
             elif direction == "west" and self.pos.x > stgs.FROG_LIMITS["left"]:
                 self.destination.x = self.pos.x - stgs.FROG_JUMP_DISTANCE
+                self.game.score += stgs.SCORE["jump"]
             elif direction == "east" and self.pos.x < stgs.FROG_LIMITS["right"]:
                 self.destination.x = self.pos.x + stgs.FROG_JUMP_DISTANCE
+                self.game.score += stgs.SCORE["jump"]
 
     def render(self, surf: pg.Surface) -> None:
         """

@@ -136,7 +136,11 @@ class Turtle:
         self.speed = speed
 
     def draw_image(self, image_to_blit: pg.Surface) -> None:
-        """ Draw the turtle's image. """
+        """
+        Draw the turtle's image.
+        Args:
+        image_to_blit (pg.Surface): The current image of the turtle animation to draw on self.image.
+        """
         self.image.fill(self.TRANSPARENT_COLOR)
         for i in range(stgs.TURTLES[self.turtles_selector]):
             self.image.blit(image_to_blit, (0 + i * stgs.TURTLE_SPACING, 0))
@@ -248,6 +252,7 @@ class LaneCrocodile:
         surf (pg.Surface): The surface to render the lane crocodile on.
         """
         surf.blit(self.image, self.rect)
+
 
 class HouseCrocodile:
     def __init__(self, game: Game, house: int) -> None:

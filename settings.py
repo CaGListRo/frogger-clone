@@ -1,61 +1,21 @@
 from typing import Final
 
-WINDOW_SIZE: Final[tuple[int]] = (800, 700)
-
-FROG_START_POS: Final[tuple[int]] = (400, 605)
-
-FROG_COLLISION_RECT: Final[tuple[int]] = (30, 30)
-
-FROG_HALF_RECT_SIZE: Final[int] = int(FROG_COLLISION_RECT[0] / 2)
-
-FROG_JUMP_DISTANCE: Final[int] = 43
-
-FROG_LIMITS: Final[dict[int]] = {
-    "top": 100,
-    "bottom": 564,
-    "left": FROG_HALF_RECT_SIZE + FROG_JUMP_DISTANCE,
-    "right": WINDOW_SIZE[0] - FROG_HALF_RECT_SIZE - FROG_JUMP_DISTANCE
-}
-
-FROG_DEAD_TIME: Final[float] = 0.6
-
-FROG_WATER_COLLISION_HEIGHT: Final[int] = 308
-
-SHOW_FROG_TIME: Final[float] = 3.0
-
-FLY_HOUSE_CENTER_POS: Final[list[tuple[int]]] = [
-    (66, 80),
-    (231, 80),
-    (400, 80),
-    (569, 80),
-    (734, 80)
+# settings for the crocodile
+CROCOS_IN_HOUSES: Final[list[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
+CROCOS_SWIMMING: Final[list[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
+HOUSE_CROCO_POS: Final[list[tuple[int]]] = [
+    (-34, 56, 16),
+    (131, 56, 181),
+    (300, 56, 350),
+    (469, 56, 519),
+    (634, 56, 684),
 ]
+HOUSE_CROCO_SPEED: Final[list[int]] = [50, 60, 70, 80]  # [level 2, level 3, level 4, level 5]
+HOUSE_CROCO_STAYING_TIME: Final[list[float]] = [3.5, 4.0, 4.5, 5.0]  # [level 2, level 3, level 4, level 5]
+LANE_CROCO_TIMER: Final[list[float]] = [5.0, 4.0, 3.0, 2.0]  # [level 2, level 3, level 4, level 5]
+HOUSE_CROCO_WAITING_TIME: Final[list[float]] = [2.0, 1.5, 1.0, 0.5]  # [level 2, level 3, level 4, level 5]
 
-FLY_STATE_TIMER: Final[float] = 1.0
-
-FLY_STAY_TIME: Final[float] = 5.0
-
-FLY_SCORES: Final[dict[int]] = {
-    "house fly": 100,
-    "trunk fly": 200
-}
-
-WATER: Final[dict[list[int]]] = {
-    "level 1": [3, 5, 2, 4, 4],  # [medium trunks, turtle pairs, large trunks, small trunks, turtle trios]
-    "level 2": [3, 5, 2, 4, 4],  # [medium trunks/one crocodile, turtle pairs, large trunks, small trunks, turtle trios]
-    "level 3": [2, 5, 1, 4, 4],
-    "level 4": [1, 4, 1, 3, 3],
-    "level 5": [1, 3, 1, 2, 2],
-}
-
-STREET: Final[dict[list[int]]] = {
-    "level 1": [2, 1, 3, 3, 3],  # [trucks, racing cars, big cars, bulldozer, small cars]
-    "level 2": [3, 2, 4, 4, 4],
-    "level 3": [3, 3, 4, 4, 4],
-    "level 4": [4, 3, 5, 5, 5],
-    "level 5": [4, 4, 6, 5, 6],
-}
-
+# decoration
 STRIPES: Final[dict[int]] = {  # the yellow stripes on the street
     "rows": 4,
     "columns": 55,
@@ -65,6 +25,38 @@ STRIPES: Final[dict[int]] = {  # the yellow stripes on the street
     "x spacing": 32
 }
 
+# settings for the fly
+FLY_HOUSE_CENTER_POS: Final[list[tuple[int]]] = [
+    (66, 80),
+    (231, 80),
+    (400, 80),
+    (569, 80),
+    (734, 80)
+]
+FLY_SCORES: Final[dict[int]] = {
+    "house fly": 100,
+    "trunk fly": 200
+}
+FLY_STATE_TIMER: Final[float] = 1.0
+FLY_STAY_TIME: Final[float] = 5.0
+
+# settings for the frog
+FROG_COLLISION_RECT: Final[tuple[int]] = (30, 30)
+FROG_DEAD_TIME: Final[float] = 0.6
+FROG_DRAW_HEIGHT: Final[int] = 630  # the y value to draw the remaining frogs
+FROG_HALF_RECT_SIZE: Final[int] = int(FROG_COLLISION_RECT[0] / 2)
+FROG_JUMP_DISTANCE: Final[int] = 43
+FROG_LIMITS: Final[dict[int]] = {
+    "top": 100,
+    "bottom": 564,
+    "left": FROG_HALF_RECT_SIZE + FROG_JUMP_DISTANCE,
+    "right": 800 - FROG_HALF_RECT_SIZE - FROG_JUMP_DISTANCE  # 800 is the window width
+}
+FROG_START_POS: Final[tuple[int]] = (400, 605)
+FROG_WATER_COLLISION_HEIGHT: Final[int] = 308
+SHOW_FROG_TIME: Final[float] = 3.0
+
+# traffic settings (water and street traffic)
 LANE_HEIGHTS: Final[dict[int]] = {
     "lane 10": 130,  # medium trunk
     "lane 9": 173,   # turtle pairs
@@ -77,7 +69,6 @@ LANE_HEIGHTS: Final[dict[int]] = {
     "lane 2": 519,   # bulldozer
     "lane 1": 562,   # small cars
 }
-
 SPACING: Final[dict[int]] = {
     "lane 10": [350, 350, 400, 400, 450],  # medium trunk
     "lane 9": [190, 190, 190, 230, 270],   # turtle pairs
@@ -90,7 +81,6 @@ SPACING: Final[dict[int]] = {
     "lane 2": [250, 200, 200, 150, 130],   # bulldozer
     "lane 1": [250, 200, 200, 150, 120],   # small cars
 }
-
 START_SPEED: Final[dict[list[int]]] = {
     # [trunks, turtles, trunks, trunks, turtles, trucks, racing cars, cars, bulldozer, cars]
     "level 1": [50, -40, 90, 30, -40, -40, 50, -30, 40, -25],
@@ -99,57 +89,57 @@ START_SPEED: Final[dict[list[int]]] = {
     "level 4": [80, -60, 30, 70, -40, -60, 110, -70, 30, -60],
     "level 5": [90, -70, 70, 90, -70, -75, 130, -80, 60, -90],
 }
+STREET: Final[dict[list[int]]] = {
+    "level 1": [2, 1, 3, 3, 3],  # [trucks, racing cars, big cars, bulldozer, small cars]
+    "level 2": [3, 2, 4, 4, 4],
+    "level 3": [3, 3, 4, 4, 4],
+    "level 4": [4, 3, 5, 5, 5],
+    "level 5": [4, 4, 6, 5, 6],
+}
+WATER: Final[dict[list[int]]] = {
+    "level 1": [3, 5, 2, 4, 4],  # [medium trunks, turtle pairs, large trunks, small trunks, turtle trios]
+    "level 2": [3, 5, 2, 4, 4],  # [medium trunks/one crocodile, turtle pairs, large trunks, small trunks, turtle trios]
+    "level 3": [2, 5, 1, 4, 4],
+    "level 4": [1, 4, 1, 3, 3],
+    "level 5": [1, 3, 1, 2, 2],
+}
 
-TURTLES: Final[tuple[int]] = (2, 3)  # number of turtles that swim together (second lane = duos, fifth lane = trios)
-
+# settings for the turtles in the traffic
+TURTLE_DIVE_TIME: Final[list[int]] = [7, 6, 5, 4, 3]  # in seconds  # [level 1, level 2, level 3, level 4, level 5]
+TURTLE_FROG_CARRY_TIME: Final[tuple[float]] = (0.75, 1.5)
+TURTLE_SPACING: Final[int] = 55
 TURTLE_SURFACE: Final[list[tuple[int]]] = [
     (105, 38),  # second lane from top with the turtle duos
     (160, 38)   # lowest lane of the water traffic with the turtle trios
 ]
+TURTLES: Final[tuple[int]] = (2, 3)  # number of turtles that swim together (second lane = duos, fifth lane = trios)
 
-TURTLE_SPACING: Final[int] = 55
-
-TURTLE_DIVE_TIME: Final[list[int]] = [7, 6, 5, 4, 3]  # in seconds  # [level 1, level 2, level 3, level 4, level 5]
-
-TURTLE_FROG_CARRY_TIME: Final[tuple[float]] = (0.75, 1.5)
-
-CROCOS_IN_HOUSES: Final[list[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
-
-CROCOS_SWIMMING: Final[list[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
-
-HOUSE_CROCO_POS: Final[list[tuple[int]]] = [
-    (-34, 56, 16),
-    (131, 56, 181),
-    (300, 56, 350),
-    (469, 56, 519),
-    (634, 56, 684),
-]
-
-HOUSE_CROCO_WAITING_TIME: Final[list[float]] = [2.0, 1.5, 1.0, 0.5]  # [level 2, level 3, level 4, level 5]
-
-HOUSE_CROCO_STAYING_TIME: Final[list[float]] = [3.5, 4.0, 4.5, 5.0]  # [level 2, level 3, level 4, level 5]
-
-HOUSE_CROCO_SPEED: Final[list[int]] = [50, 60, 70, 80]  # [level 2, level 3, level 4, level 5]
-
-LANE_CROCO_TIMER: Final[list[float]] = [5.0, 4.0, 3.0, 2.0]  # [level 2, level 3, level 4, level 5]
-
+# settings for the houses
 HOUSE_SIZE: Final[tuple[int]] = (70, 57)
+HOUSE_TOP_LEFT: Final[list[tuple[int]]] = [
+    (31, 51), 
+    (196, 51), 
+    (365, 51), 
+    (534, 51), 
+    (699, 51)]
+GRAS_RECTS: Final[list[tuple]] = [
+    (0, 99, 31, 9), 
+    (102, 99, 93, 9), 
+    (266, 99, 97, 9), 
+    (436, 99 ,97, 9), 
+    (605, 99, 93, 9), 
+    (770, 99, 800, 9)]
 
-HOUSE_TOP_LEFT: Final[list[tuple[int]]] = [(31, 51), (196, 51), (365, 51), (534, 51), (699, 51)]
-
-GRAS_RECTS: Final[list[tuple]] = [(0, 99, 31, 9), (102, 99, 93, 9), (266, 99, 97, 9), (436, 99 ,97, 9), (605, 99, 93, 9), (770, 99, 800, 9)]
-
-SNAKES: Final[list[bool]] = [False, False, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
-
+# settings for the snakes
 SNAKE_HEAD_RECT: Final[dict[tuple[int]]] = {  # Only the head of the snake is deadly for the frog
     "left": (0, 4, 14, 8),
     "right": (67, 4, 14, 8)
     }
-
 SNAKE_LANE: Final[int] = 346
-
 SNAKE_SPEED: Final[int] = 50
+SNAKES: Final[list[bool]] = [False, False, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
 
+# settings for the game
 SCORE: Final[dict[int]] = {
     "jump": 10,
     "second": 10,
@@ -157,7 +147,6 @@ SCORE: Final[dict[int]] = {
     "frogs left": 100,
     "finish level": 1000
 }
-
 TIME_BAR: Final[dict[int]] = {
     "x pos": 590,  # top right
     "y pos": 650,  # top right
@@ -165,5 +154,4 @@ TIME_BAR: Final[dict[int]] = {
     "height": 20,
     "time": 60.0
 }
-
-FROG_DRAW_HEIGHT: Final[int] = 630  # the y value to draw the remaining frogs
+WINDOW_SIZE: Final[tuple[int]] = (800, 700)
