@@ -40,7 +40,8 @@ class Game:
 
         # load images
         self.images: dict[pg.Surface] = {
-            "background": load_image("background/game background.png"),
+            "game background": load_image("background/game background.png"),
+            "menu background": load_image("background/menu background.png"),
             "house crocodile": load_image("crocodile/house/crocodile.png"),
             "houses": load_image("background/houses background.png"),
             "tree/large": load_images("objects/large trees/", scale_factor=0.9),
@@ -400,7 +401,7 @@ class Game:
         # draw houses to have a background behind the background
         self.screen.blit(self.images["houses"], (0, 0))
         # draw background
-        self.screen.blit(self.images["background"], (0, 26))
+        self.screen.blit(self.images["game background"], (0, 26))
         # draw ripples
         for ripple in self.ripples:
             ripple.render(self.screen)
@@ -467,7 +468,9 @@ class Game:
         pg.display.set_caption(f"     F R O G G E R - C L O N E          FPS:{self.fps}")
         # clear the screen
         self.screen.fill((0, 0, 0))
-        if self.game_state == "play":
+        if self.game_state == "menu":
+            self.screen.blit(self.images["menu background"], (0, 0))
+        elif self.game_state == "play":
             self.render_game()
                 
         pg.display.update()
