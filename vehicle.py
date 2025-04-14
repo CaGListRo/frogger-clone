@@ -18,7 +18,7 @@ class Truck:
         y (int): The center y-coordinate of the truck.
         """
         self.game: Game = game
-        self.pos: tuple[int] = (x, y)
+        self.pos: pg.Vector2 = pg.Vector2(x, y)
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][5]
         self.image: pg.Surface = (choice(self.game.images["trucks"]))
         self.image = pg.transform.rotate(self.image, 180)
@@ -31,18 +31,18 @@ class Truck:
         Args:
         dt (float): The time difference since the last update.
         """
-        self.pos = (self.pos[0] + self.speed * dt, self.pos[1])
-        if self.pos[0] < -self.half_image_width:
-            self.pos = (stgs.WINDOW_SIZE[0] + self.half_image_width, self.pos[1])
+        self.pos.x += self.speed * -1 * dt
+        if self.pos.x < -self.half_image_width:
+            self.pos.x = stgs.WINDOW_SIZE[0] + self.half_image_width
         self.rect.center = self.pos
 
-    def set_speed(self, speed: int) -> None:
+    def rise_speed(self, amount: int) -> None:
         """
         Set the truck's speed.
         Args:
         speed (int): The new speed of the truck.
         """
-        self.speed = speed
+        self.speed += amount
 
     def render(self, surf: pg.Surface) -> None:
         """
@@ -64,7 +64,7 @@ class RacingCar:
         y (int): The center y-coordinate of the racing car.
         """
         self.game: Game = game
-        self.pos: tuple[int] = (x, y)
+        self.pos: pg.Vector2 = pg.Vector2(x, y)
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][6]
         self.image: pg.Surface = (choice(self.game.images["racing_cars"]))
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
@@ -76,18 +76,18 @@ class RacingCar:
         Args:
         dt (float): The time difference since the last update.
         """
-        self.pos = (self.pos[0] + self.speed * dt, self.pos[1])
-        if self.pos[0] > stgs.WINDOW_SIZE[0] + self.half_image_width:
-            self.pos = (-self.half_image_width, self.pos[1])
+        self.pos.x += self.speed * dt
+        if self.pos.x > stgs.WINDOW_SIZE[0] + self.half_image_width:
+            self.pos.x = -self.half_image_width
         self.rect.center = self.pos
 
-    def set_speed(self, speed: int) -> None:
+    def rise_speed(self, amount: int) -> None:
         """
         Set the racing car's speed.
         Args:
         speed (int): The new speed of the racing car.
         """
-        self.speed = speed
+        self.speed += amount
 
     def render(self, surf: pg.Surface) -> None:
         """
@@ -109,7 +109,7 @@ class LargeCar:
         y (int): The center y-coordinate of the large car.
         """
         self.game: Game = game
-        self.pos: tuple[int] = (x, y)
+        self.pos: pg.Vector2 = pg.Vector2(x, y)
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][7]
         self.image: pg.Surface = (choice(self.game.images["large_cars"]))
         self.image = pg.transform.rotate(self.image, 180)
@@ -122,18 +122,18 @@ class LargeCar:
         Args:
         dt (float): The time difference since the last update.
         """
-        self.pos = (self.pos[0] + self.speed * dt, self.pos[1])
-        if self.pos[0] < -self.half_image_width:
-            self.pos = (stgs.WINDOW_SIZE[0] + self.half_image_width, self.pos[1])
+        self.pos.x += self.speed * -1 * dt
+        if self.pos.x < -self.half_image_width:
+            self.pos.x = stgs.WINDOW_SIZE[0] + self.half_image_width
         self.rect.center = self.pos
 
-    def set_speed(self, speed: int) -> None:
+    def rise_speed(self, amount: int) -> None:
         """
         Set the large car's speed.
         Args:
         speed (int): The new speed of the large car.
         """
-        self.speed = speed
+        self.speed += amount
 
     def render(self, surf: pg.Surface) -> None:
         """
@@ -156,7 +156,7 @@ class Bulldozer:
         y (int): The center y-coordinate of the small car.
         """
         self.game: Game = game
-        self.pos: tuple[int] = (x, y)
+        self.pos: pg.Vector2 = pg.Vector2(x, y)
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][8]
         self.animation: Animation = self.game.animations["bulldozer"].copy()
         image_to_blit: pg.Surface = self.animation.get_current_image()
@@ -178,18 +178,18 @@ class Bulldozer:
         image_to_blit: pg.Surface = self.animation.get_current_image()
         self.image.blit(image_to_blit, (0, 0))
 
-        self.pos = (self.pos[0] + self.speed * dt, self.pos[1])
-        if self.pos[0] > stgs.WINDOW_SIZE[0] + self.half_image_width:
-            self.pos = (-self.half_image_width, self.pos[1])
+        self.pos.x += self.speed * dt
+        if self.pos.x > stgs.WINDOW_SIZE[0] + self.half_image_width:
+            self.pos.x = -self.half_image_width
         self.rect.center = self.pos
 
-    def set_speed(self, speed: int) -> None:
+    def rise_speed(self, amount: int) -> None:
         """
         Set the small car's speed.
         Args:
         speed (int): The new speed of the small car.
         """
-        self.speed = speed
+        self.speed += amount
 
     def render(self, surf: pg.Surface) -> None:
         """
@@ -211,7 +211,7 @@ class SmallCar:
         y (int): The center y-coordinate of the small car.
         """
         self.game: Game = game
-        self.pos: tuple[int] = (x, y)
+        self.pos: pg.Vector2 = pg.Vector2(x, y)
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][9]
         self.image: pg.Surface = (choice(self.game.images["small_cars"]))
         self.image = pg.transform.rotate(self.image, 180)
@@ -224,18 +224,18 @@ class SmallCar:
         Args:
         dt (float): The time difference since the last update.
         """
-        self.pos = (self.pos[0] + self.speed * dt, self.pos[1])
-        if self.pos[0] < -self.half_image_width:
-            self.pos = (stgs.WINDOW_SIZE[0] + self.half_image_width, self.pos[1])
+        self.pos.x += self.speed * -1 * dt
+        if self.pos.x < -self.half_image_width:
+            self.pos.x = stgs.WINDOW_SIZE[0] + self.half_image_width
         self.rect.center = self.pos
 
-    def set_speed(self, speed: int) -> None:
+    def rise_speed(self, amount: int) -> None:
         """
         Set the small car's speed.
         Args:
         speed (int): The new speed of the small car.
         """
-        self.speed = speed
+        self.speed += amount
 
     def render(self, surf: pg.Surface) -> None:
         """

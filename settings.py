@@ -76,18 +76,18 @@ SPACING: Final[dict[int]] = {
     "lane 7": [250, 250, 250, 300, 350],   # small trunks
     "lane 6": [240, 240, 240, 290, 340],   # turtle trios
     "lane 5": [350, 320, 300, 280, 260],   # trucks
-    "lane 4": [100, 100, 100, 100, 100],   # racing cars
-    "lane 3": [250, 200, 200, 150, 110],   # large cars
+    "lane 4": [150, 150, 150, 150, 150],   # racing cars
+    "lane 3": [250, 200, 200, 150, 120],   # large cars
     "lane 2": [250, 200, 200, 150, 130],   # bulldozer
     "lane 1": [250, 200, 200, 150, 120],   # small cars
 }
 START_SPEED: Final[dict[list[int]]] = {
     # [trunks, turtles, trunks, trunks, turtles, trucks, racing cars, cars, bulldozer, cars]
-    "level 1": [50, -40, 90, 30, -40, -40, 50, -30, 40, -25],
-    "level 2": [70, -30, 50, 70, -50, -55, 90, -50, 50, -40],
-    "level 3": [50, -50, 60, 40, -60, -40, 100, -60, 40, -70],
-    "level 4": [80, -60, 30, 70, -40, -60, 110, -70, 30, -60],
-    "level 5": [90, -70, 70, 90, -70, -75, 130, -80, 60, -90],
+    "level 1": [50, 40, 90, 30, 40, 40, 50, 30, 40, 25],
+    "level 2": [70, 30, 50, 70, 50, 55, 90, 50, 50, 40],
+    "level 3": [50, 50, 60, 40, 60, 40, 100, 60, 40, 70],
+    "level 4": [80, 60, 30, 70, 40, 60, 110, 70, 30, 60],
+    "level 5": [90, 70, 70, 90, 70, 75, 130, 80, 60, 90],
 }
 STREET: Final[dict[list[int]]] = {
     "level 1": [2, 1, 3, 3, 3],  # [trucks, racing cars, big cars, bulldozer, small cars]
@@ -147,6 +147,7 @@ SCORE: Final[dict[int]] = {
     "frogs left": 100,
     "finish level": 1000
 }
+SPEED_UP_SCORE: Final[list[int]] = [1800, 3600, 5400, 7200, 10_000]
 TIME_BAR: Final[dict[int]] = {
     "x pos": 590,  # top right
     "y pos": 650,  # top right

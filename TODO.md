@@ -13,6 +13,8 @@
 
 - make a proceed level function after all houses are full. Highest level 5? **done**
 
+- speed up the traffic and water traffic at certain scores **done**
+
 - start screen
 - menu
 - sounds

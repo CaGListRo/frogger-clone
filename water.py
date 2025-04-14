@@ -38,13 +38,13 @@ class Tree:
             self.pos.x = -self.half_image_width
         self.rect.center = self.pos
 
-    def set_speed(self, speed: int) -> None:
+    def rise_speed(self, amount: int) -> None:
         """
         Set the tree's speed.
         Args:
         speed (int): The new speed of the tree.
         """
-        self.speed = speed
+        self.speed += amount
 
     def render(self, surf: pg.Surface) -> None:
         """
@@ -121,19 +121,19 @@ class Turtle:
         image_to_blit: pg.Surface = self.animation.get_current_image()
         self.draw_image(image_to_blit=image_to_blit)
 
-        self.pos.x += self.speed * dt
+        self.pos.x += self.speed * -1 * dt
         if self.pos.x < 0 - self.image_size[0] // 2:
             self.pos.x = stgs.WINDOW_SIZE[0] + self.image_size[0] // 2
 
         self.rect.center = self.pos
 
-    def set_speed(self, speed: int) -> None:
+    def rise_speed(self, amount: int) -> None:
         """
         Set the turtle's speed.
         Args:
         speed (int): The new speed of the turtle.
         """
-        self.speed = speed
+        self.speed += amount
 
     def draw_image(self, image_to_blit: pg.Surface) -> None:
         """

@@ -28,12 +28,13 @@ class Game:
         self.running: bool = True
         self.fps: int = 0
 
-        self.level: int = 3
+        self.level: int = 2
         self.frog_time: int = 0                      # this ist the time one frog needed from the start to "his" house
         self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
         self.show_time: float = stgs.SHOW_FROG_TIME  # how long the frog time is shown
         self.score: int = 0
-        self.game_state: str = "menu"
+        self.speed_ups: list[bool] = [False, False, False, False, False]
+        self.game_state: str = "play"
 
         # fonts
         self.score_font: pg.font.Font = pg.font.SysFont("Comic Sans", 32)
@@ -281,6 +282,17 @@ class Game:
         if self.frog.pos.y <= stgs.FROG_WATER_COLLISION_HEIGHT and True not in collided_list:
             self.frog.set_dead("water")
 
+    def check_speed_up(self) -> None:
+        """ Checks if the traffic according to the score has to sped up. """
+        for idx, score in enumerate(stgs.SPEED_UP_SCORE):
+            if self.score >= score and not self.speed_ups[idx]:
+                self.speed_up_traffic(self.level * 10)
+                self.speed_ups[idx] = True
+            elif self.score >= score and self.speed_ups[idx]:
+                continue
+            else:
+                break
+
     def proceed_level(self) -> None:
         """ Proceeds to the next level. """
         if self.level < 5:
@@ -288,6 +300,15 @@ class Game:
             self.initialize_game()
         else:
             raise NotImplementedError
+
+    def speed_up_traffic(self, amount: int) -> None:
+        """ Speeds up the traffic by a certain amount. """
+        for lane in self.traffic:
+            for vehicle in lane:
+                vehicle.rise_speed(amount)
+        for lane in self.water_traffic:
+            for element in lane:
+                element.rise_speed(amount)
 
     def time_up(self) -> None:
         """ Is called from the time bar object, if the time is up. """
@@ -494,6 +515,10 @@ class Game:
                 fps_counter = 0
                 fps_timer = 0.0
 
+            # check for ztaffic speed ups
+            self.check_speed_up()
+
+            # playing the game
             if self.game_state == "play":
                 self.update_variables(dt)
                 self.update_objects(dt)
