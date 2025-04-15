@@ -1,3 +1,5 @@
+import settings as stgs
+
 import os
 import pygame as pg
 from typing import Final
@@ -106,3 +108,28 @@ class Animation:
         else:
             self.done = True
             return self.done
+        
+
+class Button:
+    """ A button class that can be used to create buttons in the game. """
+    def __init__(self, x: int, y: int, text: str, color: str) -> None:
+        """ Initializes a button object.
+        Args:
+        x (int): the x position of the button
+        y (int): the y position of the button
+        text (str): the text to be displayed on the button
+        color (str): the color of the button
+        """
+        self.pos: pg.Vector2 = pg.Vector2(x, y)
+        self.size: tuple[int] = stgs.BUTTON_SIZE
+        self.color: str = color
+        self.font: pg.font.Font = pg.font.SysFont("comicsans bold", 32)
+        self.offset: int = stgs.BUTTON_OFFSET
+        self.rect: pg.Rect = pg.Rect(self.pos.x, self.pos.y - self.offset, self.size)
+
+    def render(self, surf: pg.Surface) -> None:
+        """ Renders the button on the given surface.
+        Args:
+        surf (pg.Surface): the surface to render the button on
+        """
+

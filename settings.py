@@ -56,7 +56,7 @@ FROG_START_POS: Final[tuple[int]] = (400, 605)
 FROG_WATER_COLLISION_HEIGHT: Final[int] = 308
 SHOW_FROG_TIME: Final[float] = 3.0
 
-# traffic settings (water and street traffic)
+# settings for the traffic  (water and street traffic)
 LANE_HEIGHTS: Final[dict[int]] = {
     "lane 10": 130,  # medium trunk
     "lane 9": 173,   # turtle pairs
@@ -156,3 +156,14 @@ TIME_BAR: Final[dict[int]] = {
     "time": 60.0
 }
 WINDOW_SIZE: Final[tuple[int]] = (800, 700)
+
+# settings for the menu
+BUTTON_COLORS: Final[dict[tuple[int]]] = {
+    # Button colors including the hover, frame and shadow colors.
+    'green': {'main_color': (56, 155, 60), 'hover_color': (76, 175, 80), 'shadow_color': (16, 115, 20), 'frame_color': (6, 95, 20)},
+    'yellow': {'main_color': (235, 235, 0), 'hover_color': (255, 255, 50), 'shadow_color': (195, 195, 0), 'frame_color': (125, 125, 0)},
+    'red': {'main_color': (235, 0, 0), 'hover_color': (255, 50, 50), 'shadow_color': (175, 0, 0), 'frame_color': (100, 0, 0)},
+    'white': {'main_color': (235, 235, 235), 'hover_color': (255, 255, 255), 'shadow_color': (175, 175, 175), 'frame_color': (100, 100, 100)}
+    }
+BUTTON_SIZE: Final[tuple[int]] = (100, 30)  # (width, height)
+BUTTON_OFFSET: Final[int] = 5               # is needed for the click animation

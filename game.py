@@ -515,7 +515,7 @@ class Game:
                 fps_counter = 0
                 fps_timer = 0.0
 
-            # check for ztaffic speed ups
+            # check for traffic speed ups
             self.check_speed_up()
 
             # playing the game
