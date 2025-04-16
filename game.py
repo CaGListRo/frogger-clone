@@ -1,5 +1,5 @@
 from utils import load_image, load_images
-from utils import Animation
+from utils import Animation, Button
 import settings as stgs
 from snake import MiddleSnake
 from fly import HouseFly
@@ -34,7 +34,7 @@ class Game:
         self.show_time: float = stgs.SHOW_FROG_TIME  # how long the frog time is shown
         self.score: int = 0
         self.speed_ups: list[bool] = [False, False, False, False, False]
-        self.game_state: str = "play"
+        self.game_state: str = "menu"
 
         # fonts
         self.score_font: pg.font.Font = pg.font.SysFont("Comic Sans", 32)
@@ -78,6 +78,7 @@ class Game:
 
         self.direction_pressed: bool = False
         
+        self.initialize_menu()
         self.initialize_game()  # <------------------------------------------ MOVE WHEN GAME STATES GET IMPLEMENTED
 
         self.house_rects: list[pg.Rect] = [pg.Rect(stgs.HOUSE_TOP_LEFT[0][0], stgs.HOUSE_TOP_LEFT[0][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
@@ -93,6 +94,10 @@ class Game:
         self.house_fly: None | HouseFly = None
         self.middle_snake: None | MiddleSnake = None
         
+    def initialize_menu(self) -> None:
+        """ Initialize the game menu. """
+        self.start_button: Button = Button(100, 100, "Start", "green")
+
     def initialize_game(self) -> None:
         """ Initializes the game. """
         self.frogs: int = 7
@@ -491,6 +496,7 @@ class Game:
         self.screen.fill((0, 0, 0))
         if self.game_state == "menu":
             self.screen.blit(self.images["menu background"], (0, 0))
+            self.start_button.render(self.screen)
         elif self.game_state == "play":
             self.render_game()
                 

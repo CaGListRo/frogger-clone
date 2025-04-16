@@ -115,21 +115,35 @@ class Button:
     def __init__(self, x: int, y: int, text: str, color: str) -> None:
         """ Initializes a button object.
         Args:
-        x (int): the x position of the button
+        x (int): the x position of the button 
         y (int): the y position of the button
         text (str): the text to be displayed on the button
-        color (str): the color of the button
+        color (str): the color of the button (green, yellow, red, white)
         """
         self.pos: pg.Vector2 = pg.Vector2(x, y)
         self.size: tuple[int] = stgs.BUTTON_SIZE
         self.color: str = color
-        self.font: pg.font.Font = pg.font.SysFont("comicsans bold", 32)
+        self.shadow_color: tuple[int] = stgs.BUTTON_COLORS[self.color]["shadow_color"]
+        self.main_color: tuple[int] = stgs.BUTTON_COLORS[self.color]["main_color"]
+        self.frame_color: tuple[int] = stgs.BUTTON_COLORS[self.color]["frame_color"]
+        self.hover_color: tuple[int] = stgs.BUTTON_COLORS[self.color]["hover_color"]
+        font: pg.font.Font = pg.font.SysFont("comicsans", 32)
+        self.text: pg.Surface = font.render(text, True, "white")
+        self.text_shadow: pg.Surface = font.render(text, True, "black")
+        self.text_pos: tuple[int] = (int(self.pos.x + self.size[0] // 2 - self.text.get_width() // 2),
+                                     int(self.pos.y + self.size[1] // 2 - self.text.get_height() // 2))
+        self.clicked: bool = False
         self.offset: int = stgs.BUTTON_OFFSET
-        self.rect: pg.Rect = pg.Rect(self.pos.x, self.pos.y - self.offset, self.size)
+        self.rect: pg.Rect = pg.Rect(self.pos.x, self.pos.y - self.offset, self.size[0], self.size[1])
 
     def render(self, surf: pg.Surface) -> None:
         """ Renders the button on the given surface.
         Args:
         surf (pg.Surface): the surface to render the button on
         """
+        pg.draw.rect(surf, self.shadow_color, (self.pos.x, self.pos.y, self.size[0], self.size[1]), border_radius=5)
+        pg.draw.rect(surf, self.main_color, self.rect, border_radius=5)
+        pg.draw.rect(surf, self.frame_color, self.rect, width=3, border_radius=5)
+        surf.blit(self.text_shadow, (self.text_pos[0], self.text_pos[1] - self.offset))
+        surf.blit(self.text, (self.text_pos[0] - 2, self.text_pos[1] - self.offset - 2))
 

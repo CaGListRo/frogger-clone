@@ -165,5 +165,5 @@ BUTTON_COLORS: Final[dict[tuple[int]]] = {
     'red': {'main_color': (235, 0, 0), 'hover_color': (255, 50, 50), 'shadow_color': (175, 0, 0), 'frame_color': (100, 0, 0)},
     'white': {'main_color': (235, 235, 235), 'hover_color': (255, 255, 255), 'shadow_color': (175, 175, 175), 'frame_color': (100, 100, 100)}
     }
-BUTTON_SIZE: Final[tuple[int]] = (100, 30)  # (width, height)
+BUTTON_SIZE: Final[tuple[int]] = (150, 40)  # (width, height)
 BUTTON_OFFSET: Final[int] = 5               # is needed for the click animation
