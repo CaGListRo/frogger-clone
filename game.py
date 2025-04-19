@@ -28,7 +28,7 @@ class Game:
         self.running: bool = True
         self.fps: int = 0
 
-        self.level: int = 2
+        self.level: int = 1
         self.frog_time: int = 0                      # this ist the time one frog needed from the start to "his" house
         self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
         self.show_time: float = stgs.SHOW_FROG_TIME  # how long the frog time is shown
@@ -79,7 +79,6 @@ class Game:
         self.direction_pressed: bool = False
         
         self.initialize_menu()
-        self.initialize_game()  # <------------------------------------------ MOVE WHEN GAME STATES GET IMPLEMENTED
 
         self.house_rects: list[pg.Rect] = [pg.Rect(stgs.HOUSE_TOP_LEFT[0][0], stgs.HOUSE_TOP_LEFT[0][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
                                            pg.Rect(stgs.HOUSE_TOP_LEFT[1][0], stgs.HOUSE_TOP_LEFT[1][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
@@ -227,6 +226,12 @@ class Game:
             for element in lane:
                     lane_list.append(self.frog.pos.x - element.pos.x)
             self.distances.append(lane_list)
+
+    def check_buttons(self) -> None:
+        """ Checks if the buttons are pressed. """
+        if self.start_button.check_clicked():
+            self.initialize_game()
+            self.game_state = "play"
 
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
@@ -489,14 +494,18 @@ class Game:
         # draw time bar
         self.time_bar.render(self.screen)
 
+    def render_menu(self) -> None:
+        """ Renders the menu. """
+        self.screen.blit(self.images["menu background"], (0, 0))
+        self.start_button.render(self.screen)
+
     def draw_screen(self) -> None:
         """ Draws the game screen. """
         pg.display.set_caption(f"     F R O G G E R - C L O N E          FPS:{self.fps}")
         # clear the screen
         self.screen.fill((0, 0, 0))
         if self.game_state == "menu":
-            self.screen.blit(self.images["menu background"], (0, 0))
-            self.start_button.render(self.screen)
+            self.render_menu()
         elif self.game_state == "play":
             self.render_game()
                 
@@ -504,7 +513,7 @@ class Game:
 
     def main(self) -> None:
         """ Runs the main game loop. """
-        self.calculate_distances()
+        # self.calculate_distances()
         old_time: float = pc()
         fps_timer: float = 0.0
         fps_counter: int = 0
@@ -523,6 +532,8 @@ class Game:
 
             # check for traffic speed ups
             self.check_speed_up()
+            if self.game_state == "menu":
+                self.check_buttons()
 
             # playing the game
             if self.game_state == "play":
