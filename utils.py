@@ -112,15 +112,14 @@ class Animation:
 
 class Button:
     """ A button class that can be used to create buttons in the game. """
-    def __init__(self, x: int, y: int, text: str, color: str) -> None:
+    def __init__(self, pos: tuple[int], text: str, color: str) -> None:
         """ Initializes a button object.
         Args:
-        x (int): the x position of the button 
-        y (int): the y position of the button
-        text (str): the text to be displayed on the button
-        color (str): the color of the button (green, yellow, red, white)
+        pos (tuple(int)): The topleft position of the button
+        text (str): The text to be displayed on the button
+        color (str): The color of the button (green, yellow, red, white)
         """
-        self.pos: pg.Vector2 = pg.Vector2(x, y)
+        self.pos: pg.Vector2 = pg.Vector2(pos)
         self.size: tuple[int] = stgs.BUTTON_SIZE
         
         self.shadow_color: tuple[int] = stgs.BUTTON_COLORS[color]["shadow_color"]
@@ -128,7 +127,7 @@ class Button:
         self.frame_color: tuple[int] = stgs.BUTTON_COLORS[color]["frame_color"]
         self.hover_color: tuple[int] = stgs.BUTTON_COLORS[color]["hover_color"]
         self.color: str = self.main_color
-        font: pg.font.Font = pg.font.SysFont("comicsans", 32)
+        font: pg.font.Font = pg.font.SysFont("comicsans", 23)
         self.text: pg.Surface = font.render(text, True, "white")
         self.text_shadow: pg.Surface = font.render(text, True, "black")
         self.text_pos: tuple[int] = (int(self.pos.x + self.size[0] // 2 - self.text.get_width() // 2),

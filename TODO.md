@@ -15,7 +15,8 @@
 
 - speed up the traffic and water traffic at certain scores **done**
 
-- start screen
+- start screen **done**
+- highscore list
 - menu
   - Buttons
 - sounds

@@ -35,6 +35,7 @@ class Game:
         self.score: int = 0
         self.speed_ups: list[bool] = [False, False, False, False, False]
         self.game_state: str = "menu"
+        self.language: str = "en"
 
         # fonts
         self.score_font: pg.font.Font = pg.font.SysFont("Comic Sans", 32)
@@ -92,10 +93,10 @@ class Game:
         self.house_crocodile: None | HouseCrocodile = None
         self.house_fly: None | HouseFly = None
         self.middle_snake: None | MiddleSnake = None
-        
+    
     def initialize_menu(self) -> None:
         """ Initialize the game menu. """
-        self.start_button: Button = Button(100, 100, "Start", "green")
+        self.create_menu_buttons()
 
     def initialize_game(self) -> None:
         """ Initializes the game. """
@@ -127,6 +128,15 @@ class Game:
     def calculate_time_score(self) -> None:
         """ Calculates the score for the remaining time. """
         self.score += self.time_bar.get_time() * 10
+
+    def create_menu_buttons(self) -> None:
+        """ Creates the buttons for the menu. """
+        self.menu_buttons: list[Button] = [        
+            Button(stgs.BUTTON_POSITIONS_MENU["start"], stgs.BUTTON_NAMES["start"][self.language], "green"),
+            Button(stgs.BUTTON_POSITIONS_MENU["options"], stgs.BUTTON_NAMES["options"][self.language], "white"),
+            Button(stgs.BUTTON_POSITIONS_MENU["highscores"], stgs.BUTTON_NAMES["highscores"][self.language], "white"),
+            Button(stgs.BUTTON_POSITIONS_MENU["quit"], stgs.BUTTON_NAMES["quit"][self.language], "red")
+        ]
 
     def create_new_ripple(self) -> None:
         """ Creates a new ripple at a random y-position. """
@@ -229,9 +239,18 @@ class Game:
 
     def check_buttons(self) -> None:
         """ Checks if the buttons are pressed. """
-        if self.start_button.check_clicked():
-            self.initialize_game()
-            self.game_state = "play"
+        for idx, button in enumerate(self.menu_buttons):
+            if button.check_clicked():
+                match idx:
+                    case 0:
+                        self.initialize_game()
+                        self.game_state = "play"
+                    case 1:
+                        print("options clicked")
+                    case 2:
+                        print("highscores clicked")
+                    case 3:
+                        self.running = False
 
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
@@ -497,7 +516,8 @@ class Game:
     def render_menu(self) -> None:
         """ Renders the menu. """
         self.screen.blit(self.images["menu background"], (0, 0))
-        self.start_button.render(self.screen)
+        for button in self.menu_buttons:
+            button.render(self.screen)
 
     def draw_screen(self) -> None:
         """ Draws the game screen. """

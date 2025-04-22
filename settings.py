@@ -165,5 +165,14 @@ BUTTON_COLORS: Final[dict[tuple[int]]] = {
     'red': {'main_color': (235, 0, 0), 'hover_color': (255, 50, 50), 'shadow_color': (175, 0, 0), 'frame_color': (100, 0, 0)},
     'white': {'main_color': (235, 235, 235), 'hover_color': (255, 255, 255), 'shadow_color': (175, 175, 175), 'frame_color': (100, 100, 100)}
     }
-BUTTON_SIZE: Final[tuple[int]] = (150, 40)  # (width, height)
+BUTTON_NAMES: Final[dict[dict[str]]] = {
+    "back": {"de": "ZURÜCK", "en": "BACK", "es": "VOLVER", "fr": "RETOUR", "it": "INDIETRO", "tr": "GERİ"},
+    "highscores": {"de": "RANGLISTE", "en": "HIGHSCORES", "es": "PUNTUACIONES", "fr": "MEILLEURS SCORES", "it": "CLASSIFICA", "tr": "SKOR TABLOSU"},
+    "language": {"de": "DEUTSCH", "en": "ENGLISH", "es": "ESPAÑOL", "fr": "FRANÇAIS", "it": "ITALIANO", "tr": "TÜRKÇE"},
+    "options": {"de": "OPTIONEN", "en": "OPTIONS", "es": "OPCIONES", "fr": "OPTIONS", "it": "OPZIONI", "tr": "SEÇENEKLER"},
+    "start": {"de": "START", "en": "START", "es": "COMENZAR", "fr": "COMMENCER", "it": "INIZIO", "tr": "BAŞLAT"},
+    "quit": {"de": "BEENDEN", "en": "QUIT", "es": "SALIR", "fr": "QUITTER", "it": "USCIRE", "tr": "ÇIKIŞ"},
+}
+BUTTON_POSITIONS_MENU: Final[dict[tuple]] = {"highscores": (405, 50), "options": (245, 50), "start": (85, 50), "quit": (565, 50)}
 BUTTON_OFFSET: Final[int] = 5               # is needed for the click animation
+BUTTON_SIZE: Final[tuple[int]] = (150, 40)  # (width, height)
