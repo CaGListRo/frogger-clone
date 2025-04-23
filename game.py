@@ -36,6 +36,7 @@ class Game:
         self.speed_ups: list[bool] = [False, False, False, False, False]
         self.game_state: str = "menu"
         self.language: str = "en"
+        self.back_button: None | Button = None
 
         # fonts
         self.score_font: pg.font.Font = pg.font.SysFont("Comic Sans", 32)
@@ -138,6 +139,10 @@ class Game:
             Button(stgs.BUTTON_POSITIONS_MENU["quit"], stgs.BUTTON_NAMES["quit"][self.language], "red")
         ]
 
+    def create_back_button(self) -> None:
+        """ Creates the bak button for the options menu and the highscores screen. """
+        self.back_button = Button(stgs.BUTTON_POSITIONS_MENU["back"], stgs.BUTTON_NAMES["back"][self.language], "yellow")
+
     def create_new_ripple(self) -> None:
         """ Creates a new ripple at a random y-position. """
         self.ripples.append(Ripple(self, pos=(-10, ri(25, 258))))
@@ -239,18 +244,25 @@ class Game:
 
     def check_buttons(self) -> None:
         """ Checks if the buttons are pressed. """
-        for idx, button in enumerate(self.menu_buttons):
-            if button.check_clicked():
-                match idx:
-                    case 0:
-                        self.initialize_game()
-                        self.game_state = "play"
-                    case 1:
-                        print("options clicked")
-                    case 2:
-                        print("highscores clicked")
-                    case 3:
-                        self.running = False
+        if self.game_state == "menu":
+            for idx, button in enumerate(self.menu_buttons):
+                if button.check_clicked():
+                    match idx:
+                        case 0:
+                            self.initialize_game()
+                            self.game_state = "play"
+                        case 1:
+                            self.game_state = "options"
+                            self.create_back_button()
+                        case 2:
+                            self.game_state = "highscores"
+                            self.create_back_button()
+                        case 3:
+                            self.running = False
+        elif self.game_state == "options" or self.game_state == "highscores":
+            if self.back_button.check_clicked():
+                self.game_state = "menu"
+                self.back_button = None
 
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
@@ -342,6 +354,11 @@ class Game:
     def time_up(self) -> None:
         """ Is called from the time bar object, if the time is up. """
         self.new_frog_or_game_over()
+
+    def load_highscores(self) -> None:
+        """ Loads the highscores from the highscores.list and puts them in a python list of lists. """
+        with open("highscores.list", "r") as file:
+            self.highscores: list[list[str]] = [line.strip().split() for line in file.readlines()]
 
     def event_handler(self) -> None:
         """ Handles events in the game. """
@@ -514,10 +531,22 @@ class Game:
         self.time_bar.render(self.screen)
 
     def render_menu(self) -> None:
-        """ Renders the menu. """
+        """ Renders the main menu. """
         self.screen.blit(self.images["menu background"], (0, 0))
         for button in self.menu_buttons:
             button.render(self.screen)
+
+    def render_options(self) -> None:
+        """ Renders the options menu. """
+
+    def render_highscores(self) -> None:
+        """ Render the high scores screen. """
+        # self.screen.blit(self.images["highscores background"], (0, 0))
+        # Render high score entries
+        for index, (score, name) in enumerate(self.highscores):
+            score_text: pg.Surface = self.score_font.render(f"{index + 1}. {score} {name}", True, "white")
+            self.screen.blit(score_text, (10, 20 + index * 30))
+        self.back_button.render(self.screen)
 
     def draw_screen(self) -> None:
         """ Draws the game screen. """
@@ -528,6 +557,12 @@ class Game:
             self.render_menu()
         elif self.game_state == "play":
             self.render_game()
+        # showing the highscores
+        elif self.game_state == "highscores":
+            self.render_highscores()
+        # showing the options menu
+        elif self.game_state == "options":
+            self.render_options()
                 
         pg.display.update()
 
@@ -537,6 +572,7 @@ class Game:
         old_time: float = pc()
         fps_timer: float = 0.0
         fps_counter: int = 0
+        self.load_highscores()
         while self.running:
             # calculate delta time
             dt: float = pc() - old_time
@@ -552,11 +588,11 @@ class Game:
 
             # check for traffic speed ups
             self.check_speed_up()
-            if self.game_state == "menu":
+            if self.game_state != "play":
                 self.check_buttons()
 
             # playing the game
-            if self.game_state == "play":
+            elif self.game_state == "play":
                 self.update_variables(dt)
                 self.update_objects(dt)
                 self.check_collisions()
