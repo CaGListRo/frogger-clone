@@ -133,15 +133,15 @@ class Game:
     def create_menu_buttons(self) -> None:
         """ Creates the buttons for the menu. """
         self.menu_buttons: list[Button] = [        
-            Button(stgs.BUTTON_POSITIONS_MENU["start"], stgs.BUTTON_NAMES["start"][self.language], "green"),
-            Button(stgs.BUTTON_POSITIONS_MENU["options"], stgs.BUTTON_NAMES["options"][self.language], "white"),
-            Button(stgs.BUTTON_POSITIONS_MENU["highscores"], stgs.BUTTON_NAMES["highscores"][self.language], "white"),
-            Button(stgs.BUTTON_POSITIONS_MENU["quit"], stgs.BUTTON_NAMES["quit"][self.language], "red")
+            Button(stgs.BUTTON_POSITIONS["start"], stgs.BUTTON_NAMES["start"][self.language], "green"),
+            Button(stgs.BUTTON_POSITIONS["options"], stgs.BUTTON_NAMES["options"][self.language], "white"),
+            Button(stgs.BUTTON_POSITIONS["highscores"], stgs.BUTTON_NAMES["highscores"][self.language], "white"),
+            Button(stgs.BUTTON_POSITIONS["quit"], stgs.BUTTON_NAMES["quit"][self.language], "red")
         ]
 
     def create_back_button(self) -> None:
         """ Creates the bak button for the options menu and the highscores screen. """
-        self.back_button = Button(stgs.BUTTON_POSITIONS_MENU["back"], stgs.BUTTON_NAMES["back"][self.language], "yellow")
+        self.back_button = Button(stgs.BUTTON_POSITIONS["back"], stgs.BUTTON_NAMES["back"][self.language], "yellow")
 
     def create_new_ripple(self) -> None:
         """ Creates a new ripple at a random y-position. """
@@ -538,14 +538,18 @@ class Game:
 
     def render_options(self) -> None:
         """ Renders the options menu. """
+        self.back_button.render(self.screen)
 
     def render_highscores(self) -> None:
         """ Render the high scores screen. """
         # self.screen.blit(self.images["highscores background"], (0, 0))
+        self.screen.fill((100,100,100))  # <------------------------------- for testing, gets replaced with an background image
         # Render high score entries
         for index, (score, name) in enumerate(self.highscores):
-            score_text: pg.Surface = self.score_font.render(f"{index + 1}. {score} {name}", True, "white")
-            self.screen.blit(score_text, (10, 20 + index * 30))
+            score_shadow: pg.Surface = self.score_font.render(f"{index + 1}.    {score} {name}", True, "black")
+            score_text: pg.Surface = self.score_font.render(f"{index + 1}.    {score} {name}", True, "white")
+            self.screen.blit(score_shadow, (102, 22 + index * 30))
+            self.screen.blit(score_text, (100, 20 + index * 30))
         self.back_button.render(self.screen)
 
     def draw_screen(self) -> None:

@@ -173,6 +173,6 @@ BUTTON_NAMES: Final[dict[dict[str]]] = {
     "start": {"de": "START", "en": "START", "es": "COMENZAR", "fr": "COMMENCER", "it": "INIZIO", "tr": "BAŞLAT"},
     "quit": {"de": "BEENDEN", "en": "QUIT", "es": "SALIR", "fr": "QUITTER", "it": "USCIRE", "tr": "ÇIKIŞ"},
 }
-BUTTON_POSITIONS_MENU: Final[dict[tuple]] = {"back": (600, 650), "highscores": (405, 50), "options": (245, 50), "start": (85, 50), "quit": (565, 50)}
+BUTTON_POSITIONS: Final[dict[tuple]] = {"back": (600, 650), "highscores": (412, 50), "options": (218, 50), "start": (24, 50), "quit": (606, 50)}
 BUTTON_OFFSET: Final[int] = 5               # is needed for the click animation
-BUTTON_SIZE: Final[tuple[int]] = (150, 40)  # (width, height)
+BUTTON_SIZE: Final[tuple[int]] = (170, 40)  # (width, height)
