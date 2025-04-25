@@ -35,7 +35,8 @@ class Game:
         self.score: int = 0
         self.speed_ups: list[bool] = [False, False, False, False, False]
         self.game_state: str = "menu"
-        self.language: str = "en"
+        self.languages: list[str] = [language for language in stgs.BUTTON_NAMES["language"]]
+        self.language: str = self.languages[1]
         self.back_button: None | Button = None
 
         # fonts
@@ -133,15 +134,21 @@ class Game:
     def create_menu_buttons(self) -> None:
         """ Creates the buttons for the menu. """
         self.menu_buttons: list[Button] = [        
-            Button(stgs.BUTTON_POSITIONS["start"], stgs.BUTTON_NAMES["start"][self.language], "green"),
-            Button(stgs.BUTTON_POSITIONS["options"], stgs.BUTTON_NAMES["options"][self.language], "white"),
-            Button(stgs.BUTTON_POSITIONS["highscores"], stgs.BUTTON_NAMES["highscores"][self.language], "white"),
-            Button(stgs.BUTTON_POSITIONS["quit"], stgs.BUTTON_NAMES["quit"][self.language], "red")
+            Button(stgs.BUTTON_POSITIONS["start"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["start"][self.language], "green"),
+            Button(stgs.BUTTON_POSITIONS["options"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["options"][self.language], "white"),
+            Button(stgs.BUTTON_POSITIONS["highscores"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["highscores"][self.language], "white"),
+            Button(stgs.BUTTON_POSITIONS["quit"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["quit"][self.language], "red")
         ]
 
     def create_back_button(self) -> None:
         """ Creates the bak button for the options menu and the highscores screen. """
-        self.back_button = Button(stgs.BUTTON_POSITIONS["back"], stgs.BUTTON_NAMES["back"][self.language], "yellow")
+        self.back_button = Button(stgs.BUTTON_POSITIONS["back"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["back"][self.language], "yellow")
+
+    def create_language_buttons(self) -> None:
+        """ Creates the language buttons for the options menu. """
+        self.language_buttons: list[Button] = []
+        for idx, button in enumerate(stgs.BUTTON_NAMES["language"].values()):
+            self.language_buttons.append(Button((11 + idx * 130, 600), stgs.LANGUAGE_BUTTON_SIZE, button, "white"))
 
     def create_new_ripple(self) -> None:
         """ Creates a new ripple at a random y-position. """
@@ -252,8 +259,10 @@ class Game:
                             self.initialize_game()
                             self.game_state = "play"
                         case 1:
-                            self.game_state = "options"
                             self.create_back_button()
+                            self.create_language_buttons()
+                            self.game_state = "options"
+                            
                         case 2:
                             self.game_state = "highscores"
                             self.create_back_button()
@@ -263,6 +272,14 @@ class Game:
             if self.back_button.check_clicked():
                 self.game_state = "menu"
                 self.back_button = None
+                self.language_buttons = []
+            for idx, button in enumerate(self.language_buttons):
+                old_language: str = self.language
+                if button.check_clicked():
+                    self.language = self.languages[idx]
+                if old_language != self.language:
+                    self.create_menu_buttons()
+                    self.create_back_button()
 
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
@@ -539,6 +556,8 @@ class Game:
     def render_options(self) -> None:
         """ Renders the options menu. """
         self.back_button.render(self.screen)
+        for button in self.language_buttons:
+            button.render(self.screen)
 
     def render_highscores(self) -> None:
         """ Render the high scores screen. """

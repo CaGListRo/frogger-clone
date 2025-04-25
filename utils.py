@@ -112,7 +112,7 @@ class Animation:
 
 class Button:
     """ A button class that can be used to create buttons in the game. """
-    def __init__(self, pos: tuple[int], text: str, color: str) -> None:
+    def __init__(self, pos: tuple[int], size: tuple[int], text: str, color: str) -> None:
         """ Initializes a button object.
         Args:
         pos (tuple(int)): The topleft position of the button
@@ -120,7 +120,7 @@ class Button:
         color (str): The color of the button (green, yellow, red, white)
         """
         self.pos: pg.Vector2 = pg.Vector2(pos)
-        self.size: tuple[int] = stgs.BUTTON_SIZE
+        self.size: tuple[int] = size
         
         self.shadow_color: tuple[int] = stgs.BUTTON_COLORS[color]["shadow_color"]
         self.main_color: tuple[int] = stgs.BUTTON_COLORS[color]["main_color"]

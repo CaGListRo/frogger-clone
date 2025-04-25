@@ -176,3 +176,5 @@ BUTTON_NAMES: Final[dict[dict[str]]] = {
 BUTTON_POSITIONS: Final[dict[tuple]] = {"back": (600, 650), "highscores": (412, 50), "options": (218, 50), "start": (24, 50), "quit": (606, 50)}
 BUTTON_OFFSET: Final[int] = 5               # is needed for the click animation
 BUTTON_SIZE: Final[tuple[int]] = (170, 40)  # (width, height)
+LANGUAGE_BUTTON_SIZE: Final[tuple[int]] = (120, 40)  # (width, height)
+LANGUAGE_BUTTON_POSITIONS: Final[list[tuple]] = [()]
