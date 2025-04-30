@@ -45,7 +45,9 @@ class Game:
         # load images
         self.images: dict[pg.Surface] = {
             "game background": load_image("background/game background.png"),
+            "highscores background": load_image("background/highscores background.png"),
             "menu background": load_image("background/menu background.png"),
+            "options background": load_image("background/options background.png"),
             "house crocodile": load_image("crocodile/house/crocodile.png"),
             "houses": load_image("background/houses background.png"),
             "tree/large": load_images("objects/large trees/", scale_factor=0.9),
@@ -273,13 +275,14 @@ class Game:
                 self.game_state = "menu"
                 self.back_button = None
                 self.language_buttons = []
-            for idx, button in enumerate(self.language_buttons):
-                old_language: str = self.language
-                if button.check_clicked():
-                    self.language = self.languages[idx]
-                if old_language != self.language:
-                    self.create_menu_buttons()
-                    self.create_back_button()
+            if self.game_state == "options":   
+                for idx, button in enumerate(self.language_buttons):
+                    old_language: str = self.language
+                    if button.check_clicked():
+                        self.language = self.languages[idx]
+                    if old_language != self.language:
+                        self.create_menu_buttons()
+                        self.create_back_button()
 
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
@@ -555,14 +558,14 @@ class Game:
 
     def render_options(self) -> None:
         """ Renders the options menu. """
+        self.screen.blit(self.images["options background"], (0, 0))
         self.back_button.render(self.screen)
         for button in self.language_buttons:
             button.render(self.screen)
 
     def render_highscores(self) -> None:
         """ Render the high scores screen. """
-        # self.screen.blit(self.images["highscores background"], (0, 0))
-        self.screen.fill((100,100,100))  # <------------------------------- for testing, gets replaced with an background image
+        self.screen.blit(self.images["highscores background"], (0, 0))
         # Render high score entries
         for index, (score, name) in enumerate(self.highscores):
             score_shadow: pg.Surface = self.score_font.render(f"{index + 1}.    {score} {name}", True, "black")
