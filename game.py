@@ -2,7 +2,7 @@ from utils import load_image, load_images
 from utils import Animation, Button
 import settings as stgs
 from snake import MiddleSnake
-from fly import HouseFly
+from fly import HouseFly, TreeFly
 from frog import Frog
 from vehicle import Truck, RacingCar, LargeCar, Bulldozer, SmallCar
 from water import Tree, Turtle, Ripple, HouseCrocodile, LaneCrocodile
@@ -97,6 +97,7 @@ class Game:
         self.house_crocodile: None | HouseCrocodile = None
         self.house_fly: None | HouseFly = None
         self.middle_snake: None | MiddleSnake = None
+        self.tree_fly: None | TreeFly = TreeFly(self)
     
     def initialize_menu(self) -> None:
         """ Initialize the game menu. """
@@ -437,6 +438,10 @@ class Game:
         if self.house_fly:
             self.house_fly.update(dt)
 
+        # update tree fly
+        if self.tree_fly:
+            self.tree_fly.update(0, dt)  # The "0" is for testing only! This later must be the speed of the tree.
+
         # update house crocodile
         if self.house_crocodile:
             self.house_crocodile.update(dt)
@@ -514,6 +519,9 @@ class Game:
         # draw house fly
         if self.house_fly:
             self.house_fly.render(self.screen)
+        # draw tree fly
+        if self.tree_fly:
+            self.tree_fly.render(self.screen)
         # draw frog
         self.frog.render(self.screen)
         # draw traffic
