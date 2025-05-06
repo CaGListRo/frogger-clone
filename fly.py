@@ -40,7 +40,7 @@ class HouseFly:
         self.get_current_image()
         self.stay_time -= dt
         if self.stay_time <= 0:
-            self.game.get_fly_time()
+            self.game.get_house_fly_time()
             self.game.house_fly = None
             
     def get_animation(self) -> None:
@@ -62,24 +62,30 @@ class HouseFly:
 
 
 class TreeFly:
-    def __init__(self, game: Game) -> None:
+    def __init__(self, game: Game, x_speed: int, tree_rect: pg.Rect) -> None:
         """ Initializes an fly object.
         Args:
         game (Game): The game object.
         """
-        self.game: Game = game          #   | must later be negative
-        self.state: str = "idle"        #   V
-        self.pos: pg.Vector2 = pg.Vector2((50, stgs.LANE_HEIGHTS["lane 7"]))  # the small trees width is 104.4 pixel
+        self.game: Game = game
+        self.x_speed: int = x_speed
+        self.tree_rect: pg.Rect = tree_rect
+        self.state: str = "idle"
+        self.pos: pg.Vector2 = pg.Vector2((-50, stgs.LANE_HEIGHTS["lane 7"]))  # the small trees width is 104.4 pixel
         self.speed: int = 23
         self.possible_states: list[str] = ["walk", "walk/flutter", "flutter"]
         self.get_animation()
         self.get_current_image()
-        self.reset_state_timer() 
+        self.reset_state_timer()
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
         
     def get_animation(self) -> None:
         """ Creates an animation object. """
         self.animation: Animation = self.game.animations[f"fly/{self.state}"]
+
+    def choose_direction(self) -> None:
+        """ Chooses the direction -1 for left, 1 for right. """
+        self.direction: int = choice((-1, 1))
 
     def choose_state(self) -> None:
         """ Chooses the state of the fly. """
@@ -93,7 +99,11 @@ class TreeFly:
         """ Resets the state timer. """
         self.state_timer: float = stgs.FLY_STATE_TIMER
 
-    def update(self, x_speed: int, dt: float) -> None:
+    def raise_x_speed(self, amount: int) -> None:
+        """ Sets the new speed of the tree on which the fly sits on. """
+        self.x_speed += amount
+
+    def update(self, dt: float) -> None:
         """
         Updates the tree fly.
         Args:
@@ -105,6 +115,7 @@ class TreeFly:
         if self.state_timer <= 0:
             self.choose_state()
             self.reset_state_timer()
+            self.choose_direction()
 
         if old_state != self.state:
             self.get_animation()
@@ -112,9 +123,17 @@ class TreeFly:
         self.get_current_image()
         
         if self.state in ["walk", "walk/flutter"]:
-            self.pos.x += (self.speed + x_speed) * dt
+            self.pos.x += ((self.speed * self.direction) + self.x_speed) * dt
         else:
-            self.pos.x += x_speed * dt
+            self.pos.x += self.x_speed * dt
+
+        self.tree_rect.x += self.x_speed
+
+        if self.pos.x > stgs.WINDOW_SIZE[0] + 50:
+            self.game.get_tree_fly_time()
+            self.game.tree_fly = None
+
+        self.rect.center = self.pos
 
     def render(self, surf: pg.Surface) -> None:
         """
@@ -124,4 +143,5 @@ class TreeFly:
         """
         surf.blit(self.image, self.rect)
         pg.draw.rect(surf, "red", self.rect, width=1)
+        pg.draw.rect(surf, "blue", self.tree_rect, width=3)
     

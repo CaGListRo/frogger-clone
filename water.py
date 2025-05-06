@@ -22,8 +22,9 @@ class Tree:
         """
         self.game: Game = game
         self.pos: pg.Vector2 = pg.Vector2((x, y))
+        self.size: str = size
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][lane]
-        self.image: pg.Surface = (choice(self.game.images[f"tree/{size}"]))
+        self.image: pg.Surface = (choice(self.game.images[f"tree/{self.size}"]))
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
         self.half_image_width: int = int(self.image.get_width() // 2)
 
@@ -36,6 +37,8 @@ class Tree:
         self.pos.x += self.speed * dt
         if self.pos.x > stgs.WINDOW_SIZE[0] + self.half_image_width:
             self.pos.x = -self.half_image_width
+            if self.game.tree_fly == None and self.size == "small":
+                self.game.create_tree_fly(self.speed, self.rect)
         self.rect.center = self.pos
 
     def rise_speed(self, amount: int) -> None:

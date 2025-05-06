@@ -97,7 +97,9 @@ class Game:
         self.house_crocodile: None | HouseCrocodile = None
         self.house_fly: None | HouseFly = None
         self.middle_snake: None | MiddleSnake = None
-        self.tree_fly: None | TreeFly = TreeFly(self)
+        self.tree_fly: None | TreeFly = None
+        self.tree_fly_ready: bool = False
+        # self.create_tree_fly()  # <-------------------------------- for testing
     
     def initialize_menu(self) -> None:
         """ Initialize the game menu. """
@@ -116,19 +118,24 @@ class Game:
             self.get_crocodile_time()
         if stgs.SNAKES[self.level - 1]:
             self.get_snake_time()
-        self.get_fly_time()
+        self.get_house_fly_time()
+        self.get_tree_fly_time()
 
     def get_crocodile_time(self) -> None:
         """ Sets the time of the next appearance of a crocodile in a house. """
         self.crocodile_time: int | float = ri(10, 30)
 
+    def get_house_fly_time(self) -> None:
+        """ Sets the time of the next appearance of the house fly. """
+        self.house_fly_time: int | float = ri(10, 30)
+
     def get_snake_time(self) -> None:
         """ Sets the time of the next appearance of the snake. """
         self.snake_time: int | float = ri(5, 10)
 
-    def get_fly_time(self) -> None:
-        """ Sets the time of the next appearance of the fly. """
-        self.fly_time: int | float = ri(10, 30)
+    def get_tree_fly_time(self) -> None:
+        """ Sets the time of the next possible appearance of the tree fly. """
+        self.tree_fly_time: int | float = 30
 
     def calculate_time_score(self) -> None:
         """ Calculates the score for the remaining time. """
@@ -177,6 +184,13 @@ class Game:
     def create_middle_snake(self) -> None:
         """ Creates a snake that crawls over the green in the middle of the screen. """
         self.middle_snake = MiddleSnake(self)
+    
+    def create_time_bar(self) -> None:
+        """ Creates a time bar at the bottom of the screen. """
+        self.time_bar: TimeBar = TimeBar(self)
+    
+    def create_tree_fly(self, x_speed: int, tree_rect: pg.Rect) -> None:
+        self.tree_fly = TreeFly(self, x_speed=x_speed, tree_rect=tree_rect)
 
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """
@@ -194,10 +208,6 @@ class Game:
             [Tree(self, 450 - i * stgs.SPACING["lane 7"][self.level - 1], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
             [Turtle(self, 250 + i * stgs.SPACING["lane 6"][self.level - 1], stgs.LANE_HEIGHTS["lane 6"], 4, True if i == sinking_trio else False) for i in range(stgs.WATER[f"level {self.level}"][4])],
         ]
-
-    def create_time_bar(self) -> None:
-        """ Creates a time bar at the bottom of the screen. """
-        self.time_bar: TimeBar = TimeBar(self)
 
     def create_traffic(self) -> None:
         """ Creates traffic on the road. """
@@ -330,7 +340,7 @@ class Game:
                         if self.house_fly:
                             if self.house_rects[idx].colliderect(self.house_fly.rect):
                                 self.score += stgs.FLY_SCORES["house fly"]
-                                self.get_fly_time()
+                                self.get_house_fly_time()
                         if False in self.houses:
                             self.frog_time = 60 - self.time_bar.get_time()  # the time the frog needed to get home
                             self.show_frog_time = True
@@ -367,10 +377,12 @@ class Game:
         """ Speeds up the traffic by a certain amount. """
         for lane in self.traffic:
             for vehicle in lane:
-                vehicle.rise_speed(amount)
+                vehicle.rise_speed(amount=amount)
         for lane in self.water_traffic:
             for element in lane:
-                element.rise_speed(amount)
+                element.rise_speed(amount=amount)
+        if self.tree_fly:
+            self.tree_fly.raise_x_speed(amount=amount)
 
     def time_up(self) -> None:
         """ Is called from the time bar object, if the time is up. """
@@ -440,7 +452,7 @@ class Game:
 
         # update tree fly
         if self.tree_fly:
-            self.tree_fly.update(0, dt)  # The "0" is for testing only! This later must be the speed of the tree.
+            self.tree_fly.update(dt)  # The "0" is for testing only! This later must be the speed of the tree.
 
         # update house crocodile
         if self.house_crocodile:
@@ -464,6 +476,12 @@ class Game:
         Args:
         dt (float): The time since the last update.
         """  
+        # update crocodile time if there is a crocodile in the level
+        if stgs.CROCOS_IN_HOUSES[self.level - 1] and self.house_crocodile == None:
+            self.crocodile_time -= dt
+            if self.crocodile_time <= 0:
+                self.create_house_crocodile()
+
         # update frog time
         if self.show_frog_time:
             self.show_time -= dt
@@ -471,9 +489,9 @@ class Game:
                 self.show_frog_time = False
                 self.show_time = stgs.SHOW_FROG_TIME
 
-        # update fly time
-        self.fly_time -= dt
-        if self.fly_time <= 0 and self.house_fly == None:
+        # update house fly time
+        self.house_fly_time -= dt
+        if self.house_fly_time <= 0 and self.house_fly == None:
             self.create_house_fly()
 
         # update snake time
@@ -482,12 +500,13 @@ class Game:
             if self.snake_time <= 0:
                 self.create_middle_snake()
 
-        # update crocodile time if there is a crocodile in the level
-        if stgs.CROCOS_IN_HOUSES[self.level - 1] and self.house_crocodile == None:
-            self.crocodile_time -= dt
-            if self.crocodile_time <= 0:
-                self.create_house_crocodile()
-
+        # update tree fly time
+        self.tree_fly_time -= dt
+        if self.tree_fly_time <= 0 and self.tree_fly == None:
+            if ri(1, 10) > 8:
+                self.tree_fly_ready = True
+                print("ready")
+      
     def render_game(self) -> None:
         """ Renders the game while playing. """
         # draw houses to have a background behind the background
