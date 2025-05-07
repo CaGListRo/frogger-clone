@@ -72,12 +72,13 @@ class TreeFly:
         self.tree_rect: pg.Rect = tree_rect
         self.state: str = "idle"
         self.pos: pg.Vector2 = pg.Vector2((-50, stgs.LANE_HEIGHTS["lane 7"]))  # the small trees width is 104.4 pixel
-        self.speed: int = 23
+        self.speed: int = 32
         self.possible_states: list[str] = ["walk", "walk/flutter", "flutter"]
         self.get_animation()
         self.get_current_image()
         self.reset_state_timer()
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
+        self.direction: int = 0
         
     def get_animation(self) -> None:
         """ Creates an animation object. """
@@ -85,7 +86,7 @@ class TreeFly:
 
     def choose_direction(self) -> None:
         """ Chooses the direction -1 for left, 1 for right. """
-        self.direction: int = choice((-1, 1))
+        self.direction = choice((-1, 1))
 
     def choose_state(self) -> None:
         """ Chooses the state of the fly. """
@@ -115,7 +116,6 @@ class TreeFly:
         if self.state_timer <= 0:
             self.choose_state()
             self.reset_state_timer()
-            self.choose_direction()
 
         if old_state != self.state:
             self.get_animation()
@@ -123,17 +123,23 @@ class TreeFly:
         self.get_current_image()
         
         if self.state in ["walk", "walk/flutter"]:
+            self.choose_direction()
             self.pos.x += ((self.speed * self.direction) + self.x_speed) * dt
         else:
+            self.direction = 0
             self.pos.x += self.x_speed * dt
 
-        self.tree_rect.x += self.x_speed
+        if self.direction > 0 and self.rect.right > self.tree_rect.right:
+            self.direction = -1
+        elif self.direction < 0 and self.rect.left > self.tree_rect.left:
+            self.direction = 1
 
-        if self.pos.x > stgs.WINDOW_SIZE[0] + 50:
-            self.game.get_tree_fly_time()
-            self.game.tree_fly = None
-
+        # self.tree_rect.x += self.x_speed
         self.rect.center = self.pos
+        
+        if self.pos.x > stgs.WINDOW_SIZE[0] + 25:
+            self.game.get_tree_fly_time()
+            self.game.tree_fly = None  
 
     def render(self, surf: pg.Surface) -> None:
         """
@@ -141,7 +147,14 @@ class TreeFly:
         Args:
         surf (pg.Surface): The surface to render the fly onto.
         """
-        surf.blit(self.image, self.rect)
+        if self.direction == 1:
+            image_to_blit: pg.Surface = pg.transform.rotate(self.image, 90)
+        elif self.direction == -1:
+            image_to_blit: pg.Surface = pg.transform.rotate(self.image, 270)
+        else:
+            image_to_blit: pg.Surface = self.image
+
+        surf.blit(image_to_blit, self.rect)
         pg.draw.rect(surf, "red", self.rect, width=1)
         pg.draw.rect(surf, "blue", self.tree_rect, width=3)
     

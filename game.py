@@ -99,7 +99,6 @@ class Game:
         self.middle_snake: None | MiddleSnake = None
         self.tree_fly: None | TreeFly = None
         self.tree_fly_ready: bool = False
-        # self.create_tree_fly()  # <-------------------------------- for testing
     
     def initialize_menu(self) -> None:
         """ Initialize the game menu. """
@@ -190,7 +189,10 @@ class Game:
         self.time_bar: TimeBar = TimeBar(self)
     
     def create_tree_fly(self, x_speed: int, tree_rect: pg.Rect) -> None:
-        self.tree_fly = TreeFly(self, x_speed=x_speed, tree_rect=tree_rect)
+        if self.tree_fly_ready:
+            self.tree_fly_ready = False
+            self.tree_fly = TreeFly(self, x_speed=x_speed, tree_rect=tree_rect)
+        
 
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """
@@ -649,7 +651,7 @@ class Game:
                 self.update_variables(dt)
                 self.update_objects(dt)
                 self.check_collisions()
-                if self.frog.pos.y <= 333:
+                if self.frog.pos.y <= 353:
                     self.calculate_distances()
 
             # call the methods
