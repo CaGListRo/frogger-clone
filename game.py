@@ -134,7 +134,7 @@ class Game:
 
     def get_tree_fly_time(self) -> None:
         """ Sets the time of the next possible appearance of the tree fly. """
-        self.tree_fly_time: int | float = 30
+        self.tree_fly_time: int | float = 1#30  # <-------------------------------Changed for testing
 
     def calculate_time_score(self) -> None:
         """ Calculates the score for the remaining time. """
@@ -205,10 +205,10 @@ class Game:
 
         self.water_traffic: list[Animation | pg.Surface] = [
             [LaneCrocodile(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], 0) if i == crocodile else Tree(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
-            [Turtle(self, 150 + i * stgs.SPACING["lane 9"][self.level - 1], stgs.LANE_HEIGHTS["lane 9"], 1, True if i == sinking_pair else False)  for i in range(stgs.WATER[f"level {self.level}"][1])],
-            [Tree(self, 650 - i * stgs.SPACING["lane 8"][self.level - 1], stgs.LANE_HEIGHTS["lane 8"], "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
-            [Tree(self, 450 - i * stgs.SPACING["lane 7"][self.level - 1], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
-            [Turtle(self, 250 + i * stgs.SPACING["lane 6"][self.level - 1], stgs.LANE_HEIGHTS["lane 6"], 4, True if i == sinking_trio else False) for i in range(stgs.WATER[f"level {self.level}"][4])],
+            [Turtle(self, 80 + i * stgs.SPACING["lane 9"][self.level - 1], stgs.LANE_HEIGHTS["lane 9"], 1, True if i == sinking_pair else False)  for i in range(stgs.WATER[f"level {self.level}"][1])],
+            [Tree(self, 700 - i * stgs.SPACING["lane 8"][self.level - 1], stgs.LANE_HEIGHTS["lane 8"], "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
+            [Tree(self, 800 - i * stgs.SPACING["lane 7"][self.level - 1], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
+            [Turtle(self, 50 + i * stgs.SPACING["lane 6"][self.level - 1], stgs.LANE_HEIGHTS["lane 6"], 4, True if i == sinking_trio else False) for i in range(stgs.WATER[f"level {self.level}"][4])],
         ]
 
     def create_traffic(self) -> None:
@@ -505,7 +505,7 @@ class Game:
         # update tree fly time
         self.tree_fly_time -= dt
         if self.tree_fly_time <= 0 and self.tree_fly == None:
-            if ri(1, 10) > 8:
+            if ri(1, 10) > 0:  # <-------------------------------- Changed for testing normal 8
                 self.tree_fly_ready = True
                 print("ready")
       

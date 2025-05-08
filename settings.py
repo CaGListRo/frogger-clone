@@ -57,7 +57,7 @@ FROG_WATER_COLLISION_HEIGHT: Final[int] = 308
 SHOW_FROG_TIME: Final[float] = 3.0
 
 # settings for the traffic  (water and street traffic)
-LANE_HEIGHTS: Final[dict[int]] = {
+LANE_HEIGHTS: Final[dict[int]] = {  # the center height of each lane
     "lane 10": 130,  # medium trunk
     "lane 9": 173,   # turtle pairs
     "lane 8": 217,   # large trunks
@@ -69,7 +69,7 @@ LANE_HEIGHTS: Final[dict[int]] = {
     "lane 2": 519,   # bulldozer
     "lane 1": 562,   # small cars
 }
-SPACING: Final[dict[int]] = {
+SPACING: Final[dict[int]] = {  # [Level 1, Level 2, Level 3, Level 4, Level 5]
     "lane 10": [350, 350, 400, 400, 450],  # medium trunk
     "lane 9": [190, 190, 190, 230, 270],   # turtle pairs
     "lane 8": [550, 550, 650, 650, 650],   # large trunks

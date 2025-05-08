@@ -79,6 +79,8 @@ class TreeFly:
         self.reset_state_timer()
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
         self.direction: int = 0
+        self.angle: int = 0
+        self.half_image_width: int = int(self.image.get_width() / 2)
         
     def get_animation(self) -> None:
         """ Creates an animation object. """
@@ -87,6 +89,15 @@ class TreeFly:
     def choose_direction(self) -> None:
         """ Chooses the direction -1 for left, 1 for right. """
         self.direction = choice((-1, 1))
+
+    def set_angle(self) -> None:
+        """ Sets self.angle according to self.direction. """
+        if self.direction == 1:
+            self.angle = 270
+        elif self.direction == -1:
+            self.angle = 90
+        else:
+            self.angle = 0
 
     def choose_state(self) -> None:
         """ Chooses the state of the fly. """
@@ -98,7 +109,7 @@ class TreeFly:
 
     def reset_state_timer(self) -> None:
         """ Resets the state timer. """
-        self.state_timer: float = stgs.FLY_STATE_TIMER
+        self.state_timer: float = stgs.FLY_STATE_TIMER * 2
 
     def raise_x_speed(self, amount: int) -> None:
         """ Sets the new speed of the tree on which the fly sits on. """
@@ -111,11 +122,17 @@ class TreeFly:
         x_speed (int): The speed of the tree the fly is sitting on
         dt (float): The time difference between the last and current frame.
         """
+        
         old_state: str = self.state
         self.state_timer -= dt
         if self.state_timer <= 0:
             self.choose_state()
             self.reset_state_timer()
+            if self.state in ["walk", "walk/flutter"]:
+                self.choose_direction()
+            else:
+                self.direction = 0
+            self.set_angle()
 
         if old_state != self.state:
             self.get_animation()
@@ -123,18 +140,21 @@ class TreeFly:
         self.get_current_image()
         
         if self.state in ["walk", "walk/flutter"]:
-            self.choose_direction()
             self.pos.x += ((self.speed * self.direction) + self.x_speed) * dt
-        else:
-            self.direction = 0
+        else: 
             self.pos.x += self.x_speed * dt
 
-        if self.direction > 0 and self.rect.right > self.tree_rect.right:
+        if self.direction == 1 and self.rect.right > self.tree_rect.right:
+            self.rect.right = self.tree_rect.right
+            self.pos.x = self.rect.right - self.half_image_width
             self.direction = -1
-        elif self.direction < 0 and self.rect.left > self.tree_rect.left:
+            self.set_angle()
+        elif self.direction == -1 and self.rect.left < self.tree_rect.left:
+            self.rect.left = self.tree_rect.left
+            self.pos.x = self.rect.left + self.half_image_width
             self.direction = 1
+            self.set_angle()
 
-        # self.tree_rect.x += self.x_speed
         self.rect.center = self.pos
         
         if self.pos.x > stgs.WINDOW_SIZE[0] + 25:
@@ -147,14 +167,8 @@ class TreeFly:
         Args:
         surf (pg.Surface): The surface to render the fly onto.
         """
-        if self.direction == 1:
-            image_to_blit: pg.Surface = pg.transform.rotate(self.image, 90)
-        elif self.direction == -1:
-            image_to_blit: pg.Surface = pg.transform.rotate(self.image, 270)
-        else:
-            image_to_blit: pg.Surface = self.image
-
+        image_to_blit: pg.Surface = pg.transform.rotate(self.image, self.angle)
         surf.blit(image_to_blit, self.rect)
         pg.draw.rect(surf, "red", self.rect, width=1)
-        pg.draw.rect(surf, "blue", self.tree_rect, width=3)
+        pg.draw.rect(surf, "blue", self.tree_rect, width=1)
     
