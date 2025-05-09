@@ -37,8 +37,10 @@ class Tree:
         self.pos.x += self.speed * dt
         if self.pos.x > stgs.WINDOW_SIZE[0] + self.half_image_width:
             self.pos.x = -self.half_image_width
-            if self.game.tree_fly == None and self.size == "small":
-                self.game.create_tree_fly(self.speed, self.rect)
+            if self.size == "small":
+                self.game.create_tree_fly(tree_speed=self.speed, tree_rect=self.rect)
+            elif self.size == "large":
+                self.game.create_tree_snake(tree_speed=self.speed, tree_rect=self.rect)
         self.rect.center = self.pos
 
     def rise_speed(self, amount: int) -> None:

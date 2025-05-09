@@ -39,6 +39,9 @@ FLY_SCORES: Final[dict[int]] = {
 }
 FLY_STATE_TIMER: Final[float] = 1.0
 FLY_STAY_TIME: Final[float] = 5.0
+FLY_WALK_SPEED: Final[int] = 32
+TREE_FLY_CHANCE: Final[list[int]] = [5, 6, 6, 7, 8]
+TREE_FLY_TIME: Final[list[int]] = [15, 20, 25, 30, 35]
 
 # settings for the frog
 FROG_COLLISION_RECT: Final[tuple[int]] = (30, 30)
@@ -138,6 +141,8 @@ SNAKE_HEAD_RECT: Final[dict[tuple[int]]] = {  # Only the head of the snake is de
 SNAKE_LANE: Final[int] = 346
 SNAKE_SPEED: Final[int] = 50
 SNAKES: Final[list[bool]] = [False, False, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
+TREE_SNAKE_CHANCE: Final[list[int]] = [0, 0, 8, 7, 6]  # first two are '0' because there are no snakes in level 1 and 2
+TREE_SNAKE_TIME: Final[list[int]] = [0, 0, 30, 20, 10]  # first two are '0' because there are no snakes in level 1 and 2
 
 # settings for the game
 SCORE: Final[dict[int]] = {

@@ -1,7 +1,7 @@
 from utils import load_image, load_images
 from utils import Animation, Button
 import settings as stgs
-from snake import MiddleSnake
+from snake import MiddleSnake, TreeSnake
 from fly import HouseFly, TreeFly
 from frog import Frog
 from vehicle import Truck, RacingCar, LargeCar, Bulldozer, SmallCar
@@ -28,10 +28,10 @@ class Game:
         self.running: bool = True
         self.fps: int = 0
 
-        self.level: int = 1
-        self.frog_time: int = 0                      # this ist the time one frog needed from the start to "his" house
+        self.level: int = 5
+        self.frog_time: int = 0                      # this is the time one frog needed from the start to "his" house
         self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
-        self.show_time: float = stgs.SHOW_FROG_TIME  # how long the frog time is shown
+        self.show_time: float = stgs.SHOW_FROG_TIME  # this is how long the frog time is shown
         self.score: int = 0
         self.speed_ups: list[bool] = [False, False, False, False, False]
         self.game_state: str = "menu"
@@ -99,6 +99,8 @@ class Game:
         self.middle_snake: None | MiddleSnake = None
         self.tree_fly: None | TreeFly = None
         self.tree_fly_ready: bool = False
+        self.tree_snake: None | TreeSnake = None
+        self.tree_snake_ready: bool = False
     
     def initialize_menu(self) -> None:
         """ Initialize the game menu. """
@@ -116,7 +118,8 @@ class Game:
         if stgs.CROCOS_IN_HOUSES[self.level - 1]:
             self.get_crocodile_time()
         if stgs.SNAKES[self.level - 1]:
-            self.get_snake_time()
+            self.get_middle_snake_time()
+            self.get_tree_snake_time()
         self.get_house_fly_time()
         self.get_tree_fly_time()
 
@@ -128,13 +131,17 @@ class Game:
         """ Sets the time of the next appearance of the house fly. """
         self.house_fly_time: int | float = ri(10, 30)
 
-    def get_snake_time(self) -> None:
+    def get_middle_snake_time(self) -> None:
         """ Sets the time of the next appearance of the snake. """
-        self.snake_time: int | float = ri(5, 10)
+        self.middle_snake_time: int | float = ri(5, 10)
 
     def get_tree_fly_time(self) -> None:
         """ Sets the time of the next possible appearance of the tree fly. """
-        self.tree_fly_time: int | float = 1#30  # <-------------------------------Changed for testing
+        self.tree_fly_time: int | float = stgs.TREE_FLY_TIME[self.level - 1]
+    
+    def get_tree_snake_time(self) -> None:
+        """ Sets the time of the next possible appearance of the tree snake. """
+        self.tree_snake_time: int | float = stgs.TREE_SNAKE_TIME[self.level - 1]
 
     def calculate_time_score(self) -> None:
         """ Calculates the score for the remaining time. """
@@ -188,11 +195,17 @@ class Game:
         """ Creates a time bar at the bottom of the screen. """
         self.time_bar: TimeBar = TimeBar(self)
     
-    def create_tree_fly(self, x_speed: int, tree_rect: pg.Rect) -> None:
-        if self.tree_fly_ready:
+    def create_tree_fly(self, tree_speed: int, tree_rect: pg.Rect) -> None:
+        """ Creates an TreeFly object. """
+        if self.tree_fly_ready and self.tree_fly == None:
             self.tree_fly_ready = False
-            self.tree_fly = TreeFly(self, x_speed=x_speed, tree_rect=tree_rect)
+            self.tree_fly = TreeFly(self, tree_speed=tree_speed, tree_rect=tree_rect)
         
+    def create_tree_snake(self, tree_speed: int, tree_rect: pg.Rect) -> None:
+        """ Creates an TreeSnake object. """
+        if self.tree_snake_ready and self.tree_snake == None:
+            self.tree_snake_ready = False
+            self.tree_snake = TreeSnake(self, tree_speed=tree_speed, tree_rect=tree_rect)
 
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """
@@ -454,7 +467,7 @@ class Game:
 
         # update tree fly
         if self.tree_fly:
-            self.tree_fly.update(dt)  # The "0" is for testing only! This later must be the speed of the tree.
+            self.tree_fly.update(dt)
 
         # update house crocodile
         if self.house_crocodile:
@@ -463,6 +476,10 @@ class Game:
         # update middle snake
         if self.middle_snake:
             self.middle_snake.update(dt)
+
+        # update tree snake
+        if self.tree_snake:
+            self.tree_snake.update(dt)
 
         # update the frog
         self.frog.update(dt)
@@ -496,18 +513,22 @@ class Game:
         if self.house_fly_time <= 0 and self.house_fly == None:
             self.create_house_fly()
 
-        # update snake time
+        # update snake times
         if stgs.SNAKES[self.level - 1] and self.middle_snake == None:
-            self.snake_time -= dt
-            if self.snake_time <= 0:
+            self.middle_snake_time -= dt
+            if self.middle_snake_time <= 0:
                 self.create_middle_snake()
+        if stgs.SNAKES[self.level - 1] and self.tree_snake == None:
+            self.tree_snake_time -= dt
+            if self.tree_snake_time <= 0:
+                if ri(1, 10) > stgs.TREE_SNAKE_CHANCE[self.level - 1]:
+                    self.tree_snake_ready = True
 
         # update tree fly time
         self.tree_fly_time -= dt
         if self.tree_fly_time <= 0 and self.tree_fly == None:
-            if ri(1, 10) > 0:  # <-------------------------------- Changed for testing normal 8
+            if ri(1, 10) > stgs.TREE_FLY_CHANCE[self.level - 1]:
                 self.tree_fly_ready = True
-                print("ready")
       
     def render_game(self) -> None:
         """ Renders the game while playing. """
@@ -549,9 +570,12 @@ class Game:
         for lane in self.traffic:
             for vehicle in lane:
                 vehicle.render(self.screen)
-        # draw snake
+        # draw middle snake
         if self.middle_snake:
             self.middle_snake.render(self.screen)
+        # draw tree snake
+        if self.tree_snake:
+            self.tree_snake.render(self.screen)
         # draw houses
         self.screen.blit(self.images["houses"], (0, 26))
         # draw house rects for test
