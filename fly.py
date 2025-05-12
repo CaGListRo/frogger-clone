@@ -84,7 +84,8 @@ class TreeFly:
         
     def get_animation(self) -> None:
         """ Creates an animation object. """
-        self.animation: Animation = self.game.animations[f"fly/{self.state}"]
+        state: str = self.state if self.state != "caught" else "flutter"
+        self.animation: Animation = self.game.animations[f"fly/{state}"]
 
     def choose_direction(self) -> None:
         """ Chooses the direction -1 for left, 1 for right. """
@@ -115,11 +116,10 @@ class TreeFly:
         """ Sets the new speed of the tree on which the fly sits on. """
         self.tree_speed += amount
 
-    def update(self, dt: float) -> None:
+    def handle_state_animation(self, dt: float) -> None:
         """
-        Updates the tree fly.
+        Handles the state and the animation of the fly.
         Args:
-        tree_speed (int): The speed of the tree the fly is sitting on
         dt (float): The time difference between the last and current frame.
         """
         old_state: str = self.state
@@ -137,7 +137,13 @@ class TreeFly:
             self.get_animation()
         self.animation.update(dt)
         self.get_current_image()
-        
+
+    def move(self, dt: float) -> None:
+        """
+        Moves the fly.
+        Args:
+        dt (float): The time difference between the last and current frame.
+        """
         if self.state in ["walk", "walk/flutter"]:
             self.pos.x += ((self.speed * self.direction) + self.tree_speed) * dt
         else: 
@@ -158,8 +164,21 @@ class TreeFly:
         
         if self.pos.x > stgs.WINDOW_SIZE[0] + 25:
             self.game.get_tree_fly_time()
-            self.game.tree_fly = None  
+            self.game.tree_fly = None 
 
+    def update(self, dt: float) -> None:
+        """
+        Updates the tree fly.
+        Args:
+        dt (float): The time difference between the last and current frame.
+        """
+        if self.state != "caught":
+            self.handle_state_animation(dt)
+            self.move(dt)
+        else:
+            if self.angle != 0:
+                self.angle = 0
+        
     def render(self, surf: pg.Surface) -> None:
         """
         Renders the fly onto the given surface.

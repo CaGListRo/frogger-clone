@@ -28,7 +28,7 @@ class Game:
         self.running: bool = True
         self.fps: int = 0
 
-        self.level: int = 5
+        self.level: int = 3
         self.frog_time: int = 0                      # this is the time one frog needed from the start to "his" house
         self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
         self.show_time: float = stgs.SHOW_FROG_TIME  # this is how long the frog time is shown
@@ -318,10 +318,20 @@ class Game:
                 if self.frog.collision_rect.colliderect(vehicle.rect):
                     self.frog.set_dead("street")
 
-        # collision with the snake head
+        # collision with the snake head rects
         if self.middle_snake != None:
             if self.frog.collision_rect.colliderect(self.middle_snake.head_rect):
                 self.frog.set_dead("water")
+        if self.tree_snake != None:
+            if self.frog.collision_rect.colliderect(self.tree_snake.head_rect):
+                self.frog.set_dead("water")
+
+        # collision with the tree fly
+        if self.tree_fly != None:
+            if self.frog.collision_rect.colliderect(self.tree_fly.rect):
+                self.frog.carry_fly = True
+                self.tree_fly.state = "caught"
+                self.tree_fly.rect.center = self.frog.collision_rect.center
  
         # collisions with water traffic
         collided_list: list[bool] = []
@@ -555,6 +565,9 @@ class Game:
             pos: tuple[int] = (int(stgs.WINDOW_SIZE[0] // 2 - time_to_blit.get_width() // 2), 
                                int(stgs.WINDOW_SIZE[1] // 2 - time_to_blit.get_height() // 2))
             self.screen.blit(time_to_blit, pos)
+        
+        # draw frog
+        self.frog.render(self.screen)
         # draw house crocodile
         if self.house_crocodile:
             self.house_crocodile.render(self.screen)
@@ -564,8 +577,7 @@ class Game:
         # draw tree fly
         if self.tree_fly:
             self.tree_fly.render(self.screen)
-        # draw frog
-        self.frog.render(self.screen)
+        
         # draw traffic
         for lane in self.traffic:
             for vehicle in lane:

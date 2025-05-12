@@ -38,6 +38,7 @@ class Frog:
         self.rotate: bool = False
         self.dead: bool = False
         self.dead_timer: float = 0.0
+        self.carry_fly: bool = False
 
         # collision stuff
         self.rect_size: tuple[int] = stgs.FROG_COLLISION_RECT
