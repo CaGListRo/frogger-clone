@@ -79,7 +79,7 @@ class TreeFly:
         self.reset_state_timer()
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
         self.direction: int = 0
-        self.angle: int = 0
+        self.set_angle(angle=0)
         self.half_image_width: int = int(self.image.get_width() / 2)
         
     def get_animation(self) -> None:
@@ -116,25 +116,32 @@ class TreeFly:
         """ Sets the new speed of the tree on which the fly sits on. """
         self.tree_speed += amount
 
+    def set_angle(self, angle: int) -> None:
+        """ Sets the rotation angle of the fly. """
+        self.angle: int = angle
+
     def handle_state_animation(self, dt: float) -> None:
         """
         Handles the state and the animation of the fly.
         Args:
         dt (float): The time difference between the last and current frame.
         """
+        
         old_state: str = self.state
-        self.state_timer -= dt
-        if self.state_timer <= 0:
-            self.choose_state()
-            self.reset_state_timer()
-            if self.state in ["walk", "walk/flutter"]:
-                self.choose_direction()
-            else:
-                self.direction = 0
-            self.set_angle()
+        if self.state != "caught":
+            self.state_timer -= dt
+            if self.state_timer <= 0:
+                self.choose_state()
+                self.reset_state_timer()
+                if self.state in ["walk", "walk/flutter"]:
+                    self.choose_direction()
+                else:
+                    self.direction = 0
+                    self.set_angle(0)
 
         if old_state != self.state:
             self.get_animation()
+
         self.animation.update(dt)
         self.get_current_image()
 
@@ -153,12 +160,12 @@ class TreeFly:
             self.rect.right = self.tree_rect.right
             self.pos.x = self.rect.right - self.half_image_width
             self.direction = -1
-            self.set_angle()
+            self.set_angle(90)
         elif self.direction == -1 and self.rect.left < self.tree_rect.left:
             self.rect.left = self.tree_rect.left
             self.pos.x = self.rect.left + self.half_image_width
             self.direction = 1
-            self.set_angle()
+            self.set_angle(270)
 
         self.rect.center = self.pos
         
@@ -176,8 +183,7 @@ class TreeFly:
             self.handle_state_animation(dt)
             self.move(dt)
         else:
-            if self.angle != 0:
-                self.angle = 0
+            self.handle_state_animation(dt)
         
     def render(self, surf: pg.Surface) -> None:
         """

@@ -28,7 +28,7 @@ class Game:
         self.running: bool = True
         self.fps: int = 0
 
-        self.level: int = 3
+        self.level: int = 1
         self.frog_time: int = 0                      # this is the time one frog needed from the start to "his" house
         self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
         self.show_time: float = stgs.SHOW_FROG_TIME  # this is how long the frog time is shown
@@ -145,7 +145,7 @@ class Game:
 
     def calculate_time_score(self) -> None:
         """ Calculates the score for the remaining time. """
-        self.score += self.time_bar.get_time() * 10
+        self.score += self.time_bar.get_time() * stgs.SCORE["second"]
 
     def create_menu_buttons(self) -> None:
         """ Creates the buttons for the menu. """
@@ -242,6 +242,9 @@ class Game:
         if self.frogs > 0:  
             self.handle_time_bar()
             self.create_frog()
+            if self.tree_fly and self.tree_fly.state == "caught":
+                self.tree_fly = None
+                self.get_tree_fly_time()
         else:
             raise NotImplementedError
 
@@ -312,19 +315,19 @@ class Game:
 
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
-        # collisions with traffic on the street
-        for lane in self.traffic:
-            for vehicle in lane:
-                if self.frog.collision_rect.colliderect(vehicle.rect):
-                    self.frog.set_dead("street")
+        # # collisions with traffic on the street
+        # for lane in self.traffic:
+        #     for vehicle in lane:
+        #         if self.frog.collision_rect.colliderect(vehicle.rect):
+        #             self.frog.set_dead("street")
 
-        # collision with the snake head rects
-        if self.middle_snake != None:
-            if self.frog.collision_rect.colliderect(self.middle_snake.head_rect):
-                self.frog.set_dead("water")
-        if self.tree_snake != None:
-            if self.frog.collision_rect.colliderect(self.tree_snake.head_rect):
-                self.frog.set_dead("water")
+        # # collision with the snake head rects
+        # if self.middle_snake != None:
+        #     if self.frog.collision_rect.colliderect(self.middle_snake.head_rect):
+        #         self.frog.set_dead("water")
+        # if self.tree_snake != None:
+        #     if self.frog.collision_rect.colliderect(self.tree_snake.head_rect):
+        #         self.frog.set_dead("water")
 
         # collision with the tree fly
         if self.tree_fly != None:
@@ -366,6 +369,8 @@ class Game:
                             if self.house_rects[idx].colliderect(self.house_fly.rect):
                                 self.score += stgs.FLY_SCORES["house fly"]
                                 self.get_house_fly_time()
+                        if self.tree_fly and self.tree_fly.state == "caught":
+                            self.score += stgs.FLY_SCORES["tree fly"]
                         if False in self.houses:
                             self.frog_time = 60 - self.time_bar.get_time()  # the time the frog needed to get home
                             self.show_frog_time = True
@@ -443,15 +448,23 @@ class Game:
                     if (event.key == pg.K_UP or event.key == pg.K_w) and self.direction_pressed:
                         self.frog.jump("north")
                         self.direction_pressed = False
+                        if self.tree_fly and self.tree_fly.state == "caught":
+                            self.tree_fly.set_angle(angle = 0)
                     if (event.key == pg.K_DOWN or event.key == pg.K_s) and self.direction_pressed:
                         self.frog.jump("south")
                         self.direction_pressed = False
+                        if self.tree_fly and self.tree_fly.state == "caught":
+                            self.tree_fly.set_angle(angle = 180)
                     if (event.key == pg.K_LEFT or event.key == pg.K_a) and self.direction_pressed:
                         self.frog.jump("west")
                         self.direction_pressed = False
+                        if self.tree_fly and self.tree_fly.state == "caught":
+                            self.tree_fly.set_angle(angle = 90)
                     if (event.key == pg.K_RIGHT or event.key == pg.K_d) and self.direction_pressed:
                         self.frog.jump("east")
                         self.direction_pressed = False
+                        if self.tree_fly and self.tree_fly.state == "caught":
+                            self.tree_fly.set_angle(angle = 270)
                 
     def update_objects(self, dt: float) -> None:
         """
