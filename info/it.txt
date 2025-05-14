@@ -1,0 +1,17 @@
+Clone di Frogger:
+In questo classico gioco arcade, controlli una piccola rana che deve attraversare
+una strada trafficata e un fiume impetuoso per raggiungere la sua casa.
+
+Gameplay:
+Muovi la tua rana con i tasti freccia, dal basso verso l'alto.
+Evita auto, camion, autobus e bulldozer sulla strada: una collisione è letale!
+Salta su tronchi, tartarughe e persino coccodrilli per attraversare il fiume senza
+cadere in acqua. Ma attenzione: alcune tartarughe si immergono!
+Ottieni punti bonus catturando mosche o raggiungendo velocemente gli obiettivi.
+Ogni livello diventa più difficile, con traffico più veloce e sezioni del fiume
+più pericolose.
+Riuscirai a riempire tutte e cinque le case delle rane in sicurezza?
+
+Un gameplay semplice ma coinvolgente che mette alla prova abilità e tempismo!
+
+M Musica (on/off)  S Suono (on/off)  P Pausa (on/off)

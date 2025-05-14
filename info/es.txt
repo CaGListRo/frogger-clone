@@ -1,0 +1,16 @@
+Clon de Frogger:
+En este clásico juego de arcade, controlas una pequeña rana que debe cruzar una
+carretera llena de tráfico y un río embravecido para llegar a su hogar.
+
+Mecánica del juego:
+Mueve a tu rana con las teclas de flecha, de abajo hacia arriba.
+Evita coches, camiones, autobuses y bulldozers en la carretera: ¡un choque es mortal!
+Salta sobre troncos, tortugas e incluso cocodrilos para cruzar el río sin caer al agua.
+¡Pero cuidado, algunas tortugas se sumergen!
+Consigue puntos extra atrapando moscas o alcanzando los objetivos rápidamente.
+Cada nivel es más difícil, con tráfico más rápido y tramos del río más peligrosos.
+¿Podrás llenar las cinco casas de ranas con éxito?
+
+¡Una mecánica de juego simple pero adictiva que pone a prueba tu habilidad y sincronización!
+
+M Música (on/off)  S Sonido (on/off)  P Pausa (on/off)

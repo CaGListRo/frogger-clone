@@ -101,6 +101,9 @@ class Game:
         self.tree_fly_ready: bool = False
         self.tree_snake: None | TreeSnake = None
         self.tree_snake_ready: bool = False
+
+        # for testing
+        self.load_info()
     
     def initialize_menu(self) -> None:
         """ Initialize the game menu. """
@@ -151,8 +154,8 @@ class Game:
         """ Creates the buttons for the menu. """
         self.menu_buttons: list[Button] = [        
             Button(stgs.BUTTON_POSITIONS["start"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["start"][self.language], "green"),
-            Button(stgs.BUTTON_POSITIONS["options"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["options"][self.language], "white"),
-            Button(stgs.BUTTON_POSITIONS["highscores"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["highscores"][self.language], "white"),
+            Button(stgs.BUTTON_POSITIONS["options"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["options"][self.language], "beige"),
+            Button(stgs.BUTTON_POSITIONS["highscores"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["highscores"][self.language], "beige"),
             Button(stgs.BUTTON_POSITIONS["quit"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["quit"][self.language], "red")
         ]
 
@@ -164,7 +167,7 @@ class Game:
         """ Creates the language buttons for the options menu. """
         self.language_buttons: list[Button] = []
         for idx, button in enumerate(stgs.BUTTON_NAMES["language"].values()):
-            self.language_buttons.append(Button((11 + idx * 130, 600), stgs.LANGUAGE_BUTTON_SIZE, button, "white"))
+            self.language_buttons.append(Button((11 + idx * 130, 600), stgs.LANGUAGE_BUTTON_SIZE, button, "beige"))
 
     def create_new_ripple(self) -> None:
         """ Creates a new ripple at a random y-position. """
@@ -315,19 +318,19 @@ class Game:
 
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
-        # # collisions with traffic on the street
-        # for lane in self.traffic:
-        #     for vehicle in lane:
-        #         if self.frog.collision_rect.colliderect(vehicle.rect):
-        #             self.frog.set_dead("street")
+        # collisions with traffic on the street
+        for lane in self.traffic:
+            for vehicle in lane:
+                if self.frog.collision_rect.colliderect(vehicle.rect):
+                    self.frog.set_dead("street")
 
-        # # collision with the snake head rects
-        # if self.middle_snake != None:
-        #     if self.frog.collision_rect.colliderect(self.middle_snake.head_rect):
-        #         self.frog.set_dead("water")
-        # if self.tree_snake != None:
-        #     if self.frog.collision_rect.colliderect(self.tree_snake.head_rect):
-        #         self.frog.set_dead("water")
+        # collision with the snake head rects
+        if self.middle_snake != None:
+            if self.frog.collision_rect.colliderect(self.middle_snake.head_rect):
+                self.frog.set_dead("water")
+        if self.tree_snake != None:
+            if self.frog.collision_rect.colliderect(self.tree_snake.head_rect):
+                self.frog.set_dead("water")
 
         # collision with the tree fly
         if self.tree_fly != None:
@@ -422,6 +425,13 @@ class Game:
         """ Loads the highscores from the highscores.list and puts them in a python list of lists. """
         with open("highscores.list", "r") as file:
             self.highscores: list[list[str]] = [line.strip().split() for line in file.readlines()]
+
+    def load_info(self) -> None:
+        """ Loads the info text in the selected language. """
+        self.info_text: list[str] = []
+        file_path: str = f"info/{self.language}.txt"
+        with open(file_path, "r") as file:
+            self.info_text.append(file.readlines())
 
     def event_handler(self) -> None:
         """ Handles events in the game. """

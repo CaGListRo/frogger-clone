@@ -1,0 +1,16 @@
+Frogger Klonu:
+Bu klasik arcade oyununda, evine ulaşmak için yoğun bir yol ve hızlı akan bir
+nehri geçmek zorunda olan küçük bir kurbağayı kontrol ediyorsun.
+
+Oyun Mekaniği:
+Kurbağanı ok tuşlarıyla aşağıdan yukarıya doğru hareket ettir.
+Yoldaki arabalar, kamyonlar, otobüsler ve buldozerlerden kaçın – çarpışma ölümcül!
+Nehri geçmek için kütüklere, kaplumbağalara ve hatta timsahlara atla. Ama dikkat
+et, bazı kaplumbağalar dalıyor!
+Sinek yakalayarak veya hedeflere hızlı ulaşarak bonus puanlar kazan.
+Her seviyede trafik hızlanır ve nehir bölümleri daha tehlikeli hale gelir.
+Beş kurbağa evini güvenle doldurabilecek misin?
+
+Basit ama bağımlılık yaratan bir oyun mekaniği – becerini ve zamanlamanı test et!
+
+M Müzik (aç/kapa)  S Ses (aç/kapa)  P Duraklat (aç/kapa)

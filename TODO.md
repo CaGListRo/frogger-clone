@@ -3,10 +3,10 @@
 - check for collisions with the gras around the houses -> "death" of one frog **done**
 
 - make the snake appear continuously in the middle zone (level 3 or higher) **done**
-- make snakes appear on tree trunks on lane 8 (level 3 or higher)
+- make snakes appear on tree trunks on lane 8 (level 3 or higher) **done**
 
 - make flies appear in houses **done**
-- make flies appear on tree trunks on lane 7
+- make flies appear on tree trunks on lane 7 **done**
 
 - make crocodiles appear in houses (level 2 or higher) **done**
 - make crocodiles appear instead of on large tree trunks (level 2 or higher) **done**
@@ -17,7 +17,8 @@
 
 - start screen **done**
 - highscore list
-- menu
-  - Buttons
+- menu **done**
+  - Buttons **done**
 - sounds
 - music
+- dev-mode?

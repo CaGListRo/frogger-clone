@@ -127,7 +127,7 @@ class Button:
         self.frame_color: tuple[int] = stgs.BUTTON_COLORS[color]["frame_color"]
         self.hover_color: tuple[int] = stgs.BUTTON_COLORS[color]["hover_color"]
         self.color: str = self.main_color
-        font: pg.font.Font = pg.font.SysFont("comicsans", 23)
+        font: pg.font.Font = pg.font.SysFont("comicsans", stgs.BUTTON_FONT_SIZE)
         self.text: pg.Surface = font.render(text, True, "white")
         self.text_shadow: pg.Surface = font.render(text, True, "black")
         self.text_pos: tuple[int] = (int(self.pos.x + self.size[0] // 2 - self.text.get_width() // 2),

@@ -1,0 +1,17 @@
+Clone de Frogger :
+Dans ce jeu d'arcade classique, vous contrôlez une petite grenouille qui doit traverser
+une route très fréquentée et une rivière tumultueuse pour rentrer chez elle.
+
+Principe du jeu :
+Déplacez votre grenouille avec les touches fléchées, du bas vers le haut.
+Évitez les voitures, camions, bus et bulldozers sur la route – une collision est fatale !
+Sautez sur des troncs, des tortues et même des crocodiles pour traverser la rivière sans
+tomber dans l'eau. Mais attention, certaines tortues plongent !
+Gagnez des points bonus en attrapant des mouches ou en atteignant rapidement les objectifs.
+Chaque niveau devient plus difficile, avec une circulation plus rapide et des sections de
+rivière plus dangereuses.
+Saurez-vous remplir les cinq maisons de grenouilles en toute sécurité ?
+
+Un concept de jeu simple mais addictif qui teste votre habileté et votre timing !
+
+M Musique (on/off)  S Son (on/off)  P Pause (on/off)

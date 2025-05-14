@@ -35,7 +35,7 @@ FLY_HOUSE_CENTER_POS: Final[list[tuple[int]]] = [
 ]
 FLY_SCORES: Final[dict[int]] = {
     "house fly": 100,
-    "trunk fly": 200
+    "tree fly": 200
 }
 FLY_STATE_TIMER: Final[float] = 1.0
 FLY_STAY_TIME: Final[float] = 5.0
@@ -168,11 +168,13 @@ BUTTON_COLORS: Final[dict[tuple[int]]] = {
     'green': {'main_color': (56, 155, 60), 'hover_color': (76, 175, 80), 'shadow_color': (16, 115, 20), 'frame_color': (6, 95, 20)},
     'yellow': {'main_color': (235, 235, 0), 'hover_color': (255, 255, 50), 'shadow_color': (195, 195, 0), 'frame_color': (125, 125, 0)},
     'red': {'main_color': (235, 0, 0), 'hover_color': (255, 50, 50), 'shadow_color': (175, 0, 0), 'frame_color': (100, 0, 0)},
-    'white': {'main_color': (235, 235, 235), 'hover_color': (255, 255, 255), 'shadow_color': (175, 175, 175), 'frame_color': (100, 100, 100)}
+    'white': {'main_color': (235, 235, 235), 'hover_color': (255, 255, 255), 'shadow_color': (175, 175, 175), 'frame_color': (100, 100, 100)},
+    'beige': {'main_color': (235, 220, 195), 'hover_color': (245, 230, 210), 'shadow_color': (185, 170, 145), 'frame_color': (120, 105, 80)}
     }
+BUTTON_FONT_SIZE: Final[int] = 20
 BUTTON_NAMES: Final[dict[dict[str]]] = {
     "back": {"de": "ZURÜCK", "en": "BACK", "es": "VOLVER", "fr": "RETOUR", "it": "INDIETRO", "tr": "GERİ"},
-    "highscores": {"de": "RANGLISTE", "en": "HIGHSCORES", "es": "PUNTUACIONES", "fr": "MEILLEURS SCORES", "it": "CLASSIFICA", "tr": "SKOR TABLOSU"},
+    "highscores": {"de": "RANGLISTE", "en": "HIGHSCORES", "es": "RÉCORDS", "fr": "CLASSEMENT", "it": "CLASSIFICA", "tr": "SKOR TABLOSU"},
     "language": {"de": "DEUTSCH", "en": "ENGLISH", "es": "ESPAÑOL", "fr": "FRANÇAIS", "it": "ITALIANO", "tr": "TÜRKÇE"},
     "options": {"de": "OPTIONEN", "en": "OPTIONS", "es": "OPCIONES", "fr": "OPTIONS", "it": "OPZIONI", "tr": "SEÇENEKLER"},
     "start": {"de": "START", "en": "START", "es": "COMENZAR", "fr": "COMMENCER", "it": "INIZIO", "tr": "BAŞLAT"},
