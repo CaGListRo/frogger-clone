@@ -1,18 +1,16 @@
 Frogger-Clone:
-
-In diesem klassischen Arcade-Spiel steuerst du einen kleinen Frosch, der sicher über eine 
-vielbefahrene Straße und einen reißenden Fluss navigieren muss, um sein Zuhause zu erreichen.
+In diesem klassischen Arcade-Spiel steuerst du einen kleinen Frosch, der
+sicher über eine vielbefahrene Straße und einen reißenden Fluss navigieren
+muss, um sein Zuhause zu erreichen.
 
 Spielprinzip:
 Bewege deinen Frosch mit den Pfeiltasten von unten nach oben.
-Meide Autos, LKWs, Busse und Bulldozer auf der Straße – eine Kollision ist tödlich!
-Springe auf Baumstämmen, Schildkröten und sogar Krokodile, um den Fluss zu überqueren,
-ohne ins Wasser zu fallen. Aber Vorsicht! Manche Schildkröten tauchen!
-Sammle Bonuspunkte durch das fangen von Fliegen oder schnelles Erreichen der Ziele.
-Jede Ebene wird schwieriger, mit schnellerem Verkehr und gefährlicheren Flussabschnitten. 
+Meide Autos, LKWs, Busse und Bulldozer auf der Straße – eine Kollision ist
+tödlich! Springe auf Baumstämmen, Schildkröten und sogar Krokodile, um den
+Fluss zu überqueren, ohne ins Wasser zu fallen. Aber Vorsicht! Manche
+Schildkröten tauchen! Sammle Bonuspunkte durch das fangen von Fliegen oder
+schnelles Erreichen der Ziele. Jede Ebene wird schwieriger, mit schnellerem
+Verkehr und gefährlicheren Flussabschnitten.
 Schaffst du es, alle fünf Frosch-Häuser sicher zu füllen?
-
-Ein einfaches, aber süchtig machendes Spielprinzip, das Geschicklichkeit und Timing testet!
-
 
 M Musik (an/aus)  S Ton (an/aus)  P Pause (an/aus)

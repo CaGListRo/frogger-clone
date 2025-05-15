@@ -1,16 +1,15 @@
 Frogger Clone:
-In this classic arcade game, you control a small frog that must safely navigate a busy road
-and a raging river to reach its home.
+In this classic arcade game, you control a small frog that must safely navigate a
+busy road and a raging river to reach its home.
 
 Gameplay:
 Move your frog using the arrow keys from the bottom to the top.
 Avoid cars, trucks, buses, and bulldozers on the road – a collision is deadly!
-Hop on logs, turtles, and even crocodiles to cross the river without falling into the water. 
-But beware – some turtles dive!
+Hop on logs, turtles, and even crocodiles to cross the river without falling into
+the water. But beware – some turtles dive!
 Earn bonus points by catching flies or reaching the goals quickly.
 Each level gets harder, with faster traffic and more dangerous river sections.
 Can you safely fill all five frog homes?
 
-A simple but addictive gameplay concept that tests your skill and timing!
 
 M Music (on/off)  S Sound (on/off)  P Pause (on/off)

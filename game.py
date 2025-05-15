@@ -41,6 +41,7 @@ class Game:
 
         # fonts
         self.score_font: pg.font.Font = pg.font.SysFont("Comic Sans", 32)
+        self.info_font: pg.font.Font = pg.font.SysFont("Comic Sans", 18)
 
         # load images
         self.images: dict[pg.Surface] = {
@@ -295,13 +296,14 @@ class Game:
                         case 1:
                             self.create_back_button()
                             self.create_language_buttons()
+                            self.load_info()
                             self.game_state = "options"
-                            
                         case 2:
                             self.game_state = "highscores"
                             self.create_back_button()
                         case 3:
                             self.running = False
+
         elif self.game_state == "options" or self.game_state == "highscores":
             if self.back_button.check_clicked():
                 self.game_state = "menu"
@@ -315,6 +317,7 @@ class Game:
                     if old_language != self.language:
                         self.create_menu_buttons()
                         self.create_back_button()
+                        self.load_info()
 
     def check_collisions(self) -> None:
         """ Checks for collisions between the player and other objects. """
@@ -430,8 +433,12 @@ class Game:
         """ Loads the info text in the selected language. """
         self.info_text: list[str] = []
         file_path: str = f"info/{self.language}.txt"
-        with open(file_path, "r") as file:
-            self.info_text.append(file.readlines())
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                self.info_text = file.readlines()
+                self.info_text = [line.strip() for line in self.info_text]
+        except FileNotFoundError as e:
+            print(f"Error: {e}")
 
     def event_handler(self) -> None:
         """ Handles events in the game. """
@@ -647,6 +654,11 @@ class Game:
     def render_options(self) -> None:
         """ Renders the options menu. """
         self.screen.blit(self.images["options background"], (0, 0))
+        for idx, line in enumerate(self.info_text):
+            shadow: pg.Surface = self.info_font.render(str(line), True, "black")
+            text: pg.Surface = self.info_font.render(str(line), True, "white")
+            self.screen.blit(shadow, (52, 52 + idx * 30))
+            self.screen.blit(text, (50, 50 + idx * 30))
         self.back_button.render(self.screen)
         for button in self.language_buttons:
             button.render(self.screen)
