@@ -185,3 +185,15 @@ BUTTON_OFFSET: Final[int] = 5               # is needed for the click animation
 BUTTON_SIZE: Final[tuple[int]] = (170, 40)  # (width, height)
 LANGUAGE_BUTTON_SIZE: Final[tuple[int]] = (120, 40)  # (width, height)
 LANGUAGE_BUTTON_POSITIONS: Final[list[tuple]] = [()]
+
+# settings for the pause screen
+PAUSE: Final[dict[str]] = {
+    "pause": {"de": "PAUSE", "en": "PAUSE", "es": "PAUSA", "fr": "PAUSE", "it": "PAUSA", "tr": "DURAKLATILDI"},
+    "text": {"de": "Drücke [P], um fortzufahren.", 
+             "en": "Press [P] to resume.", 
+             "es": "Presiona [P] para continuar.", 
+             "fr": "Appuyez sur [P] pour reprendre.", 
+             "it": "Premi [P] per continuare.", 
+             "tr": "Devam etmek için [P] tuşuna basın."}
+}
+BLINK_TIME: Final[float] = 0.8

@@ -38,11 +38,16 @@ class Game:
         self.languages: list[str] = [language for language in stgs.BUTTON_NAMES["language"]]
         self.language: str = self.languages[1]
         self.back_button: None | Button = None
+        self.pause_key_pressed: bool = False
+        self.show_pause_text: bool = True
+        self.blink_timer: float = stgs.BLINK_TIME
 
         # fonts
-        self.score_font: pg.font.Font = pg.font.SysFont("Comic Sans", 32)
         self.info_font: pg.font.Font = pg.font.SysFont("Comic Sans", 18)
-
+        self.pause_font: pg.font.Font = pg.font.SysFont("Comic Sans", 55)
+        self.pause_text_font: pg.font.Font = pg.font.SysFont("Comic Sans", 23)
+        self.score_font: pg.font.Font = pg.font.SysFont("Comic Sans", 32)
+        
         # load images
         self.images: dict[pg.Surface] = {
             "game background": load_image("background/game background.png"),
@@ -103,8 +108,11 @@ class Game:
         self.tree_snake: None | TreeSnake = None
         self.tree_snake_ready: bool = False
 
-        # for testing
-        self.load_info()
+        # audio
+        self.music_enabled: bool = True
+        self.sound_enabled: bool = True
+        self.music_key_pressed: bool = False
+        self.sound_key_pressed: bool = False
     
     def initialize_menu(self) -> None:
         """ Initialize the game menu. """
@@ -447,9 +455,21 @@ class Game:
             # handle quit event
             if event.type == pg.QUIT:
                 self.running = False
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_m:
+                    self.music_key_pressed = True
+                if event.key == pg.K_s:
+                    self.sound_key_pressed = True
+            if event.type == pg.KEYUP:
+                if event.key == pg.K_m and self.music_key_pressed:
+                    self.music_enabled = False if self.music_enabled == True else True
+                    self.music_key_pressed = False
+                if event.key == pg.K_s and self.sound_key_pressed:
+                    self.sound_enabled = False if self.sound_enabled == True else True
+                    self.sound_key_pressed = False
             
             # check key events while playing the game
-            if self.game_state == "play":
+            if self.game_state == "play" or self.game_state == "pause":
                 if event.type == pg.KEYDOWN:
                     
                     if event.key == pg.K_UP or event.key == pg.K_w:
@@ -460,28 +480,33 @@ class Game:
                         self.direction_pressed = True
                     if event.key == pg.K_RIGHT or event.key == pg.K_d:
                         self.direction_pressed = True
+                    if event.key == pg.K_p and not self.pause_key_pressed:
+                        self.pause_key_pressed = True                    
 
-                if event.type == pg.KEYUP and not self.frog.jumping:
-                    if (event.key == pg.K_UP or event.key == pg.K_w) and self.direction_pressed:
+                if event.type == pg.KEYUP:
+                    if (event.key == pg.K_UP or event.key == pg.K_w) and self.direction_pressed and not self.frog.jumping:
                         self.frog.jump("north")
                         self.direction_pressed = False
                         if self.tree_fly and self.tree_fly.state == "caught":
                             self.tree_fly.set_angle(angle = 0)
-                    if (event.key == pg.K_DOWN or event.key == pg.K_s) and self.direction_pressed:
+                    if (event.key == pg.K_DOWN or event.key == pg.K_s) and self.direction_pressed and not self.frog.jumping:
                         self.frog.jump("south")
                         self.direction_pressed = False
                         if self.tree_fly and self.tree_fly.state == "caught":
                             self.tree_fly.set_angle(angle = 180)
-                    if (event.key == pg.K_LEFT or event.key == pg.K_a) and self.direction_pressed:
+                    if (event.key == pg.K_LEFT or event.key == pg.K_a) and self.direction_pressed and not self.frog.jumping:
                         self.frog.jump("west")
                         self.direction_pressed = False
                         if self.tree_fly and self.tree_fly.state == "caught":
                             self.tree_fly.set_angle(angle = 90)
-                    if (event.key == pg.K_RIGHT or event.key == pg.K_d) and self.direction_pressed:
+                    if (event.key == pg.K_RIGHT or event.key == pg.K_d) and self.direction_pressed and not self.frog.jumping:
                         self.frog.jump("east")
                         self.direction_pressed = False
                         if self.tree_fly and self.tree_fly.state == "caught":
                             self.tree_fly.set_angle(angle = 270)
+                    if event.key == pg.K_p and self.pause_key_pressed:
+                        self.game_state = "pause" if self.game_state == "play" else "play"
+                        self.pause_key_pressed = False
                 
     def update_objects(self, dt: float) -> None:
         """
@@ -645,6 +670,24 @@ class Game:
         # draw time bar
         self.time_bar.render(self.screen)
 
+        if self.game_state == "pause":
+            surf: pg.Surface = pg.Surface(stgs.WINDOW_SIZE, pg.SRCALPHA)
+            surf.fill((200, 200, 200, 50))
+            self.screen.blit(surf, (0, 0))
+            shadow: pg.Surface = self.pause_font.render(stgs.PAUSE["pause"][self.language], True, "black")
+            text: pg.Surface = self.pause_font.render(stgs.PAUSE["pause"][self.language], True, "white")
+            x_pos: int = int(stgs.WINDOW_SIZE[0] / 2 - text.get_width() / 2)
+            y_pos: int = int(stgs.WINDOW_SIZE[1] / 2 - text.get_height() / 2)
+            self.screen.blit(shadow, (x_pos - 3, y_pos + 3))
+            self.screen.blit(text, (x_pos, y_pos))
+            if self.show_pause_text:
+                shadow: pg.Surface = self.pause_text_font.render(stgs.PAUSE["text"][self.language], True, "black")
+                text: pg.Surface = self.pause_text_font.render(stgs.PAUSE["text"][self.language], True, "white")
+                x_pos: int = int(stgs.WINDOW_SIZE[0] / 2 - text.get_width() / 2)
+                y_pos: int = int(stgs.WINDOW_SIZE[1] / 3 * 2 - text.get_height() / 2)
+                self.screen.blit(shadow, (x_pos - 2, y_pos + 2))
+                self.screen.blit(text, (x_pos, y_pos))
+
     def render_menu(self) -> None:
         """ Renders the main menu. """
         self.screen.blit(self.images["menu background"], (0, 0))
@@ -681,7 +724,7 @@ class Game:
         self.screen.fill((0, 0, 0))
         if self.game_state == "menu":
             self.render_menu()
-        elif self.game_state == "play":
+        elif self.game_state == "play" or self.game_state == "pause":
             self.render_game()
         # showing the highscores
         elif self.game_state == "highscores":
@@ -714,7 +757,7 @@ class Game:
 
             # check for traffic speed ups
             self.check_speed_up()
-            if self.game_state != "play":
+            if self.game_state != "play" and self.game_state != "pause":
                 self.check_buttons()
 
             # playing the game
@@ -724,6 +767,13 @@ class Game:
                 self.check_collisions()
                 if self.frog.pos.y <= 353:
                     self.calculate_distances()
+
+            # let the pause text blink
+            elif self.game_state == "pause":
+                self.blink_timer -= dt
+                if self.blink_timer <= 0:
+                    self.show_pause_text = False if self.show_pause_text == True else True
+                    self.blink_timer = stgs.BLINK_TIME
 
             # call the methods
             self.event_handler()
