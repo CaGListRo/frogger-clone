@@ -220,6 +220,9 @@ class LaneCrocodile:
         self.half_image_width: int = int(self.image.get_width() // 2)
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
 
+    def __iter__(self):
+        yield self
+
     def get_timer(self) -> None:
         """ Get's the time for the timer to open and close the mouth from the settings.py. """
         self.oc_timer: float = stgs.LANE_CROCO_TIMER[self.game.level - 2]

@@ -167,6 +167,9 @@ class Bulldozer:
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
         self.half_image_width: int = int(image_to_blit.get_width() // 2)
 
+    def __iter__(self):
+        yield self
+
     def update(self, dt: float) -> None:
         """
         Update the small car's position.

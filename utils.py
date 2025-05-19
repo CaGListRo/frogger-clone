@@ -73,6 +73,9 @@ class Animation:
         self.image_timer: float = 0.0
         self.done: bool = False
 
+    def __iter__(self):
+        yield self
+
     def copy(self) -> object:
         """ Returns a copy of the animation object. """
         return Animation(images = self.images, animation_duration = self.animation_duration, loop = self.loop)
