@@ -2,13 +2,15 @@ import settings as stgs
 
 import pygame as pg
 from icecream import ic
-from typing import TypeVar, Final
+from typing import TYPE_CHECKING
 
-Game = TypeVar("Game")
-Animation = TypeVar("Animation")
+if TYPE_CHECKING:
+    from utils import Animation
+    from game import Game
+
 
 class Frog:
-    def __init__(self, game: Game, pos: tuple[int], direction: str = "north") -> None:
+    def __init__(self, game: "Game", pos: tuple[int, int], direction: str = "north") -> None:
         """
         Initialize a Frog object.
         Args:
@@ -16,7 +18,7 @@ class Frog:
         size (tuple[int]): The size of the frog.
         direction (str): The initial direction of the frog. Defaults to "north".
         """        
-        self.game: Game = game
+        self.game: "Game" = game
         # image stuff
         self.state: str = "idle"
         self.new_animation()

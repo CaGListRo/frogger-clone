@@ -15,7 +15,7 @@ from time import perf_counter as pc
 from random import choice
 from random import randint as ri
 import sys
-from typing import Final
+from typing import List, Union
 
 
 class Game:
@@ -23,7 +23,7 @@ class Game:
         """ Initializes the game class. """
         pg.init()
         # set up screen
-        self.screen: pg.display = pg.display.set_mode(stgs.WINDOW_SIZE)
+        self.screen: pg.Surface = pg.display.set_mode(stgs.WINDOW_SIZE)
 
         self.running: bool = True
         self.fps: int = 0
@@ -49,13 +49,18 @@ class Game:
         self.score_font: pg.font.Font = pg.font.SysFont("Comic Sans", 32)
         
         # load images
-        self.images: dict[pg.Surface] = {
+        self.image: dict[str, pg.Surface] = {
             "game background": load_image("background/game background.png"),
             "highscores background": load_image("background/highscores background.png"),
             "menu background": load_image("background/menu background.png"),
             "options background": load_image("background/options background.png"),
             "house crocodile": load_image("crocodile/house/crocodile.png"),
             "houses": load_image("background/houses background.png"),
+            "stripe": load_image("objects/stripe.png", scale_factor=0.75),
+            "frog/house": load_image("frog/house/frog.png"),
+            "frog/life": load_image("frog/idle/frog0001.png", scale_factor=0.7)
+        }
+        self.image_lists: dict[str, List[pg.Surface]] = {
             "tree/large": load_images("objects/large trees/", scale_factor=0.9),
             "tree/medium": load_images("objects/medium trees/", scale_factor=0.9),
             "tree/small": load_images("objects/small trees/", scale_factor=0.9),
@@ -63,14 +68,11 @@ class Game:
             "racing_cars": load_images("racing cars/", scale_factor=0.8),
             "large_cars": load_images("large cars/", scale_factor=0.9),            
             "small_cars": load_images("small cars/", scale_factor=0.85),
-            "stripe": load_image("objects/stripe.png", scale_factor=0.75),
-            "frog/house": load_image("frog/house/frog.png"),
-            "frog/life": load_image("frog/idle/frog0001.png", scale_factor=0.7),
             "ripple": load_images("water/", scale_factor=2),
         }
 
         # create animations
-        self.animations: dict[Animation] = {
+        self.animations: dict[str, Animation] = {
             "bulldozer": Animation(load_images("bulldozer/", scale_factor=0.9), animation_duration=0.4),
             "crocodile/closed": Animation(load_images("crocodile/swimming closed/", scale_factor=0.9), animation_duration=1),
             "crocodile/open": Animation(load_images("crocodile/swimming open/", scale_factor=0.9), animation_duration=1),
@@ -162,29 +164,29 @@ class Game:
     def create_menu_buttons(self) -> None:
         """ Creates the buttons for the menu. """
         self.menu_buttons: list[Button] = [        
-            Button(stgs.BUTTON_POSITIONS["start"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["start"][self.language], "green"),
-            Button(stgs.BUTTON_POSITIONS["options"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["options"][self.language], "beige"),
-            Button(stgs.BUTTON_POSITIONS["highscores"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["highscores"][self.language], "beige"),
-            Button(stgs.BUTTON_POSITIONS["quit"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["quit"][self.language], "red")
+            Button(pos=stgs.BUTTON_POSITIONS["start"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["start"][self.language], color="green"),
+            Button(pos=stgs.BUTTON_POSITIONS["options"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["options"][self.language], color="beige"),
+            Button(pos=stgs.BUTTON_POSITIONS["highscores"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["highscores"][self.language], color="beige"),
+            Button(pos=stgs.BUTTON_POSITIONS["quit"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["quit"][self.language], color="red")
         ]
 
     def create_back_button(self) -> None:
         """ Creates the bak button for the options menu and the highscores screen. """
-        self.back_button = Button(stgs.BUTTON_POSITIONS["back"], stgs.BUTTON_SIZE, stgs.BUTTON_NAMES["back"][self.language], "yellow")
+        self.back_button: Button = Button(pos=stgs.BUTTON_POSITIONS["back"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["back"][self.language], color="yellow")
 
     def create_language_buttons(self) -> None:
         """ Creates the language buttons for the options menu. """
         self.language_buttons: list[Button] = []
         for idx, button in enumerate(stgs.BUTTON_NAMES["language"].values()):
-            self.language_buttons.append(Button((11 + idx * 130, 600), stgs.LANGUAGE_BUTTON_SIZE, button, "beige"))
+            self.language_buttons.append(Button(pos=(11 + idx * 130, 600), size=stgs.LANGUAGE_BUTTON_SIZE, text=str(button), color="beige"))
 
     def create_new_ripple(self) -> None:
         """ Creates a new ripple at a random y-position. """
-        self.ripples.append(Ripple(self, pos=(-10, ri(25, 258))))
+        self.ripples.append(Ripple(self, pos=(-10, ri(25, 300))))
 
     def create_ripples(self) -> None:
         """ Creates a list of ripples. """
-        self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(50, 284))) for i in range(100)]
+        self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(50, 300))) for i in range(100)]
 
     def create_house_crocodile(self) -> None:
         """ Creates a crocodile in a random house. """
@@ -228,7 +230,7 @@ class Game:
         sinking_pair: int = ri(0, stgs.WATER[f"level {self.level}"][1] - 1)
         sinking_trio: int = ri(0, stgs.WATER[f"level {self.level}"][4] - 1)
 
-        self.water_traffic: list[Animation | pg.Surface] = [
+        self.water_traffic: List[List[Union[LaneCrocodile, Tree, Turtle]]] = [
             [LaneCrocodile(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], 0) if i == crocodile else Tree(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
             [Turtle(self, 80 + i * stgs.SPACING["lane 9"][self.level - 1], stgs.LANE_HEIGHTS["lane 9"], 1, True if i == sinking_pair else False)  for i in range(stgs.WATER[f"level {self.level}"][1])],
             [Tree(self, 700 - i * stgs.SPACING["lane 8"][self.level - 1], stgs.LANE_HEIGHTS["lane 8"], "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
@@ -238,7 +240,7 @@ class Game:
 
     def create_traffic(self) -> None:
         """ Creates traffic on the road. """
-        self.traffic: list[Animation | pg.Surface] = [
+        self.traffic: List[List[Union[Truck, RacingCar, LargeCar, Bulldozer, SmallCar]]] = [
             [Truck(self, 700 - i * stgs.SPACING["lane 5"][self.level - 1], stgs.LANE_HEIGHTS["lane 5"]) for i in range(stgs.STREET[f"level {self.level}"][0])],
             [RacingCar(self, 400 - i * stgs.SPACING["lane 4"][self.level - 1], stgs.LANE_HEIGHTS["lane 4"]) for i in range(stgs.STREET[f"level {self.level}"][1])],
             [LargeCar(self, 800 - i * stgs.SPACING["lane 3"][self.level - 1], stgs.LANE_HEIGHTS["lane 3"]) for i in range(stgs.STREET[f"level {self.level}"][2])],
@@ -265,7 +267,7 @@ class Game:
         del self.time_bar
         self.create_time_bar()
 
-    def handle_water_traffic_collision(self, collision_object: object, lane_index, element_index) -> bool:
+    def handle_water_traffic_collision(self, collision_object: Union["Turtle", "Tree", "LaneCrocodile"], lane_index: int, element_index: int) -> bool:
         """
         Handles collision with water traffic.
         Args:
@@ -285,11 +287,11 @@ class Game:
 
     def calculate_distances(self) -> None:
         """ Checks the distances on the x axis from the frog to the water objects. """
-        self.distances: list[int] = []
-        for idx, lane in enumerate(self.water_traffic):
-            lane_list: list[int] = []
+        self.distances: List[List[int]] = []
+        for _, lane in enumerate(self.water_traffic):
+            lane_list: List[int] = []
             for element in lane:
-                    lane_list.append(self.frog.pos.x - element.pos.x)
+                lane_list.append(int(self.frog.pos.x - element.pos.x))
             self.distances.append(lane_list)
 
     def check_buttons(self) -> None:
@@ -313,9 +315,9 @@ class Game:
                             self.running = False
 
         elif self.game_state == "options" or self.game_state == "highscores":
-            if self.back_button.check_clicked():
+            if self.back_button and self.back_button.check_clicked():
                 self.game_state = "menu"
-                self.back_button = None
+                del self.back_button
                 self.language_buttons = []
             if self.game_state == "options":   
                 for idx, button in enumerate(self.language_buttons):
@@ -352,14 +354,15 @@ class Game:
  
         # collisions with water traffic
         collided_list: list[bool] = []
+        collided: bool = False
         for lane_index, lane in enumerate(self.water_traffic):
             for element_index, element in enumerate(lane):
                 if lane_index == 1 or lane_index == 4:  # lane_index 1 and 4 are the turtles
                     if not element.diving:
-                        collided: bool = self.frog.collision_rect.colliderect(element.rect)
+                        collided = self.frog.collision_rect.colliderect(element.rect)
                         collided_list.append(collided)
                 else:
-                    collided: bool = self.frog.collision_rect.colliderect(element.rect)
+                    collided = self.frog.collision_rect.colliderect(element.rect)
                     collided_list.append(collided)
                 if collided:
                     self.handle_water_traffic_collision(element, lane_index, element_index)
@@ -598,18 +601,18 @@ class Game:
     def render_game(self) -> None:
         """ Renders the game while playing. """
         # draw houses to have a background behind the background
-        self.screen.blit(self.images["houses"], (0, 0))
+        self.screen.blit(self.image["houses"], (0, 0))
         # draw background
-        self.screen.blit(self.images["game background"], (0, 26))
+        self.screen.blit(self.image["game background"], (0, 26))
         # draw ripples
         for ripple in self.ripples:
             ripple.render(self.screen)
         # draw stripes
         for i in range(4):
             for j in range(55):
-                pos: tuple[int] = (stgs.STRIPES["x start"] + j * stgs.STRIPES["x spacing"], 
-                                   stgs.STRIPES["y start"] + i * stgs.STRIPES["y spacing"])
-                self.screen.blit(self.images["stripe"], pos)
+                pos: tuple[int, int] = (stgs.STRIPES["x start"] + j * stgs.STRIPES["x spacing"], 
+                                        stgs.STRIPES["y start"] + i * stgs.STRIPES["y spacing"])
+                self.screen.blit(self.image["stripe"], pos)
         # draw water traffic
         for lane in self.water_traffic:
             for element in lane:
@@ -617,8 +620,8 @@ class Game:
         # draw frog time
         if self.show_frog_time:
             time_to_blit: pg.Surface = self.score_font.render(f"{int(self.frog_time)} Seconds", True, "white", "black")
-            pos: tuple[int] = (int(stgs.WINDOW_SIZE[0] // 2 - time_to_blit.get_width() // 2), 
-                               int(stgs.WINDOW_SIZE[1] // 2 - time_to_blit.get_height() // 2))
+            pos: tuple[int, int] = (int(stgs.WINDOW_SIZE[0] // 2 - time_to_blit.get_width() // 2), 
+                                    int(stgs.WINDOW_SIZE[1] // 2 - time_to_blit.get_height() // 2))
             self.screen.blit(time_to_blit, pos)
         
         # draw frog
@@ -644,7 +647,7 @@ class Game:
         if self.tree_snake:
             self.tree_snake.render(self.screen)
         # draw houses
-        self.screen.blit(self.images["houses"], (0, 26))
+        self.screen.blit(self.image["houses"], (0, 26))
         # draw house rects for test
         for rect in self.house_rects:
             pg.draw.rect(self.screen, "red", rect, width=1)
@@ -658,10 +661,10 @@ class Game:
         for i in range(5):
             if self.houses[i]:
                 multiplicand: int = 167 if i != 3 else 169
-                self.screen.blit(self.images["frog/house"], (35 + i * multiplicand, 52))
+                self.screen.blit(self.image["frog/house"], (35 + i * multiplicand, 52))
         # draw the remaining frogs
         for i in range(self.frogs):
-            self.screen.blit(self.images["frog/life"], (10 + i * 32, stgs.FROG_DRAW_HEIGHT))
+            self.screen.blit(self.image["frog/life"], (10 + i * 32, stgs.FROG_DRAW_HEIGHT))
 
         # showing gras rects for testing
         for gras_rect in self.gras_rects:
@@ -690,13 +693,13 @@ class Game:
 
     def render_menu(self) -> None:
         """ Renders the main menu. """
-        self.screen.blit(self.images["menu background"], (0, 0))
+        self.screen.blit(self.image["menu background"], (0, 0))
         for button in self.menu_buttons:
             button.render(self.screen)
 
     def render_options(self) -> None:
         """ Renders the options menu. """
-        self.screen.blit(self.images["options background"], (0, 0))
+        self.screen.blit(self.image["options background"], (0, 0))
         for idx, line in enumerate(self.info_text):
             shadow: pg.Surface = self.info_font.render(str(line), True, "black")
             text: pg.Surface = self.info_font.render(str(line), True, "white")
@@ -708,7 +711,7 @@ class Game:
 
     def render_highscores(self) -> None:
         """ Render the high scores screen. """
-        self.screen.blit(self.images["highscores background"], (0, 0))
+        self.screen.blit(self.image["highscores background"], (0, 0))
         # Render high score entries
         for index, (score, name) in enumerate(self.highscores):
             score_shadow: pg.Surface = self.score_font.render(f"{index + 1}.    {score} {name}", True, "black")

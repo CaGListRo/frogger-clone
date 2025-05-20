@@ -2,31 +2,33 @@ import settings as stgs
 
 import pygame as pg
 from random import choice, randint
-from typing import TypeVar, Final
+from typing import TYPE_CHECKING, Final
 from icecream import ic
 
-Animation = TypeVar("Animation")
-Game = TypeVar("Game")
+if TYPE_CHECKING:
+    from game import Game
+    from utils import Animation
 
 
 class Tree:
-    def __init__(self, game: Game, x: int, y: int, size: str, lane: int) -> None:
+    def __init__(self, game: "Game", x: int, y: int, size: str, lane: int) -> None:
         """
         Initialize a tree object.
         Args:
-        game (Game): The game object.
+        game ("Game"): The game object.
         x (int): The center x-coordinate of the tree.
         y (int): The center y-coordinate of the tree.
         size (str): The size of the tree. (large/medium/small)
         lane (int): The lane of the tree.
         """
-        self.game: Game = game
+        self.game: "Game" = game
         self.pos: pg.Vector2 = pg.Vector2((x, y))
         self.size: str = size
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][lane]
         self.image: pg.Surface = (choice(self.game.images[f"tree/{self.size}"]))
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
         self.half_image_width: int = int(self.image.get_width() // 2)
+        self.diving: bool = False
 
     def update(self, dt: float) -> None:
         """
@@ -63,17 +65,17 @@ class Tree:
 
 class Turtle:
     TRANSPARENT_COLOR: Final[tuple[int]] = (0, 0, 0, 0)
-    def __init__(self, game: Game, x: int, y: int, lane: int, sinkable: bool = False) -> None:
+    def __init__(self, game: "Game", x: int, y: int, lane: int, sinkable: bool = False) -> None:
         """
         Initialize a turtle object.
         Args:
-        game (Game): The game object.
+        game ("Game"): The game object.
         x (int): The center x-coordinate of the turtle.
         y (int): The center y-coordinate of the turtle.
         lane (int): The lane of the turtle.
         sinkable (bool): Whether the turtle can dive. Defaults to False.
         """
-        self.game: Game = game
+        self.game: "Game" = game
         self.pos: pg.Vector2 = pg.Vector2((x, y))
         self.speed: int = stgs.START_SPEED[f"level {self.game.level}"][lane]
         self.sinkable: bool = sinkable  # the general ability to dive
@@ -162,14 +164,14 @@ class Turtle:
 
 
 class Ripple:
-    def __init__(self, game: Game, pos: tuple[int]) -> None:
+    def __init__(self, game: "Game", pos: tuple[int, int]) -> None:
         """
         Initialize a ripple.
         Args:
-        game (Game): The game instance.
+        game ("Game"): The game instance.
         pos (tuple[int]): The position of the ripple.
         """
-        self.game: Game = game
+        self.game: "Game" = game
         self.pos: pg.Vector2 = pg.Vector2(pos)
         self.image: pg.Surface = choice(self.game.images["ripple"])
         self.speed: int = randint(30, 90)
@@ -204,13 +206,13 @@ class Ripple:
 
 
 class LaneCrocodile:
-    def __init__(self, game: Game, x: int, y: int, lane: int) -> None:
+    def __init__(self, game: "Game", x: int, y: int, lane: int) -> None:
         """
         Initialize a lane crocodile.
         Args:
-        game (Game): The game instance.
+        game ("Game"): The game instance.
         """
-        self.game: Game = game
+        self.game: "Game" = game
         self.pos: pg.Vector2 = pg.Vector2((x, y))
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][lane]
         self.state: str = "closed"
@@ -219,6 +221,7 @@ class LaneCrocodile:
         self.get_timer()
         self.half_image_width: int = int(self.image.get_width() // 2)
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
+        self.diving: bool = False
 
     def __iter__(self):
         yield self
@@ -263,14 +266,14 @@ class LaneCrocodile:
 
 
 class HouseCrocodile:
-    def __init__(self, game: Game, house: int) -> None:
+    def __init__(self, game: "Game", house: int) -> None:
         """
         Initialize a house crocodile object.
         Args:
-        game (Game): The game instance.
+        game ("Game"): The game instance.
         house (int): The number of the house in which the crocodile should appear (0-4).
         """
-        self.game: Game = game
+        self.game: "Game" = game
         self.house: int = house
         self.image: pg.Surface = game.images["house crocodile"]
         self.pos: pg.Vector2 = pg.Vector2(stgs.HOUSE_CROCO_POS[self.house][0], stgs.HOUSE_CROCO_POS[self.house][1])

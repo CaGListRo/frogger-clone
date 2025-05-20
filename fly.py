@@ -2,19 +2,20 @@ import settings as stgs
 
 import pygame as pg
 from random import choice
-from typing import TypeVar
+from typing import TYPE_CHECKING
 
-Game = TypeVar("Game")
-Animation = TypeVar("Animation")
+if TYPE_CHECKING:
+    from utils import Animation
+    from game import Game
 
 
 class HouseFly:
-    def __init__(self, game: Game, pos: tuple[int]) -> None:
+    def __init__(self, game: "Game", pos: tuple[int, int]) -> None:
         """ Initializes an fly object.
         Args:
         game (Game): The game object.
         """
-        self.game: Game = game
+        self.game: "Game" = game
         self.state: str = "idle"
         self.get_animation()
         self.get_current_image()
@@ -62,12 +63,12 @@ class HouseFly:
 
 
 class TreeFly:
-    def __init__(self, game: Game, tree_speed: int, tree_rect: pg.Rect) -> None:
+    def __init__(self, game: "Game", tree_speed: int, tree_rect: pg.Rect) -> None:
         """ Initializes an fly object.
         Args:
         game (Game): The game object.
         """
-        self.game: Game = game
+        self.game: "Game" = game
         self.tree_speed: int = tree_speed
         self.tree_rect: pg.Rect = tree_rect
         self.state: str = "idle"

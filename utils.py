@@ -115,7 +115,7 @@ class Animation:
 
 class Button:
     """ A button class that can be used to create buttons in the game. """
-    def __init__(self, pos: tuple[int], size: tuple[int], text: str, color: str) -> None:
+    def __init__(self, pos: tuple[int, int], size: tuple[int, int], text: str, color: str) -> None:
         """ Initializes a button object.
         Args:
         pos (tuple(int)): The topleft position of the button
@@ -123,24 +123,24 @@ class Button:
         color (str): The color of the button (green, yellow, red, white)
         """
         self.pos: pg.Vector2 = pg.Vector2(pos)
-        self.size: tuple[int] = size
+        self.size: tuple[int, int] = size
         
-        self.shadow_color: tuple[int] = stgs.BUTTON_COLORS[color]["shadow_color"]
-        self.main_color: tuple[int] = stgs.BUTTON_COLORS[color]["main_color"]
-        self.frame_color: tuple[int] = stgs.BUTTON_COLORS[color]["frame_color"]
-        self.hover_color: tuple[int] = stgs.BUTTON_COLORS[color]["hover_color"]
-        self.color: str = self.main_color
+        self.shadow_color: tuple[int, int, int] = stgs.BUTTON_COLORS[color]["shadow_color"]
+        self.main_color: tuple[int, int, int] = stgs.BUTTON_COLORS[color]["main_color"]
+        self.frame_color: tuple[int, int, int] = stgs.BUTTON_COLORS[color]["frame_color"]
+        self.hover_color: tuple[int, int, int] = stgs.BUTTON_COLORS[color]["hover_color"]
+        self.color: tuple[int, int, int] = self.main_color
         font: pg.font.Font = pg.font.SysFont("comicsans", stgs.BUTTON_FONT_SIZE)
         self.text: pg.Surface = font.render(text, True, "white")
         self.text_shadow: pg.Surface = font.render(text, True, "black")
-        self.text_pos: tuple[int] = (int(self.pos.x + self.size[0] // 2 - self.text.get_width() // 2),
+        self.text_pos: tuple[int, int] = (int(self.pos.x + self.size[0] // 2 - self.text.get_width() // 2),
                                      int(self.pos.y + self.size[1] // 2 - self.text.get_height() // 2))
         self.clicked: bool = False
         self.offset: int = stgs.BUTTON_OFFSET
         self.rect: pg.Rect = self.create_rect()
 
     def check_clicked(self) -> None | bool:
-        """ Checks if the button is clicked. """
+        """ Checks if the button is clicked. Returns True if the button is clicked else None. """
         if self.rect.collidepoint(pg.mouse.get_pos()):
             self.color = self.hover_color
             if pg.mouse.get_pressed()[0]:
