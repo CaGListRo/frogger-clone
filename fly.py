@@ -50,7 +50,7 @@ class HouseFly:
 
     def get_current_image(self) -> None:
         """ Gets the current image from the animation. """
-        self.image: pg.Surface = self.animation.get_current_image()
+        self.image: pg.Surface = self.animation.get_current_image()  # type: ignore
 
     def render(self, surf: pg.Surface) -> None:
         """
@@ -92,22 +92,13 @@ class TreeFly:
         """ Chooses the direction -1 for left, 1 for right. """
         self.direction = choice((-1, 1))
 
-    def set_angle(self) -> None:
-        """ Sets self.angle according to self.direction. """
-        if self.direction == 1:
-            self.angle = 270
-        elif self.direction == -1:
-            self.angle = 90
-        else:
-            self.angle = 0
-
     def choose_state(self) -> None:
         """ Chooses the state of the fly. """
         self.state = choice(self.possible_states)
 
     def get_current_image(self) -> None:
         """ Gets the current image from the animation. """
-        self.image: pg.Surface = self.animation.get_current_image()
+        self.image: pg.Surface = self.animation.get_current_image()  # type: ignore
 
     def reset_state_timer(self) -> None:
         """ Resets the state timer. """
@@ -127,7 +118,6 @@ class TreeFly:
         Args:
         dt (float): The time difference between the last and current frame.
         """
-        
         old_state: str = self.state
         if self.state != "caught":
             self.state_timer -= dt
@@ -168,7 +158,7 @@ class TreeFly:
             self.direction = 1
             self.set_angle(270)
 
-        self.rect.center = self.pos
+        self.rect.center = (int(self.pos.x), int(self.pos.y))  # rect.center = tuple, self.pos = Vector2
         
         if self.pos.x > stgs.WINDOW_SIZE[0] + 25:
             self.game.get_tree_fly_time()

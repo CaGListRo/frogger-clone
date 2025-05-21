@@ -167,11 +167,11 @@ SCORE: Final[Dict[str, int]] = {
     "finish level": 1000
 }
 SPEED_UP_SCORE: Final[List[int]] = [1800, 3600, 5400, 7200, 10_000]
-TIME_BAR: Final[Dict[str, int | float]] = {
-    "x pos": 590,
-    "y pos": 650,
-    "length": 300,
-    "height": 20,
+TIME_BAR: Final[Dict[str, float]] = {
+    "x pos": 590.0,
+    "y pos": 650.0,
+    "length": 300.0,
+    "height": 20.0,
     "time": 60.0
 }
 WINDOW_SIZE: Final[Tuple[int, int]] = (800, 700)

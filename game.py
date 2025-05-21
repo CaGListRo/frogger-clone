@@ -28,7 +28,7 @@ class Game:
         self.running: bool = True
         self.fps: int = 0
 
-        self.level: int = 1
+        self.level: int = 5
         self.frog_time: int = 0                      # this is the time one frog needed from the start to "his" house
         self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
         self.show_time: float = stgs.SHOW_FROG_TIME  # this is how long the frog time is shown
@@ -172,7 +172,7 @@ class Game:
 
     def create_back_button(self) -> None:
         """ Creates the bak button for the options menu and the highscores screen. """
-        self.back_button: Button = Button(pos=stgs.BUTTON_POSITIONS["back"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["back"][self.language], color="yellow")
+        self.back_button = Button(pos=stgs.BUTTON_POSITIONS["back"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["back"][self.language], color="yellow")
 
     def create_language_buttons(self) -> None:
         """ Creates the language buttons for the options menu. """
@@ -705,7 +705,8 @@ class Game:
             text: pg.Surface = self.info_font.render(str(line), True, "white")
             self.screen.blit(shadow, (52, 52 + idx * 30))
             self.screen.blit(text, (50, 50 + idx * 30))
-        self.back_button.render(self.screen)
+        if self.back_button:
+            self.back_button.render(self.screen)
         for button in self.language_buttons:
             button.render(self.screen)
 
@@ -718,7 +719,8 @@ class Game:
             score_text: pg.Surface = self.score_font.render(f"{index + 1}.    {score} {name}", True, "white")
             self.screen.blit(score_shadow, (102, 22 + index * 30))
             self.screen.blit(score_text, (100, 20 + index * 30))
-        self.back_button.render(self.screen)
+        if self.back_button:
+            self.back_button.render(self.screen)
 
     def draw_screen(self) -> None:
         """ Draws the game screen. """
@@ -784,8 +786,8 @@ class Game:
             self.draw_screen()
 
             # fps break
-            if dt < 1 / 60:
-                pg.time.wait(int(1000 * ((1 / 60) - dt)))
+            # if dt < 1 / 60:
+            #     pg.time.wait(int(1000 * ((1 / 60) - dt)))
         
         
         pg.quit()

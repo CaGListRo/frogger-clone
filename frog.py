@@ -21,15 +21,16 @@ class Frog:
         self.game: "Game" = game
         # image stuff
         self.state: str = "idle"
+        self.animation: Animation = self.game.animations[f"frog/{self.state}"].copy()
         self.new_animation()
-        image_size: tuple[int] = self.animation.get_current_image().get_size()
+        image_size: tuple[int, int] = self.animation.get_current_image().get_size()  # type: ignore
         self.image: pg.Surface = pg.Surface(image_size, pg.SRCALPHA)
-        self.image.blit(self.animation.get_current_image(), (0, 0))
+        self.image.blit(self.animation.get_current_image(), (0, 0))  # type: ignore
         self.image_to_blit: pg.Surface = self.image
         self.image_rect: pg.Rect = self.image.get_rect(center=pos)
         
         # frog stuff
-        frog_pos: tuple[int] = (int(pos[0] - image_size[0] / 2), pos[1])
+        frog_pos: tuple[int, int] = (int(pos[0] - image_size[0] / 2), pos[1])
         self.pos: pg.Vector2 = pg.Vector2(frog_pos)
         self.destination: pg.Vector2 = pg.Vector2()
         self.speed: int = 200
@@ -43,12 +44,12 @@ class Frog:
         self.carry_fly: bool = False
 
         # collision stuff
-        self.rect_size: tuple[int] = stgs.FROG_COLLISION_RECT
+        self.rect_size: tuple[int, int] = stgs.FROG_COLLISION_RECT
         self.collision_rect: pg.Rect = pg.Rect(self.pos.x - self.rect_size[0] // 2, self.pos.y + self.rect_size[1] // 2, self.rect_size[0], self.rect_size[1])
 
     def new_animation(self) -> None:
         """ Copies the animation from self.game.animations. """
-        self.animation: Animation = self.game.animations[f"frog/{self.state}"].copy()
+        self.animation = self.game.animations[f"frog/{self.state}"].copy()
 
     def set_dead(self, kind: str) -> None:
         """
@@ -62,7 +63,7 @@ class Frog:
 
     def move_collision_rect(self) -> None:
         """ Moves the collision rect. """
-        self.collision_rect.center = self.pos
+        self.collision_rect.center = (int(self.pos.x), int(self.pos.y))  # collision_rect.center = tuple, self.pos = Vector2
 
     def update(self, dt: float) -> None:
         """
@@ -153,7 +154,7 @@ class Frog:
         surf (pg.Surface): The surface to render the frog on.
         """
         if isinstance(self.animation.get_current_image(), pg.Surface):
-            self.image_to_blit = pg.transform.rotate(self.animation.get_current_image(), self.angle)
+            self.image_to_blit = pg.transform.rotate(self.animation.get_current_image(), self.angle)  # type: ignore
             self.image_rect = self.image_to_blit.get_rect(center=self.pos)
             surf.blit(self.image_to_blit, self.image_rect)
         pg.draw.rect(surf, "red", self.collision_rect, width=1)

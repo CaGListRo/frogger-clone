@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import settings as stgs
 
 import os
 import pygame as pg
-from typing import Final
+
+from typing import Final, List, Iterator
 
 BASE_PATH: Final[str] = "images/"
 def load_image(img_name: str, scale_factor: int|float = 1) -> pg.Surface:
@@ -24,8 +27,9 @@ def load_image(img_name: str, scale_factor: int|float = 1) -> pg.Surface:
             return scale_image(image = img, scale_factor = scale_factor)
     except FileNotFoundError as e:
         print(f"File not found: {e}")
+        return pg.Surface((32, 32), pg.SRCALPHA)  # in case of failure return an transparent surface
 
-def load_images(image_path: str, scale_factor: int|float = 1) -> list[pg.Surface]:
+def load_images(image_path: str, scale_factor: int|float = 1) -> List[pg.Surface]:
     """ 
     Loads a list of images from the given path and let them scale by the given factor.
     e.g. example_folder/example_image.png
@@ -43,6 +47,7 @@ def load_images(image_path: str, scale_factor: int|float = 1) -> list[pg.Surface
         return images
     except NotADirectoryError as e:
         print(f"Path is not a directory: {e}")
+        return [pg.Surface((32, 32), pg.SRCALPHA)]  # in case of failure return a list with an transparent surface in it
 
 def scale_image(image: pg.Surface, scale_factor: float) -> pg.Surface:
     """
@@ -73,10 +78,10 @@ class Animation:
         self.image_timer: float = 0.0
         self.done: bool = False
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator["Animation"]:
         yield self
 
-    def copy(self) -> object:
+    def copy(self) -> Animation:
         """ Returns a copy of the animation object. """
         return Animation(images = self.images, animation_duration = self.animation_duration, loop = self.loop)
     
@@ -100,7 +105,7 @@ class Animation:
                         self.done = True
                         return self.done
     
-    def get_current_image(self) -> pg.Surface | None:
+    def get_current_image(self) -> pg.Surface | bool:
         """
         Returns the current image in the animation.
         Returns:

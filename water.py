@@ -1,8 +1,9 @@
+from __future__ import annotations
 import settings as stgs
 
 import pygame as pg
 from random import choice, randint
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, Iterator
 from icecream import ic
 
 if TYPE_CHECKING:
@@ -25,7 +26,7 @@ class Tree:
         self.pos: pg.Vector2 = pg.Vector2((x, y))
         self.size: str = size
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][lane]
-        self.image: pg.Surface = (choice(self.game.images[f"tree/{self.size}"]))
+        self.image: pg.Surface = (choice(self.game.image_lists[f"tree/{self.size}"]))
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
         self.half_image_width: int = int(self.image.get_width() // 2)
         self.diving: bool = False
@@ -43,13 +44,13 @@ class Tree:
                 self.game.create_tree_fly(tree_speed=self.speed, tree_rect=self.rect)
             elif self.size == "large":
                 self.game.create_tree_snake(tree_speed=self.speed, tree_rect=self.rect)
-        self.rect.center = self.pos
+        self.rect.center = (int(self.pos.x), int(self.pos.y))  # rect.center = tuple, self.pos = Vector2
 
     def rise_speed(self, amount: int) -> None:
         """
         Set the tree's speed.
         Args:
-        speed (int): The new speed of the tree.
+        amount (int): The amount the speed should be risen.
         """
         self.speed += amount
 
@@ -64,7 +65,7 @@ class Tree:
 
 
 class Turtle:
-    TRANSPARENT_COLOR: Final[tuple[int]] = (0, 0, 0, 0)
+    TRANSPARENT_COLOR: Final[tuple[int, int, int, int]] = (0, 0, 0, 0)
     def __init__(self, game: "Game", x: int, y: int, lane: int, sinkable: bool = False) -> None:
         """
         Initialize a turtle object.
@@ -80,15 +81,16 @@ class Turtle:
         self.speed: int = stgs.START_SPEED[f"level {self.game.level}"][lane]
         self.sinkable: bool = sinkable  # the general ability to dive
         self.state: str = "swimming"
-        self.diving: bool = False     # if it is actually diving
+        self.diving: bool = False       # if it is actually diving
         self.get_new_animation()
         
-        image_to_blit: pg.Surface = self.animation.get_current_image()
+        image_to_blit: pg.Surface | bool = self.animation.get_current_image()
         surface_selector: int = 0 if lane == 1 else 1
         self.turtles_selector: int = 0 if lane == 1 else 1
-        self.image_size: tuple[int] = stgs.TURTLE_SURFACE[surface_selector]
+        self.image_size: tuple[int, int] = stgs.TURTLE_SURFACE[surface_selector]
         self.image: pg.Surface = pg.Surface(self.image_size, pg.SRCALPHA)
-        self.draw_image(image_to_blit=image_to_blit)
+        if isinstance(image_to_blit, pg.Surface):
+            self.draw_image(image_to_blit=image_to_blit)
         
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
 
@@ -125,20 +127,21 @@ class Turtle:
             self.get_new_animation()
 
         self.image.fill(self.TRANSPARENT_COLOR)
-        image_to_blit: pg.Surface = self.animation.get_current_image()
-        self.draw_image(image_to_blit=image_to_blit)
+        image_to_blit: pg.Surface | bool = self.animation.get_current_image()
+        if isinstance(image_to_blit, pg.Surface):
+            self.draw_image(image_to_blit=image_to_blit)
 
         self.pos.x += self.speed * -1 * dt
         if self.pos.x < 0 - self.image_size[0] // 2:
             self.pos.x = stgs.WINDOW_SIZE[0] + self.image_size[0] // 2
 
-        self.rect.center = self.pos
+        self.rect.center = (int(self.pos.x), int(self.pos.y))  # rect.center = tuple, self.pos = Vector2
 
     def rise_speed(self, amount: int) -> None:
         """
         Set the turtle's speed.
         Args:
-        speed (int): The new speed of the turtle.
+        amount (int): The amount the speed should be risen.
         """
         self.speed += amount
 
@@ -173,7 +176,7 @@ class Ripple:
         """
         self.game: "Game" = game
         self.pos: pg.Vector2 = pg.Vector2(pos)
-        self.image: pg.Surface = choice(self.game.images["ripple"])
+        self.image: pg.Surface = choice(self.game.image_lists["ripple"])
         self.speed: int = randint(30, 90)
         self.timer: float = 0.0
         self.change_time: float = 0.3
@@ -187,7 +190,7 @@ class Ripple:
         # system to change the image of the ripple for mor natural look
         self.timer += dt
         if self.timer >= self.change_time:
-            self.image = choice(self.game.images["ripple"])
+            self.image = choice(self.game.image_lists["ripple"])
             self.timer = 0.0
         # make it go right
         self.pos.x += self.speed * dt
@@ -219,16 +222,24 @@ class LaneCrocodile:
         self.get_animation()
         self.get_image()
         self.get_timer()
-        self.half_image_width: int = int(self.image.get_width() // 2)
-        self.rect: pg.Rect = self.image.get_rect(center=self.pos)
+        self.half_image_width: int = int(self.image.get_width() // 2)  # type: ignore
+        self.rect: pg.Rect = self.image.get_rect(center=self.pos)      # type: ignore
         self.diving: bool = False
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator["LaneCrocodile"]:
         yield self
 
     def get_timer(self) -> None:
         """ Get's the time for the timer to open and close the mouth from the settings.py. """
         self.oc_timer: float = stgs.LANE_CROCO_TIMER[self.game.level - 2]
+
+    def rise_speed(self, amount: int) -> None:
+        """
+        Rise the crocodile's speed.
+        Args:
+        amount (int): The amount the speed should be risen.
+        """
+        self.speed += amount
 
     def get_animation(self) -> None:
         """ Get the animation of the lane crocodile. """
@@ -236,7 +247,7 @@ class LaneCrocodile:
 
     def get_image(self) -> None:
         """ Get the current image of the lane crocodile. """
-        self.image: pg.Surface = self.animation.get_current_image()
+        self.image: pg.Surface | bool = self.animation.get_current_image()
 
     def update(self, dt: float) -> None:
         """
@@ -254,7 +265,7 @@ class LaneCrocodile:
         self.pos.x += self.speed * dt
         if self.pos.x > stgs.WINDOW_SIZE[0] + self.half_image_width:
             self.pos.x = -self.half_image_width
-        self.rect.center = self.pos
+        self.rect.center = (int(self.pos.x), int(self.pos.y))  # rect.center = tuple, self.pos = Vector2
 
     def render(self, surf: pg.Surface) -> None:
         """
@@ -262,7 +273,8 @@ class LaneCrocodile:
         Args:
         surf (pg.Surface): The surface to render the lane crocodile on.
         """
-        surf.blit(self.image, self.rect)
+        if isinstance(self.image, pg.Surface):
+            surf.blit(self.image, self.rect)
 
 
 class HouseCrocodile:
@@ -275,7 +287,7 @@ class HouseCrocodile:
         """
         self.game: "Game" = game
         self.house: int = house
-        self.image: pg.Surface = game.images["house crocodile"]
+        self.image: pg.Surface = game.image["house crocodile"]
         self.pos: pg.Vector2 = pg.Vector2(stgs.HOUSE_CROCO_POS[self.house][0], stgs.HOUSE_CROCO_POS[self.house][1])
         self.end_pos: int = stgs.HOUSE_CROCO_POS[self.house][2]
 
@@ -304,14 +316,14 @@ class HouseCrocodile:
 
         elif self.state == "move in":
             self.pos.x += self.speed * dt
-            self.rect.x = self.pos.x + 20
+            self.rect.x = int(self.pos.x + 20)
             if self.pos.x >= self.end_pos:
                 self.pos.x = self.end_pos
                 self.state = "staying"
 
         elif self.state == "move out":
             self.pos.x -= self.speed * dt
-            self.rect.x = self.pos.x + 20
+            self.rect.x = int(self.pos.x + 20)
             if self.pos.x <= stgs.HOUSE_CROCO_POS[self.house][0]:
                 self.game.get_crocodile_time()
                 self.game.house_crocodile = None

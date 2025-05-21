@@ -3,15 +3,16 @@ import settings as stgs
 import pygame as pg
 
 from random import choice
-from typing import TypeVar, Final
+from typing import Final, TYPE_CHECKING
 
-Game = TypeVar("Game")
-Animation = TypeVar("Animation")
+if TYPE_CHECKING:
+    from utils import Animation
+    from game import Game
 
 
 class MiddleSnake:
-    TRANSPARENT_COLOR: Final[tuple[int]] = (0, 0, 0, 0)
-    def __init__(self, game: Game) -> None:
+    TRANSPARENT_COLOR: Final[tuple[int, int, int, int]] = (0, 0, 0, 0)
+    def __init__(self, game: "Game") -> None:
         """
         Initializes an middle snake object.
         A snake that crawls on the gras stripe in the middle of the screen.
@@ -19,16 +20,12 @@ class MiddleSnake:
         Args:
         game: The game object.
         """
-        self.game: Game = game
+        self.game: "Game" = game
         self.animation: Animation = self.game.animations["snake"].copy()
-        image_to_blit: pg.Surface = self.animation.get_current_image()
-        image_size: tuple[int] = image_to_blit.get_size()
-        self.half_image_height: int = int(image_size[1] / 2)
-        self.image_length: int = image_size[0]
-        self.image: pg.Surface = pg.Surface(image_size, pg.SRCALPHA)
-        self.image.fill(self.TRANSPARENT_COLOR)
-        self.image.blit(image_to_blit, (0, 0))
+        self.image: pg.Surface
         self.direction: str = choice(["left", "right"])
+        self.get_current_image()
+        
         y_position: int = stgs.SNAKE_LANE
         x_position: int = -self.image_length if self.direction == "right" else stgs.WINDOW_SIZE[0]
         self.pos: pg.Vector2 = pg.Vector2((x_position, y_position))
@@ -42,6 +39,20 @@ class MiddleSnake:
                                           stgs.SNAKE_HEAD_RECT[self.direction][2], 
                                           stgs.SNAKE_HEAD_RECT[self.direction][3])
 
+    def get_current_image(self) -> None:
+        """ Gets the current image of the animation and blits it on self.image. """
+        image_to_blit: pg.Surface | bool = self.animation.get_current_image()
+        if isinstance(image_to_blit, pg.Surface):
+            if not hasattr(self, "image"):
+                image_size: tuple[int, int] = image_to_blit.get_size()
+                self.half_image_height: int = int(image_size[1] / 2)
+                self.image_length: int = image_size[0]
+                self.image: pg.Surface = pg.Surface(image_size, pg.SRCALPHA)
+            flip: bool = True if self.direction == "right" else False
+            image_to_blit = pg.transform.flip(image_to_blit, flip, False)
+            self.image.fill(self.TRANSPARENT_COLOR)
+            self.image.blit(image_to_blit, (0, 0))
+
     def update(self, dt: float) -> None:
         """
         Updates the snake animation.
@@ -51,7 +62,7 @@ class MiddleSnake:
         self.animation.update(dt)
         multiplicand: int = 1 if self.direction == "right" else -1  # -1 = snake heading left, 1 = snake heading right
         self.pos.x += self.speed * multiplicand * dt
-        self.head_rect.x = self.pos.x + stgs.SNAKE_HEAD_RECT[self.direction][0]
+        self.head_rect.x = int(self.pos.x + stgs.SNAKE_HEAD_RECT[self.direction][0])
         if self.direction == "right" and self.pos.x > stgs.WINDOW_SIZE[0]:
             self.game.get_middle_snake_time()
             self.game.middle_snake = None
@@ -65,18 +76,14 @@ class MiddleSnake:
         Args:
         surf (pg.Surface): The surface to render the snake onto.
         """
-        image_to_blit: pg.Surface = self.animation.get_current_image()
-        flip: bool = True if self.direction == "right" else False
-        image_to_blit = pg.transform.flip(image_to_blit, flip, False)
-        self.image.fill(self.TRANSPARENT_COLOR)
-        self.image.blit(image_to_blit, (0, 0))
+        self.get_current_image()
         surf.blit(self.image, (self.pos.x, self.pos.y - self.half_image_height))
         pg.draw.rect(surf, "red", self.head_rect, width=2)
 
 
 class TreeSnake:
-    TRANSPARENT_COLOR: Final[tuple[int]] = (0, 0, 0, 0)
-    def __init__(self, game: Game, tree_rect: pg.Rect, tree_speed: int) -> None:
+    TRANSPARENT_COLOR: Final[tuple[int, int, int, int]] = (0, 0, 0, 0)
+    def __init__(self, game: "Game", tree_rect: pg.Rect, tree_speed: int) -> None:
         """
         Initializes an tree snake object.
         This snake appears on the large tree trunks every now and then.
@@ -84,12 +91,13 @@ class TreeSnake:
         Args:
         game: The game object.
         """
-        self.game: Game = game
+        self.game: "Game" = game
         self.tree_rect: pg.Rect = tree_rect
         self.tree_speed: int = tree_speed
         self.animation: Animation = self.game.animations["snake"].copy()
-        self.image: pg.Surface = self.animation.get_current_image()
+        self.image: pg.Surface
         self.direction: str = choice(["left", "right"])
+        self.get_current_image()
         y_position: int = stgs.LANE_HEIGHTS["lane 8"]
         x_position: int = -180  # The large tree has a width of 400 pixel. It' scaled to 90% -> 360 pixel -> -360 / 2 => -180
         self.pos: pg.Vector2 = pg.Vector2((x_position, y_position))
@@ -104,6 +112,20 @@ class TreeSnake:
                                           stgs.SNAKE_HEAD_RECT[self.direction][2], 
                                           stgs.SNAKE_HEAD_RECT[self.direction][3])
 
+    def get_current_image(self) -> None:
+        """ Gets the current image of the animation and blits it on self.image. """
+        image_to_blit: pg.Surface | bool = self.animation.get_current_image()
+        if isinstance(image_to_blit, pg.Surface):
+            if not hasattr(self, "image"):
+                image_size: tuple[int, int] = image_to_blit.get_size()
+                self.half_image_height: int = int(image_size[1] / 2)
+                self.image_length: int = image_size[0]
+                self.image: pg.Surface = pg.Surface(image_size, pg.SRCALPHA)
+            flip: bool = True if self.direction == "right" else False
+            image_to_blit = pg.transform.flip(image_to_blit, flip, False)
+            self.image.fill(self.TRANSPARENT_COLOR)
+            self.image.blit(image_to_blit, (0, 0))
+
     def update(self, dt: float) -> None:
         """
         Updates the snake animation and position.
@@ -112,11 +134,10 @@ class TreeSnake:
         tree_rect (pg.Rect): The rectangle of the tree the snake is on.
         """
         self.animation.update(dt)
-        self.image = self.animation.get_current_image()
         multiplicand: int = 1 if self.direction == "right" else -1  # -1 = snake heading left, 1 = snake heading right
         self.pos.x += (self.tree_speed + (self.speed * multiplicand)) * dt
-        self.head_rect.x = self.pos.x + stgs.SNAKE_HEAD_RECT[self.direction][0] -42
-        self.rect.center = self.pos
+        self.head_rect.x = int(self.pos.x + stgs.SNAKE_HEAD_RECT[self.direction][0] - 42)  # <--------------- 42 in settings?
+        self.rect.center = (int(self.pos.x), int(self.pos.y))
         if self.direction == "right":
             if self.head_rect.right >= self.tree_rect.right:
                 self.direction = "left"
@@ -133,8 +154,7 @@ class TreeSnake:
         Args:
         surf (pg.Surface): The surface to render the snake onto.
         """
-        flip: bool = True if self.direction == "right" else False
-        image_to_blit: pg.Surface = pg.transform.flip(self.image, flip, False)
-        surf.blit(image_to_blit, self.rect)
+        self.get_current_image()
+        surf.blit(self.image, self.rect)
         pg.draw.rect(surf, "red", self.rect, width=2)
         pg.draw.rect(surf, "red", self.head_rect, width=2)

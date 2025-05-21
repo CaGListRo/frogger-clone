@@ -1,25 +1,26 @@
 import settings as stgs
 
 import pygame as pg
-from typing import TypeVar
+from typing import TYPE_CHECKING
 
-Game = TypeVar("Game")
+if TYPE_CHECKING:
+    from game import Game
 
 
 class TimeBar:
-    def __init__(self, game: Game) -> None:
+    def __init__(self, game: "Game") -> None:
         """
         Initializes an TimeBar object.
         Args:
-        game (Game): The game object.
+        game ("Game"): The game object.
         """
-        self.game: Game = game
+        self.game: "Game" = game
         self.time: float = stgs.TIME_BAR["time"]
         self.max_time: float = stgs.TIME_BAR["time"]
-        self.length: int = stgs.TIME_BAR["length"]
-        self.max_length: int = stgs.TIME_BAR["length"]
-        self.height: int = stgs.TIME_BAR["height"]
-        self.pos: tuple[int] = (stgs.TIME_BAR["x pos"], stgs.TIME_BAR["y pos"])  # top right corner
+        self.length: float = stgs.TIME_BAR["length"]
+        self.max_length: float = stgs.TIME_BAR["length"]
+        self.height: float = stgs.TIME_BAR["height"]
+        self.pos: tuple[float, float] = (stgs.TIME_BAR["x pos"], stgs.TIME_BAR["y pos"])  # top right corner
         self.r: int = 0
         self.g: int = 255
         self.b: int = 0
@@ -48,15 +49,15 @@ class TimeBar:
     def calculate_color(self) -> None:
         """ Calculates the color of the TimeBar object. """
         if self.length > self.two_third_length:
-            self.r = (self.max_length - self.length) * self.steps
+            self.r = int((self.max_length - self.length) * self.steps)
             if self.r > 255:
                 self.r = 255
         elif self.length > self.one_third_length:
-            self.g = 255 - (self.two_third_length - self.length) * (self.steps / 2)
+            self.g = int(255 - (self.two_third_length - self.length) * (self.steps / 2))
             if self.g < 165:
                 self.g = 165
         else:
-            self.g = 165 - (self.one_third_length - self.length) * (self.steps / 2)
+            self.g = int(165 - (self.one_third_length - self.length) * (self.steps / 2))
             if self.g < 0:
                 self.g = 0
 
