@@ -25,22 +25,23 @@ class Game:
         # set up screen
         self.screen: pg.Surface = pg.display.set_mode(stgs.WINDOW_SIZE)
 
+        # game and frog settings
         self.running: bool = True
         self.fps: int = 0
-
         self.level: int = 5
         self.frog_time: int = 0                      # this is the time one frog needed from the start to "his" house
         self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
         self.show_time: float = stgs.SHOW_FROG_TIME  # this is how long the frog time is shown
         self.score: int = 0
-        self.speed_ups: list[bool] = [False, False, False, False, False]
+        self.speed_ups: List[bool] = [False, False, False, False, False]
         self.game_state: str = "menu"
-        self.languages: list[str] = [language for language in stgs.BUTTON_NAMES["language"]]
+        self.languages: List[str] = [language for language in stgs.BUTTON_NAMES["language"]]
         self.language: str = self.languages[1]
         self.back_button: None | Button = None
         self.pause_key_pressed: bool = False
         self.show_pause_text: bool = True
         self.blink_timer: float = stgs.BLINK_TIME
+        self.direction_pressed: bool = False
 
         # fonts
         self.info_font: pg.font.Font = pg.font.SysFont("Comic Sans", 18)
@@ -59,7 +60,7 @@ class Game:
             "stripe": load_image("objects/stripe.png", scale_factor=0.75),
             "frog/house": load_image("frog/house/frog.png"),
             "frog/life": load_image("frog/idle/frog0001.png", scale_factor=0.7)
-        }
+        }        
         self.image_lists: dict[str, List[pg.Surface]] = {
             "tree/large": load_images("objects/large trees/", scale_factor=0.9),
             "tree/medium": load_images("objects/medium trees/", scale_factor=0.9),
@@ -88,18 +89,14 @@ class Game:
             "turtle/swimming": Animation(load_images("turtle/swimming/", scale_factor=0.9), animation_duration=1),
             "turtle/diving": Animation(load_images("turtle/diving/", scale_factor=0.9), animation_duration=3, loop=False),
         }
-
-        self.direction_pressed: bool = False
-        
-        self.initialize_menu()
-
-        self.house_rects: list[pg.Rect] = [pg.Rect(stgs.HOUSE_TOP_LEFT[0][0], stgs.HOUSE_TOP_LEFT[0][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
+ 
+        # collision rects
+        self.house_rects: List[pg.Rect] = [pg.Rect(stgs.HOUSE_TOP_LEFT[0][0], stgs.HOUSE_TOP_LEFT[0][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
                                            pg.Rect(stgs.HOUSE_TOP_LEFT[1][0], stgs.HOUSE_TOP_LEFT[1][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
                                            pg.Rect(stgs.HOUSE_TOP_LEFT[2][0], stgs.HOUSE_TOP_LEFT[2][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
                                            pg.Rect(stgs.HOUSE_TOP_LEFT[3][0], stgs.HOUSE_TOP_LEFT[3][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),
                                            pg.Rect(stgs.HOUSE_TOP_LEFT[4][0], stgs.HOUSE_TOP_LEFT[4][1], stgs.HOUSE_SIZE[0], stgs.HOUSE_SIZE[1]),]
-        
-        self.gras_rects: list[pg.Rect] = [pg.Rect(element) for element in stgs.GRAS_RECTS]
+        self.gras_rects: List[pg.Rect] = [pg.Rect(element) for element in stgs.GRAS_RECTS]
 
         # entities
         self.house_crocodile: None | HouseCrocodile = None
@@ -111,13 +108,19 @@ class Game:
         self.tree_snake_ready: bool = False
 
         # audio
+        pg.mixer.init()
         self.music_enabled: bool = True
         self.sound_enabled: bool = True
+        self.music_volume: float = 0.75
+        self.sound_volume: float = 0.75
         self.music_key_pressed: bool = False
         self.sound_key_pressed: bool = False
+        
+        self.initialize_menu()
     
     def initialize_menu(self) -> None:
         """ Initialize the game menu. """
+        self.music_start_stop()
         self.create_menu_buttons()
 
     def initialize_game(self) -> None:
@@ -136,6 +139,7 @@ class Game:
             self.get_tree_snake_time()
         self.get_house_fly_time()
         self.get_tree_fly_time()
+        self.music_start_stop()
 
     def get_crocodile_time(self) -> None:
         """ Sets the time of the next appearance of a crocodile in a house. """
@@ -163,7 +167,7 @@ class Game:
 
     def create_menu_buttons(self) -> None:
         """ Creates the buttons for the menu. """
-        self.menu_buttons: list[Button] = [        
+        self.menu_buttons: List[Button] = [        
             Button(pos=stgs.BUTTON_POSITIONS["start"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["start"][self.language], color="green"),
             Button(pos=stgs.BUTTON_POSITIONS["options"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["options"][self.language], color="beige"),
             Button(pos=stgs.BUTTON_POSITIONS["highscores"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["highscores"][self.language], color="beige"),
@@ -176,7 +180,7 @@ class Game:
 
     def create_language_buttons(self) -> None:
         """ Creates the language buttons for the options menu. """
-        self.language_buttons: list[Button] = []
+        self.language_buttons: List[Button] = []
         for idx, button in enumerate(stgs.BUTTON_NAMES["language"].values()):
             self.language_buttons.append(Button(pos=(11 + idx * 130, 600), size=stgs.LANGUAGE_BUTTON_SIZE, text=str(button), color="beige"))
 
@@ -186,7 +190,7 @@ class Game:
 
     def create_ripples(self) -> None:
         """ Creates a list of ripples. """
-        self.ripples: list[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(50, 300))) for i in range(100)]
+        self.ripples: List[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(50, 300))) for i in range(100)]
 
     def create_house_crocodile(self) -> None:
         """ Creates a crocodile in a random house. """
@@ -249,7 +253,7 @@ class Game:
 
     def clear_houses(self) -> None:
         """ Clears the houses list. """
-        self.houses: list[int] = [False, False, False, False, False]
+        self.houses: List[int] = [False, False, False, False, False]
 
     def new_frog_or_game_over(self) -> None:
         """ Checks if a new frog can be created or if the game is over. """
@@ -301,8 +305,8 @@ class Game:
                 if button.check_clicked():
                     match idx:
                         case 0:
-                            self.initialize_game()
                             self.game_state = "play"
+                            self.initialize_game()
                         case 1:
                             self.create_back_button()
                             self.create_language_buttons()
@@ -353,7 +357,7 @@ class Game:
                 self.tree_fly.rect.center = self.frog.collision_rect.center
  
         # collisions with water traffic
-        collided_list: list[bool] = []
+        collided_list: List[bool] = []
         collided: bool = False
         for lane_index, lane in enumerate(self.water_traffic):
             for element_index, element in enumerate(lane):
@@ -438,11 +442,11 @@ class Game:
     def load_highscores(self) -> None:
         """ Loads the highscores from the highscores.list and puts them in a python list of lists. """
         with open("highscores.list", "r") as file:
-            self.highscores: list[list[str]] = [line.strip().split() for line in file.readlines()]
+            self.highscores: List[List[str]] = [line.strip().split() for line in file.readlines()]
 
     def load_info(self) -> None:
         """ Loads the info text in the selected language. """
-        self.info_text: list[str] = []
+        self.info_text: List[str] = []
         file_path: str = f"info/{self.language}.txt"
         try:
             with open(file_path, "r", encoding="utf-8") as file:
@@ -450,6 +454,16 @@ class Game:
                 self.info_text = [line.strip() for line in self.info_text]
         except FileNotFoundError as e:
             print(f"Error: {e}")
+
+    def music_start_stop(self) -> None:
+        """ Starts or stops the music. """
+        number: str = "1" if self.game_state == "menu" else "2"
+        if self.music_enabled:
+            pg.mixer.music.load(f"audio/Theme {number}.mp3")
+            pg.mixer.music.set_volume(self.music_volume)
+            pg.mixer.music.play(loops=-1)
+        else:
+            pg.mixer.music.stop()
 
     def event_handler(self) -> None:
         """ Handles events in the game. """
@@ -467,6 +481,7 @@ class Game:
                 if event.key == pg.K_m and self.music_key_pressed:
                     self.music_enabled = False if self.music_enabled == True else True
                     self.music_key_pressed = False
+                    self.music_start_stop()
                 if event.key == pg.K_s and self.sound_key_pressed:
                     self.sound_enabled = False if self.sound_enabled == True else True
                     self.sound_key_pressed = False
@@ -786,8 +801,8 @@ class Game:
             self.draw_screen()
 
             # fps break
-            # if dt < 1 / 60:
-            #     pg.time.wait(int(1000 * ((1 / 60) - dt)))
+            if dt < 1 / 60:
+                pg.time.wait(int(1000 * ((1 / 60) - dt)))
         
         
         pg.quit()
