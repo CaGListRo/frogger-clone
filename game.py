@@ -1,4 +1,4 @@
-from utils import load_image, load_images
+from utils import load_image, load_images, load_sound
 from utils import Animation, Button
 import settings as stgs
 from snake import MiddleSnake, TreeSnake
@@ -115,6 +115,11 @@ class Game:
         self.sound_volume: float = 0.75
         self.music_key_pressed: bool = False
         self.sound_key_pressed: bool = False
+        self.sounds: dict[str, pg.mixer.Sound] = {
+            "frog/jump 1": load_sound("jump 1"),
+            "frog/jump 2": load_sound("jump 2"),
+            "racing car": load_sound("racing car")
+        }
         
         self.initialize_menu()
     

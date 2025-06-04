@@ -16,9 +16,8 @@
 - speed up the traffic and water traffic at certain scores **done**
 
 - start screen **done**
-- highscore list
+- highscore list <----------- **still needs to be prettified**
 - menu **done**
   - Buttons **done**
-- sounds
-- music
-- dev-mode?
+- sounds <------------------- **the racing car sound still needs to be implemented**
+- music **done**

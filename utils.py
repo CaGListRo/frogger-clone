@@ -5,9 +5,10 @@ import settings as stgs
 import os
 import pygame as pg
 
-from typing import Final, List, Iterator
+from typing import Final, List, Iterator, Optional
 
-BASE_PATH: Final[str] = "images/"
+IMAGE_BASE_PATH: Final[str] = "images/"
+SOUND_BASE_PATH: Final[str] = "audio/"
 def load_image(img_name: str, scale_factor: int|float = 1) -> pg.Surface:
     """ 
     Loads an image from the given path and let it scale by the given factor.
@@ -18,7 +19,7 @@ def load_image(img_name: str, scale_factor: int|float = 1) -> pg.Surface:
     Returns:
     pg.Surface: the loaded and scaled image
     """
-    img_path = BASE_PATH + img_name
+    img_path = IMAGE_BASE_PATH + img_name
     try:
         img: pg.Surface = pg.image.load(img_path).convert_alpha()
         if scale_factor == 1:
@@ -41,7 +42,7 @@ def load_images(image_path: str, scale_factor: int|float = 1) -> List[pg.Surface
     """
     images: list[pg.Surface] = []
     try:
-        for img_name in os.listdir(BASE_PATH + image_path):
+        for img_name in os.listdir(IMAGE_BASE_PATH + image_path):
             img: pg.Surface = load_image(image_path + img_name, scale_factor)
             images.append(img)
         return images
@@ -60,7 +61,22 @@ def scale_image(image: pg.Surface, scale_factor: float) -> pg.Surface:
     """
     return pg.transform.scale(image, (int(image.get_width() * scale_factor), int(image.get_height() * scale_factor)))
 
+def load_sound(sound_name: str) -> pg.mixer.Sound:
+    """
+    Loads a sound and returns it as a pg.mixer.Sound object.
+    Args:
+        sound_name (str): The name of the sound to load.
+    Returns:
+        pg.mixer.Sound: The loaded sound object or an empty sound if loading fails.
+    """
+    try:
+        sound = pg.mixer.Sound(SOUND_BASE_PATH + sound_name + ".mp3")
+        return sound
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        return pg.mixer.Sound(buffer=bytearray()) 
 
+    
 class Animation:
     def __init__(self, images: list[pg.Surface], animation_duration: float, loop: bool = True) -> None:
         """
