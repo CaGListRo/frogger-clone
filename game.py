@@ -122,177 +122,10 @@ class Game:
         }
         
         self.initialize_menu()
-    
-    def initialize_menu(self) -> None:
-        """ Initialize the game menu. """
-        self.music_start_stop()
-        self.create_menu_buttons()
-
-    def initialize_game(self) -> None:
-        """ Initializes the game. """
-        self.frogs: int = 7
-        self.clear_houses()
-        self.create_ripples()
-        self.create_traffic()
-        self.create_water_traffic()
-        self.create_frog()
-        self.create_time_bar()
-        if stgs.CROCOS_IN_HOUSES[self.level - 1]:
-            self.get_crocodile_time()
-        if stgs.SNAKES[self.level - 1]:
-            self.get_middle_snake_time()
-            self.get_tree_snake_time()
-        self.get_house_fly_time()
-        self.get_tree_fly_time()
-        self.music_start_stop()
-
-    def get_crocodile_time(self) -> None:
-        """ Sets the time of the next appearance of a crocodile in a house. """
-        self.crocodile_time: int | float = ri(10, 30)
-
-    def get_house_fly_time(self) -> None:
-        """ Sets the time of the next appearance of the house fly. """
-        self.house_fly_time: int | float = ri(10, 30)
-
-    def get_middle_snake_time(self) -> None:
-        """ Sets the time of the next appearance of the snake. """
-        self.middle_snake_time: int | float = ri(5, 10)
-
-    def get_tree_fly_time(self) -> None:
-        """ Sets the time of the next possible appearance of the tree fly. """
-        self.tree_fly_time: int | float = stgs.TREE_FLY_TIME[self.level - 1]
-    
-    def get_tree_snake_time(self) -> None:
-        """ Sets the time of the next possible appearance of the tree snake. """
-        self.tree_snake_time: int | float = stgs.TREE_SNAKE_TIME[self.level - 1]
 
     def calculate_time_score(self) -> None:
         """ Calculates the score for the remaining time. """
         self.score += self.time_bar.get_time() * stgs.SCORE["second"]
-
-    def create_menu_buttons(self) -> None:
-        """ Creates the buttons for the menu. """
-        self.menu_buttons: List[Button] = [        
-            Button(pos=stgs.BUTTON_POSITIONS["start"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["start"][self.language], color="green"),
-            Button(pos=stgs.BUTTON_POSITIONS["options"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["options"][self.language], color="beige"),
-            Button(pos=stgs.BUTTON_POSITIONS["highscores"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["highscores"][self.language], color="beige"),
-            Button(pos=stgs.BUTTON_POSITIONS["quit"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["quit"][self.language], color="red")
-        ]
-
-    def create_back_button(self) -> None:
-        """ Creates the bak button for the options menu and the highscores screen. """
-        self.back_button = Button(pos=stgs.BUTTON_POSITIONS["back"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["back"][self.language], color="yellow")
-
-    def create_language_buttons(self) -> None:
-        """ Creates the language buttons for the options menu. """
-        self.language_buttons: List[Button] = []
-        for idx, button in enumerate(stgs.BUTTON_NAMES["language"].values()):
-            self.language_buttons.append(Button(pos=(11 + idx * 130, 600), size=stgs.LANGUAGE_BUTTON_SIZE, text=str(button), color="beige"))
-
-    def create_new_ripple(self) -> None:
-        """ Creates a new ripple at a random y-position. """
-        self.ripples.append(Ripple(self, pos=(-10, ri(25, 300))))
-
-    def create_ripples(self) -> None:
-        """ Creates a list of ripples. """
-        self.ripples: List[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(50, 300))) for i in range(100)]
-
-    def create_house_crocodile(self) -> None:
-        """ Creates a crocodile in a random house. """
-        self.house_crocodile = HouseCrocodile(self, ri(0, 4))
-
-    def create_house_fly(self) -> None:
-        """ Creates a fly in a random house. """
-        self.house_fly = HouseFly(self, stgs.FLY_HOUSE_CENTER_POS[ri(0, 4)])
-
-    def create_frog(self) -> None:
-        """ Creates a frog at the start position. """
-        self.frog: Frog = Frog(self, stgs.FROG_START_POS)
-        self.frogs -= 1
-
-    def create_middle_snake(self) -> None:
-        """ Creates a snake that crawls over the green in the middle of the screen. """
-        self.middle_snake = MiddleSnake(self)
-    
-    def create_time_bar(self) -> None:
-        """ Creates a time bar at the bottom of the screen. """
-        self.time_bar: TimeBar = TimeBar(self)
-    
-    def create_tree_fly(self, tree_speed: int, tree_rect: pg.Rect) -> None:
-        """ Creates an TreeFly object. """
-        if self.tree_fly_ready and self.tree_fly == None:
-            self.tree_fly_ready = False
-            self.tree_fly = TreeFly(self, tree_speed=tree_speed, tree_rect=tree_rect)
-        
-    def create_tree_snake(self, tree_speed: int, tree_rect: pg.Rect) -> None:
-        """ Creates an TreeSnake object. """
-        if self.tree_snake_ready and self.tree_snake == None:
-            self.tree_snake_ready = False
-            self.tree_snake = TreeSnake(self, tree_speed=tree_speed, tree_rect=tree_rect)
-
-    def create_water_traffic(self) -> None:
-        """ Creates water traffic. """
-        crocodile: int = 10  # choose a high number to never get a crocodile if in the level is no crocodile
-        if stgs.CROCOS_SWIMMING[self.level - 1]:
-            crocodile = ri(0, stgs.WATER[f"level {self.level}"][0] - 1)
-
-        sinking_pair: int = ri(0, stgs.WATER[f"level {self.level}"][1] - 1)
-        sinking_trio: int = ri(0, stgs.WATER[f"level {self.level}"][4] - 1)
-
-        self.water_traffic: List[List[Union[LaneCrocodile, Tree, Turtle]]] = [
-            [LaneCrocodile(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], 0) if i == crocodile else Tree(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
-            [Turtle(self, 80 + i * stgs.SPACING["lane 9"][self.level - 1], stgs.LANE_HEIGHTS["lane 9"], 1, True if i == sinking_pair else False)  for i in range(stgs.WATER[f"level {self.level}"][1])],
-            [Tree(self, 700 - i * stgs.SPACING["lane 8"][self.level - 1], stgs.LANE_HEIGHTS["lane 8"], "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
-            [Tree(self, 800 - i * stgs.SPACING["lane 7"][self.level - 1], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
-            [Turtle(self, 50 + i * stgs.SPACING["lane 6"][self.level - 1], stgs.LANE_HEIGHTS["lane 6"], 4, True if i == sinking_trio else False) for i in range(stgs.WATER[f"level {self.level}"][4])],
-        ]
-
-    def create_traffic(self) -> None:
-        """ Creates traffic on the road. """
-        self.traffic: List[List[Union[Truck, RacingCar, LargeCar, Bulldozer, SmallCar]]] = [
-            [Truck(self, 700 - i * stgs.SPACING["lane 5"][self.level - 1], stgs.LANE_HEIGHTS["lane 5"]) for i in range(stgs.STREET[f"level {self.level}"][0])],
-            [RacingCar(self, 400 - i * stgs.SPACING["lane 4"][self.level - 1], stgs.LANE_HEIGHTS["lane 4"]) for i in range(stgs.STREET[f"level {self.level}"][1])],
-            [LargeCar(self, 800 - i * stgs.SPACING["lane 3"][self.level - 1], stgs.LANE_HEIGHTS["lane 3"]) for i in range(stgs.STREET[f"level {self.level}"][2])],
-            [Bulldozer(self, 400 - i * stgs.SPACING["lane 2"][self.level - 1], stgs.LANE_HEIGHTS["lane 2"]) for i in range(stgs.STREET[f"level {self.level}"][3])],
-            [SmallCar(self, 600 - i * stgs.SPACING["lane 1"][self.level - 1], stgs.LANE_HEIGHTS["lane 1"]) for i in range(stgs.STREET[f"level {self.level}"][4])],]
-
-    def clear_houses(self) -> None:
-        """ Clears the houses list. """
-        self.houses: List[int] = [False, False, False, False, False]
-
-    def new_frog_or_game_over(self) -> None:
-        """ Checks if a new frog can be created or if the game is over. """
-        if self.frogs > 0:  
-            self.handle_time_bar()
-            self.create_frog()
-            if self.tree_fly and self.tree_fly.state == "caught":
-                self.tree_fly = None
-                self.get_tree_fly_time()
-        else:
-            raise NotImplementedError
-
-    def handle_time_bar(self) -> None:
-        """ Deletes the old time bar and creates a new one. """
-        del self.time_bar
-        self.create_time_bar()
-
-    def handle_water_traffic_collision(self, collision_object: Union["Turtle", "Tree", "LaneCrocodile"], lane_index: int, element_index: int) -> bool:
-        """
-        Handles collision with water traffic.
-        Args:
-        collision_object: The object that collided with the frog.
-        lane_index: The index of the lane where the collision occurred.
-        element_index: The index of the element in the lane where the collision occurred.
-        """
-        collided: bool = False
-        offset: float = self.distances[lane_index][element_index]
-        if self.frog.collision_rect.left >= collision_object.rect.left - 10 and self.frog.collision_rect.right <= collision_object.rect.right + 10:
-            collided = True
-            if self.frog.collision_rect.top <= collision_object.rect.bottom - 19 and self.frog.collision_rect.bottom >= collision_object.rect.top + 19:
-                if not self.frog.jumping:
-                    self.frog.pos.x = collision_object.pos.x + offset
-                    self.frog.move_collision_rect()
-        return collided
 
     def calculate_distances(self) -> None:
         """ Checks the distances on the x axis from the frog to the water objects. """
@@ -420,6 +253,176 @@ class Game:
                 continue
             else:
                 break
+
+    def create_menu_buttons(self) -> None:
+        """ Creates the buttons for the menu. """
+        self.menu_buttons: List[Button] = [        
+            Button(pos=stgs.BUTTON_POSITIONS["start"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["start"][self.language], color="green"),
+            Button(pos=stgs.BUTTON_POSITIONS["options"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["options"][self.language], color="beige"),
+            Button(pos=stgs.BUTTON_POSITIONS["highscores"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["highscores"][self.language], color="beige"),
+            Button(pos=stgs.BUTTON_POSITIONS["quit"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["quit"][self.language], color="red")
+        ]
+
+    def create_back_button(self) -> None:
+        """ Creates the bak button for the options menu and the highscores screen. """
+        self.back_button = Button(pos=stgs.BUTTON_POSITIONS["back"], size=stgs.BUTTON_SIZE, text=stgs.BUTTON_NAMES["back"][self.language], color="yellow")
+
+    def create_language_buttons(self) -> None:
+        """ Creates the language buttons for the options menu. """
+        self.language_buttons: List[Button] = []
+        for idx, button in enumerate(stgs.BUTTON_NAMES["language"].values()):
+            self.language_buttons.append(Button(pos=(11 + idx * 130, 600), size=stgs.LANGUAGE_BUTTON_SIZE, text=str(button), color="beige"))
+
+    def create_new_ripple(self) -> None:
+        """ Creates a new ripple at a random y-position. """
+        self.ripples.append(Ripple(self, pos=(-10, ri(25, 300))))
+
+    def create_ripples(self) -> None:
+        """ Creates a list of ripples. """
+        self.ripples: List[Ripple] = [Ripple(self, pos=(-5 + i * ri(30, 60), ri(50, 300))) for i in range(100)]
+
+    def create_house_crocodile(self) -> None:
+        """ Creates a crocodile in a random house. """
+        self.house_crocodile = HouseCrocodile(self, ri(0, 4))
+
+    def create_house_fly(self) -> None:
+        """ Creates a fly in a random house. """
+        self.house_fly = HouseFly(self, stgs.FLY_HOUSE_CENTER_POS[ri(0, 4)])
+
+    def create_frog(self) -> None:
+        """ Creates a frog at the start position. """
+        self.frog: Frog = Frog(self, stgs.FROG_START_POS)
+        self.frogs -= 1
+
+    def create_middle_snake(self) -> None:
+        """ Creates a snake that crawls over the green in the middle of the screen. """
+        self.middle_snake = MiddleSnake(self)
+    
+    def create_time_bar(self) -> None:
+        """ Creates a time bar at the bottom of the screen. """
+        self.time_bar: TimeBar = TimeBar(self)
+    
+    def create_tree_fly(self, tree_speed: int, tree_rect: pg.Rect) -> None:
+        """ Creates an TreeFly object. """
+        if self.tree_fly_ready and self.tree_fly == None:
+            self.tree_fly_ready = False
+            self.tree_fly = TreeFly(self, tree_speed=tree_speed, tree_rect=tree_rect)
+        
+    def create_tree_snake(self, tree_speed: int, tree_rect: pg.Rect) -> None:
+        """ Creates an TreeSnake object. """
+        if self.tree_snake_ready and self.tree_snake == None:
+            self.tree_snake_ready = False
+            self.tree_snake = TreeSnake(self, tree_speed=tree_speed, tree_rect=tree_rect)
+
+    def create_water_traffic(self) -> None:
+        """ Creates water traffic. """
+        crocodile: int = 10  # choose a high number to never get a crocodile if in the level is no crocodile
+        if stgs.CROCOS_SWIMMING[self.level - 1]:
+            crocodile = ri(0, stgs.WATER[f"level {self.level}"][0] - 1)
+
+        sinking_pair: int = ri(0, stgs.WATER[f"level {self.level}"][1] - 1)
+        sinking_trio: int = ri(0, stgs.WATER[f"level {self.level}"][4] - 1)
+
+        self.water_traffic: List[List[Union[LaneCrocodile, Tree, Turtle]]] = [
+            [LaneCrocodile(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], 0) if i == crocodile else Tree(self, 750 - i * stgs.SPACING["lane 10"][self.level - 1], stgs.LANE_HEIGHTS["lane 10"], "medium", 0) for i in range(stgs.WATER[f"level {self.level}"][0])],
+            [Turtle(self, 80 + i * stgs.SPACING["lane 9"][self.level - 1], stgs.LANE_HEIGHTS["lane 9"], 1, True if i == sinking_pair else False)  for i in range(stgs.WATER[f"level {self.level}"][1])],
+            [Tree(self, 700 - i * stgs.SPACING["lane 8"][self.level - 1], stgs.LANE_HEIGHTS["lane 8"], "large", 2) for i in range(stgs.WATER[f"level {self.level}"][2])],
+            [Tree(self, 800 - i * stgs.SPACING["lane 7"][self.level - 1], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
+            [Turtle(self, 50 + i * stgs.SPACING["lane 6"][self.level - 1], stgs.LANE_HEIGHTS["lane 6"], 4, True if i == sinking_trio else False) for i in range(stgs.WATER[f"level {self.level}"][4])],
+        ]
+
+    def create_traffic(self) -> None:
+        """ Creates traffic on the road. """
+        self.traffic: List[List[Union[Truck, RacingCar, LargeCar, Bulldozer, SmallCar]]] = [
+            [Truck(self, 700 - i * stgs.SPACING["lane 5"][self.level - 1], stgs.LANE_HEIGHTS["lane 5"]) for i in range(stgs.STREET[f"level {self.level}"][0])],
+            [RacingCar(self, 400 - i * stgs.SPACING["lane 4"][self.level - 1], stgs.LANE_HEIGHTS["lane 4"]) for i in range(stgs.STREET[f"level {self.level}"][1])],
+            [LargeCar(self, 800 - i * stgs.SPACING["lane 3"][self.level - 1], stgs.LANE_HEIGHTS["lane 3"]) for i in range(stgs.STREET[f"level {self.level}"][2])],
+            [Bulldozer(self, 400 - i * stgs.SPACING["lane 2"][self.level - 1], stgs.LANE_HEIGHTS["lane 2"]) for i in range(stgs.STREET[f"level {self.level}"][3])],
+            [SmallCar(self, 600 - i * stgs.SPACING["lane 1"][self.level - 1], stgs.LANE_HEIGHTS["lane 1"]) for i in range(stgs.STREET[f"level {self.level}"][4])],]
+
+    def clear_houses(self) -> None:
+        """ Clears the houses list. """
+        self.houses: List[int] = [False, False, False, False, False]
+
+    def initialize_menu(self) -> None:
+        """ Initialize the game menu. """
+        self.music_start_stop()
+        self.create_menu_buttons()
+
+    def initialize_game(self) -> None:
+        """ Initializes the game. """
+        self.frogs: int = 7
+        self.clear_houses()
+        self.create_ripples()
+        self.create_traffic()
+        self.create_water_traffic()
+        self.create_frog()
+        self.create_time_bar()
+        if stgs.CROCOS_IN_HOUSES[self.level - 1]:
+            self.get_crocodile_time()
+        if stgs.SNAKES[self.level - 1]:
+            self.get_middle_snake_time()
+            self.get_tree_snake_time()
+        self.get_house_fly_time()
+        self.get_tree_fly_time()
+        self.music_start_stop()
+
+    def get_crocodile_time(self) -> None:
+        """ Sets the time of the next appearance of a crocodile in a house. """
+        self.crocodile_time: int | float = ri(10, 30)
+
+    def get_house_fly_time(self) -> None:
+        """ Sets the time of the next appearance of the house fly. """
+        self.house_fly_time: int | float = ri(10, 30)
+
+    def get_middle_snake_time(self) -> None:
+        """ Sets the time of the next appearance of the snake. """
+        self.middle_snake_time: int | float = ri(5, 10)
+
+    def get_tree_fly_time(self) -> None:
+        """ Sets the time of the next possible appearance of the tree fly. """
+        self.tree_fly_time: int | float = stgs.TREE_FLY_TIME[self.level - 1]
+    
+    def get_tree_snake_time(self) -> None:
+        """ Sets the time of the next possible appearance of the tree snake. """
+        self.tree_snake_time: int | float = stgs.TREE_SNAKE_TIME[self.level - 1]
+
+    def new_frog_or_game_over(self) -> None:
+        """ Checks if a new frog can be created or if the game is over. """
+        if self.frogs > 0:  
+            self.handle_time_bar()
+            self.create_frog()
+            if self.tree_fly and self.tree_fly.state == "caught":
+                self.tree_fly = None
+                self.get_tree_fly_time()
+        else:
+            if self.score > int(self.highscores[9][0]):
+                self.game_state = "enter name"
+            else:
+                self.game_state = "game over"
+
+    def handle_time_bar(self) -> None:
+        """ Deletes the old time bar and creates a new one. """
+        del self.time_bar
+        self.create_time_bar()
+
+    def handle_water_traffic_collision(self, collision_object: Union["Turtle", "Tree", "LaneCrocodile"], lane_index: int, element_index: int) -> bool:
+        """
+        Handles collision with water traffic.
+        Args:
+        collision_object: The object that collided with the frog.
+        lane_index: The index of the lane where the collision occurred.
+        element_index: The index of the element in the lane where the collision occurred.
+        """
+        collided: bool = False
+        offset: float = self.distances[lane_index][element_index]
+        if self.frog.collision_rect.left >= collision_object.rect.left - 10 and self.frog.collision_rect.right <= collision_object.rect.right + 10:
+            collided = True
+            if self.frog.collision_rect.top <= collision_object.rect.bottom - 19 and self.frog.collision_rect.bottom >= collision_object.rect.top + 19:
+                if not self.frog.jumping:
+                    self.frog.pos.x = collision_object.pos.x + offset
+                    self.frog.move_collision_rect()
+        return collided
 
     def proceed_level(self) -> None:
         """ Proceeds to the next level. """
@@ -710,6 +713,16 @@ class Game:
                 y_pos: int = int(stgs.WINDOW_SIZE[1] / 3 * 2 - text.get_height() / 2)
                 self.screen.blit(shadow, (x_pos - 2, y_pos + 2))
                 self.screen.blit(text, (x_pos, y_pos))
+        elif self.game_state == "game over":
+            surf: pg.Surface = pg.Surface(stgs.WINDOW_SIZE, pg.SRCALPHA)
+            surf.fill((200, 200, 200, 50))
+            self.screen.blit(surf, (0, 0))
+            shadow: pg.Surface = self.pause_font.render(stgs.GAME_OVER["game over"][self.language], True, "black")
+            text: pg.Surface = self.pause_font.render(stgs.GAME_OVER["game over"][self.language], True, "white")
+            x_pos: int = int(stgs.WINDOW_SIZE[0] / 2 - text.get_width() / 2)
+            y_pos: int = int(stgs.WINDOW_SIZE[1] / 2 - text.get_height() / 2)
+            self.screen.blit(shadow, (x_pos - 3, y_pos + 3))
+            self.screen.blit(text, (x_pos, y_pos))
 
     def render_menu(self) -> None:
         """ Renders the main menu. """
@@ -735,11 +748,26 @@ class Game:
         self.screen.blit(self.image["highscores background"], (0, 0))
         # Render high score entries
         for index, (score, name) in enumerate(self.highscores):
-            score_shadow: pg.Surface = self.score_font.render(f"{index + 1}.    {score} {name}", True, "black")
-            score_text: pg.Surface = self.score_font.render(f"{index + 1}.    {score} {name}", True, "white")
-            self.screen.blit(score_shadow, (102, 22 + index * 30))
-            self.screen.blit(score_text, (100, 20 + index * 30))
-        if self.back_button:
+            score = score if score != "0" else "00000"
+            # calculating the real rank
+            int_number: int = index + 1
+            # making a string out of the number with a '0' in front of numbers under 10
+            str_number: str = f"{int_number}" if int_number > 9 else f"0{int_number}"
+            # render the strings as shadow and text
+            number_shadow: pg.Surface = self.score_font.render(f"{str_number}.", True, "black")
+            number_text: pg.Surface = self.score_font.render(f"{str_number}.", True, "white")
+            score_shadow: pg.Surface = self.score_font.render(score, True, "black")
+            score_text: pg.Surface = self.score_font.render(score, True, "white")
+            name_shadow: pg.Surface = self.score_font.render(name, True, "black")
+            name_text: pg.Surface = self.score_font.render(name, True, "white")
+            # blit shadow and text
+            self.screen.blit(number_shadow, (102, 22 + index * 35))
+            self.screen.blit(number_text, (100, 20 + index * 35))
+            self.screen.blit(score_shadow, (202, 22 + index * 35))
+            self.screen.blit(score_text, (200, 20 + index * 35))
+            self.screen.blit(name_shadow, (352, 22 + index * 35))
+            self.screen.blit(name_text, (350, 20 + index * 35))
+        if self.back_button and self.game_state != "enter name":
             self.back_button.render(self.screen)
 
     def draw_screen(self) -> None:
@@ -752,7 +780,7 @@ class Game:
         elif self.game_state == "play" or self.game_state == "pause":
             self.render_game()
         # showing the highscores
-        elif self.game_state == "highscores":
+        elif self.game_state == "highscores" or self.game_state == "enter name":
             self.render_highscores()
         # showing the options menu
         elif self.game_state == "options":
@@ -767,6 +795,7 @@ class Game:
         fps_timer: float = 0.0
         fps_counter: int = 0
         self.load_highscores()
+
         while self.running:
             # calculate delta time
             dt: float = pc() - old_time
@@ -799,6 +828,9 @@ class Game:
                 if self.blink_timer <= 0:
                     self.show_pause_text = False if self.show_pause_text == True else True
                     self.blink_timer = stgs.BLINK_TIME
+
+            elif self.game_state == "enter name":
+                pass
 
             # call the methods
             self.event_handler()
