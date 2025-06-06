@@ -28,7 +28,7 @@ class Game:
         # game and frog settings
         self.running: bool = True
         self.fps: int = 0
-        self.level: int = 5
+        self.level: int = 1
         self.frog_time: int = 0                      # this is the time one frog needed from the start to "his" house
         self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
         self.show_time: float = stgs.SHOW_FROG_TIME  # this is how long the frog time is shown
@@ -42,6 +42,7 @@ class Game:
         self.show_pause_text: bool = True
         self.blink_timer: float = stgs.BLINK_TIME
         self.direction_pressed: bool = False
+        self.player_name: str = ""
 
         # fonts
         self.info_font: pg.font.Font = pg.font.SysFont("Comic Sans", 18)
@@ -159,7 +160,7 @@ class Game:
         elif self.game_state == "options" or self.game_state == "highscores":
             if self.back_button and self.back_button.check_clicked():
                 self.game_state = "menu"
-                del self.back_button
+                self.back_button = None
                 self.language_buttons = []
             if self.game_state == "options":   
                 for idx, button in enumerate(self.language_buttons):
@@ -396,10 +397,7 @@ class Game:
                 self.tree_fly = None
                 self.get_tree_fly_time()
         else:
-            if self.score > int(self.highscores[9][0]):
-                self.game_state = "enter name"
-            else:
-                self.game_state = "game over"
+            self.game_state = "game over"
 
     def handle_time_bar(self) -> None:
         """ Deletes the old time bar and creates a new one. """
@@ -452,6 +450,29 @@ class Game:
         with open("highscores.list", "r") as file:
             self.highscores: List[List[str]] = [line.strip().split() for line in file.readlines()]
 
+    def sort_highscores(self) -> None:
+        """ Sorts the highscores list with bubble sort. """
+        while True:
+            bubbled: bool = False
+            for i in range(len(self.highscores) - 1):
+                if int(self.highscores[i][0]) < int(self.highscores[i + 1][0]):
+                    self.highscores[i + 1], self.highscores[i] = self.highscores[i], self.highscores[i + 1]
+                    bubbled = True
+            if not bubbled:
+                del self.highscores[-1]
+                break
+    
+    def write_highscores(self) -> None:
+        """ Writes self.highscores to highscores.list. """
+        with open("highscores.list", "w", encoding="utf-8") as highscores_file:
+            for i in range(10):
+                for j in range(2):
+                    highscores_file.write(self.highscores[i][j])
+                    if j == 1:
+                        highscores_file.write("\n")
+                    else:
+                        highscores_file.write(" ")
+
     def load_info(self) -> None:
         """ Loads the info text in the selected language. """
         self.info_text: List[str] = []
@@ -498,13 +519,13 @@ class Game:
             if self.game_state == "play" or self.game_state == "pause":
                 if event.type == pg.KEYDOWN:
                     
-                    if event.key == pg.K_UP or event.key == pg.K_w:
+                    if (event.key == pg.K_UP or event.key == pg.K_w) and self.game_state != "pause":
                         self.direction_pressed = True
-                    if event.key == pg.K_DOWN or event.key == pg.K_s:
+                    if (event.key == pg.K_DOWN or event.key == pg.K_s) and self.game_state != "pause":
                         self.direction_pressed = True
-                    if event.key == pg.K_LEFT or event.key == pg.K_a:
+                    if (event.key == pg.K_LEFT or event.key == pg.K_a) and self.game_state != "pause":
                         self.direction_pressed = True
-                    if event.key == pg.K_RIGHT or event.key == pg.K_d:
+                    if (event.key == pg.K_RIGHT or event.key == pg.K_d) and self.game_state != "pause":
                         self.direction_pressed = True
                     if event.key == pg.K_p and not self.pause_key_pressed:
                         self.pause_key_pressed = True                    
@@ -533,6 +554,24 @@ class Game:
                     if event.key == pg.K_p and self.pause_key_pressed:
                         self.game_state = "pause" if self.game_state == "play" else "play"
                         self.pause_key_pressed = False
+            
+            elif self.game_state == "game over":
+                lowest_highscore: int = int(self.highscores[-1][0])
+                if self.score > lowest_highscore:
+                    if event.type == pg.KEYDOWN:
+                        if event.key == pg.K_BACKSPACE and len(self.player_name) > 0:
+                            self.player_name = self.player_name[0:-1]
+                        elif event.key == pg.K_RETURN and len(self.player_name) > 0:
+                            self.highscores.append([str(self.score), self.player_name])
+                            self.sort_highscores()
+                            self.write_highscores()
+                            self.create_back_button()
+                            self.player_name = ""
+                            self.game_state = "highscores"
+                        else:
+                            if len(self.player_name) < 8:
+                                self.player_name += event.unicode
+
                 
     def update_objects(self, dt: float) -> None:
         """
@@ -767,7 +806,10 @@ class Game:
             self.screen.blit(score_text, (200, 20 + index * 35))
             self.screen.blit(name_shadow, (352, 22 + index * 35))
             self.screen.blit(name_text, (350, 20 + index * 35))
-        if self.back_button and self.game_state != "enter name":
+        if self.game_state == "game over":
+            name_to_blit: pg.Surface = self.score_font.render(self.player_name, True, "white")
+            self.screen.blit(name_to_blit, (int(stgs.WINDOW_SIZE[0] / 2 - 200), stgs.WINDOW_SIZE[0] - 150))
+        if self.back_button and self.game_state != "game over":
             self.back_button.render(self.screen)
 
     def draw_screen(self) -> None:
@@ -780,7 +822,7 @@ class Game:
         elif self.game_state == "play" or self.game_state == "pause":
             self.render_game()
         # showing the highscores
-        elif self.game_state == "highscores" or self.game_state == "enter name":
+        elif self.game_state == "highscores" or self.game_state == "game over":
             self.render_highscores()
         # showing the options menu
         elif self.game_state == "options":
@@ -828,9 +870,6 @@ class Game:
                 if self.blink_timer <= 0:
                     self.show_pause_text = False if self.show_pause_text == True else True
                     self.blink_timer = stgs.BLINK_TIME
-
-            elif self.game_state == "enter name":
-                pass
 
             # call the methods
             self.event_handler()
