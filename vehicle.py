@@ -21,7 +21,10 @@ class Truck:
         self.game: "Game" = game
         self.pos: pg.Vector2 = pg.Vector2(x, y)
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][5]
-        self.image: pg.Surface = (choice(self.game.image_lists["trucks"]))
+        if self.game.level < 5:
+            self.image: pg.Surface = (choice(self.game.image_lists["trucks"]))
+        else:
+            self.image: pg.Surface = self.game.image_lists["trucks"][0]
         self.image = pg.transform.rotate(self.image, 180)
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
         self.half_image_width: int = int(self.game.image_lists["trucks"][1].get_width() // 2)
@@ -56,7 +59,7 @@ class Truck:
 
 
 class RacingCar:
-    def __init__(self, game: "Game", x: int, y: int) -> None:
+    def __init__(self, game: "Game", x: int, y: int, number: int) -> None:
         """
         Initialize a racing car object.
         Args:
@@ -66,6 +69,7 @@ class RacingCar:
         """
         self.game: "Game" = game
         self.pos: pg.Vector2 = pg.Vector2(x, y)
+        self.number: int = number
         self.speed: int = stgs.START_SPEED[f"level {str(self.game.level)}"][6]
         self.image: pg.Surface = (choice(self.game.image_lists["racing_cars"]))
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)
@@ -80,6 +84,8 @@ class RacingCar:
         self.pos.x += self.speed * dt
         if self.pos.x > stgs.WINDOW_SIZE[0] + self.half_image_width:
             self.pos.x = -self.half_image_width
+            if self.game.sound_enabled and self.number == 0 and self.game.speed_ups[0]:  # only the first car makes sound and that begins after the first speed up
+                pg.mixer.Sound.play(self.game.sounds["racing car"])
         self.rect.center = (int(self.pos.x), int(self.pos.y))  # collision_rect.center = tuple, self.pos = Vector2
 
     def rise_speed(self, amount: int) -> None:

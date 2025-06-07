@@ -315,6 +315,15 @@ class Game:
             self.tree_snake_ready = False
             self.tree_snake = TreeSnake(self, tree_speed=tree_speed, tree_rect=tree_rect)
 
+    def create_traffic(self) -> None:
+        """ Creates traffic on the road. """
+        self.traffic: List[List[Union[Truck, RacingCar, LargeCar, Bulldozer, SmallCar]]] = [
+            [Truck(self, 700 - i * stgs.SPACING["lane 5"][self.level - 1], stgs.LANE_HEIGHTS["lane 5"]) for i in range(stgs.STREET[f"level {self.level}"][0])],
+            [RacingCar(self, 400 - i * stgs.SPACING["lane 4"][self.level - 1], stgs.LANE_HEIGHTS["lane 4"], number=i) for i in range(stgs.STREET[f"level {self.level}"][1])],
+            [LargeCar(self, 800 - i * stgs.SPACING["lane 3"][self.level - 1], stgs.LANE_HEIGHTS["lane 3"]) for i in range(stgs.STREET[f"level {self.level}"][2])],
+            [Bulldozer(self, 400 - i * stgs.SPACING["lane 2"][self.level - 1], stgs.LANE_HEIGHTS["lane 2"]) for i in range(stgs.STREET[f"level {self.level}"][3])],
+            [SmallCar(self, 600 - i * stgs.SPACING["lane 1"][self.level - 1], stgs.LANE_HEIGHTS["lane 1"]) for i in range(stgs.STREET[f"level {self.level}"][4])],]
+
     def create_water_traffic(self) -> None:
         """ Creates water traffic. """
         crocodile: int = 10  # choose a high number to never get a crocodile if in the level is no crocodile
@@ -331,15 +340,6 @@ class Game:
             [Tree(self, 800 - i * stgs.SPACING["lane 7"][self.level - 1], stgs.LANE_HEIGHTS["lane 7"], "small", 3) for i in range(stgs.WATER[f"level {self.level}"][3])],
             [Turtle(self, 50 + i * stgs.SPACING["lane 6"][self.level - 1], stgs.LANE_HEIGHTS["lane 6"], 4, True if i == sinking_trio else False) for i in range(stgs.WATER[f"level {self.level}"][4])],
         ]
-
-    def create_traffic(self) -> None:
-        """ Creates traffic on the road. """
-        self.traffic: List[List[Union[Truck, RacingCar, LargeCar, Bulldozer, SmallCar]]] = [
-            [Truck(self, 700 - i * stgs.SPACING["lane 5"][self.level - 1], stgs.LANE_HEIGHTS["lane 5"]) for i in range(stgs.STREET[f"level {self.level}"][0])],
-            [RacingCar(self, 400 - i * stgs.SPACING["lane 4"][self.level - 1], stgs.LANE_HEIGHTS["lane 4"]) for i in range(stgs.STREET[f"level {self.level}"][1])],
-            [LargeCar(self, 800 - i * stgs.SPACING["lane 3"][self.level - 1], stgs.LANE_HEIGHTS["lane 3"]) for i in range(stgs.STREET[f"level {self.level}"][2])],
-            [Bulldozer(self, 400 - i * stgs.SPACING["lane 2"][self.level - 1], stgs.LANE_HEIGHTS["lane 2"]) for i in range(stgs.STREET[f"level {self.level}"][3])],
-            [SmallCar(self, 600 - i * stgs.SPACING["lane 1"][self.level - 1], stgs.LANE_HEIGHTS["lane 1"]) for i in range(stgs.STREET[f"level {self.level}"][4])],]
 
     def clear_houses(self) -> None:
         """ Clears the houses list. """
