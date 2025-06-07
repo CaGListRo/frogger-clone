@@ -10,6 +10,7 @@
 
 - make crocodiles appear in houses (level 2 or higher) **done**
 - make crocodiles appear instead of on large tree trunks (level 2 or higher) **done**
+- the lane crocodile needs a collision rect while its mouth is open
 
 - make a proceed level function after all houses are full. Highest level 5? **done**
 
@@ -19,5 +20,5 @@
 - highscore list <----------- **still needs to be prettified**
 - menu **done**
   - Buttons **done**
-- sounds <------------------- **the racing car sound still needs to be implemented**
+- sounds **done**
 - music **done**
