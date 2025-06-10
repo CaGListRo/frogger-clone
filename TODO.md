@@ -10,7 +10,7 @@
 
 - make crocodiles appear in houses (level 2 or higher) **done**
 - make crocodiles appear instead of on large tree trunks (level 2 or higher) **done**
-- the lane crocodile needs a collision rect while its mouth is open
+- the lane crocodile needs a collision rect while its mouth is open **done**
 
 - make a proceed level function after all houses are full. Highest level 5? **done**
 

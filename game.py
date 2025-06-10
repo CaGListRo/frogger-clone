@@ -28,7 +28,7 @@ class Game:
         # game and frog settings
         self.running: bool = True
         self.fps: int = 0
-        self.level: int = 1
+        self.level: int = 3
         self.frog_time: int = 0                      # this is the time one frog needed from the start to "his" house
         self.show_frog_time: bool = False            # In the original game the needed time is shown in the center of the screen
         self.show_time: float = stgs.SHOW_FROG_TIME  # this is how long the frog time is shown
@@ -200,6 +200,9 @@ class Game:
         collided: bool = False
         for lane_index, lane in enumerate(self.water_traffic):
             for element_index, element in enumerate(lane):
+                if lane_index == 0 and isinstance(element, LaneCrocodile):
+                    if element.state == "open" and self.frog.collision_rect.colliderect(element.head_rect):
+                        self.frog.set_dead("water")
                 if lane_index == 1 or lane_index == 4:  # lane_index 1 and 4 are the turtles
                     if not element.diving:
                         collided = self.frog.collision_rect.colliderect(element.rect)

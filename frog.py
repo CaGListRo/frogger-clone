@@ -133,7 +133,9 @@ class Frog:
         """
         self.direction = direction
         if not self.jumping:
-            self.jumping = True 
+            self.jumping = True
+            if self.game.sound_enabled:
+                pg.mixer.Sound.play(self.game.sounds["frog/jump 2"])
             if direction == "north" and self.pos.y >= stgs.FROG_LIMITS["top"]:
                 self.destination.y = self.pos.y - stgs.FROG_JUMP_DISTANCE
                 self.game.score += stgs.SCORE["jump"]

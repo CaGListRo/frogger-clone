@@ -225,6 +225,12 @@ class LaneCrocodile:
         self.half_image_width: int = int(self.image.get_width() // 2)  # type: ignore
         self.rect: pg.Rect = self.image.get_rect(center=self.pos)      # type: ignore
         self.diving: bool = False
+        self.head_react_relative_pos: tuple[int, int] = (int(stgs.LANE_CROCO_HEAD_RECT[0] - self.half_image_width),
+                                                        int(stgs.LANE_CROCO_HEAD_RECT[1] - self.image.get_height() / 2))  # type: ignore
+        self.head_rect: pg.Rect = pg.Rect(self.pos.x + self.head_react_relative_pos[0],
+                                          self.pos.y + self.head_react_relative_pos[1],
+                                          stgs.LANE_CROCO_HEAD_RECT[2],
+                                          stgs.LANE_CROCO_HEAD_RECT[3])
 
     def __iter__(self) -> Iterator["LaneCrocodile"]:
         yield self
@@ -266,6 +272,8 @@ class LaneCrocodile:
         if self.pos.x > stgs.WINDOW_SIZE[0] + self.half_image_width:
             self.pos.x = -self.half_image_width
         self.rect.center = (int(self.pos.x), int(self.pos.y))  # rect.center = tuple, self.pos = Vector2
+        self.head_rect.topleft = (int(self.pos.x + self.head_react_relative_pos[0]), 
+                                  int(self.pos.y + self.head_react_relative_pos[1]))
 
     def render(self, surf: pg.Surface) -> None:
         """
@@ -275,6 +283,7 @@ class LaneCrocodile:
         """
         if isinstance(self.image, pg.Surface):
             surf.blit(self.image, self.rect)
+        pg.draw.rect(surf, "red", self.head_rect, width=2)
 
 
 class HouseCrocodile:

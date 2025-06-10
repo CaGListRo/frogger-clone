@@ -15,7 +15,7 @@ class LanguageTexts(TypedDict):
     it: str
     tr: str
 
-# settings for the crocodile
+# settings for the crocodiles
 CROCOS_IN_HOUSES: Final[List[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
 CROCOS_SWIMMING: Final[List[bool]] = [False, True, True, True, True]  # [level 1, level 2, level 3, level 4, level 5]
 HOUSE_CROCO_POS: Final[List[Tuple[int, int, int]]] = [
@@ -29,6 +29,7 @@ HOUSE_CROCO_SPEED: Final[List[int]] = [50, 60, 70, 80]  # [level 2, level 3, lev
 HOUSE_CROCO_STAYING_TIME: Final[List[float]] = [3.5, 4.0, 4.5, 5.0]  # [level 2, level 3, level 4, level 5]
 LANE_CROCO_TIMER: Final[List[float]] = [5.0, 4.0, 3.0, 2.0]  # [level 2, level 3, level 4, level 5]
 HOUSE_CROCO_WAITING_TIME: Final[List[float]] = [2.0, 1.5, 1.0, 0.5]  # [level 2, level 3, level 4, level 5]
+LANE_CROCO_HEAD_RECT: Final[List[int]] = [188, 10, 21, 16]
 
 # decorations
 STRIPES: Final[Dict[str, int]] = {  # the yellow stripes on the street
@@ -264,3 +265,14 @@ PAUSE: Final[Dict[str, LanguageTexts]] = {
     }
 }
 BLINK_TIME: Final[float] = 0.8
+
+GAME_OVER: Final[Dict[str, LanguageTexts]] = {
+    "game over": {
+        "de": "SPIEL ENDE", 
+        "en": "GAME OVER", 
+        "es": "JUEGO TERMINADO", 
+        "fr": "JEU TERMINÉ", 
+        "it": "GIOCO FINITO", 
+        "tr": "OYUN BİTTİ"
+    }
+}
