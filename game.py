@@ -43,6 +43,8 @@ class Game:
         self.blink_timer: float = stgs.BLINK_TIME
         self.direction_pressed: bool = False
         self.player_name: str = ""
+        self.cursor_blink_timer: float = 0.0
+        self.cursor_visible: bool = True
 
         # fonts
         self.info_font: pg.font.Font = pg.font.SysFont("Comic Sans", 18)
@@ -522,34 +524,34 @@ class Game:
             if self.game_state == "play" or self.game_state == "pause":
                 if event.type == pg.KEYDOWN:
                     
-                    if (event.key == pg.K_UP or event.key == pg.K_w) and self.game_state != "pause":
+                    if event.key == pg.K_UP and self.game_state != "pause":
                         self.direction_pressed = True
-                    if (event.key == pg.K_DOWN or event.key == pg.K_s) and self.game_state != "pause":
+                    if event.key == pg.K_DOWN and self.game_state != "pause":
                         self.direction_pressed = True
-                    if (event.key == pg.K_LEFT or event.key == pg.K_a) and self.game_state != "pause":
+                    if event.key == pg.K_LEFT and self.game_state != "pause":
                         self.direction_pressed = True
-                    if (event.key == pg.K_RIGHT or event.key == pg.K_d) and self.game_state != "pause":
+                    if event.key == pg.K_RIGHT and self.game_state != "pause":
                         self.direction_pressed = True
                     if event.key == pg.K_p and not self.pause_key_pressed:
                         self.pause_key_pressed = True                    
 
                 if event.type == pg.KEYUP:
-                    if (event.key == pg.K_UP or event.key == pg.K_w) and self.direction_pressed and not self.frog.jumping:
+                    if event.key == pg.K_UP and self.direction_pressed and not self.frog.jumping:
                         self.frog.jump("north")
                         self.direction_pressed = False
                         if self.tree_fly and self.tree_fly.state == "caught":
                             self.tree_fly.set_angle(angle = 0)
-                    if (event.key == pg.K_DOWN or event.key == pg.K_s) and self.direction_pressed and not self.frog.jumping:
+                    if event.key == pg.K_DOWN and self.direction_pressed and not self.frog.jumping:
                         self.frog.jump("south")
                         self.direction_pressed = False
                         if self.tree_fly and self.tree_fly.state == "caught":
                             self.tree_fly.set_angle(angle = 180)
-                    if (event.key == pg.K_LEFT or event.key == pg.K_a) and self.direction_pressed and not self.frog.jumping:
+                    if event.key == pg.K_LEFT and self.direction_pressed and not self.frog.jumping:
                         self.frog.jump("west")
                         self.direction_pressed = False
                         if self.tree_fly and self.tree_fly.state == "caught":
                             self.tree_fly.set_angle(angle = 90)
-                    if (event.key == pg.K_RIGHT or event.key == pg.K_d) and self.direction_pressed and not self.frog.jumping:
+                    if event.key == pg.K_RIGHT and self.direction_pressed and not self.frog.jumping:
                         self.frog.jump("east")
                         self.direction_pressed = False
                         if self.tree_fly and self.tree_fly.state == "caught":
@@ -574,8 +576,7 @@ class Game:
                         else:
                             if len(self.player_name) < 8:
                                 self.player_name += event.unicode
-
-                
+           
     def update_objects(self, dt: float) -> None:
         """
         Updates all objects in the game.
@@ -788,6 +789,11 @@ class Game:
     def render_highscores(self) -> None:
         """ Render the high scores screen. """
         self.screen.blit(self.image["highscores background"], (0, 0))
+        # render highscores text
+        highscores_shadow: pg.Surface = self.pause_font.render(stgs.GAME_OVER["highscores"][self.language], True, "black")
+        highscores_text: pg.Surface = self.pause_font.render(stgs.GAME_OVER["highscores"][self.language], True, "white")
+        self.screen.blit(highscores_shadow, (int(stgs.WINDOW_SIZE[0] / 2 - highscores_shadow.get_width() / 2) + 3, 53))
+        self.screen.blit(highscores_text, (int(stgs.WINDOW_SIZE[0] / 2 - highscores_text.get_width() / 2), 50))
         # Render high score entries
         for index, (score, name) in enumerate(self.highscores):
             score = score if score != "0" else "00000"
@@ -803,15 +809,25 @@ class Game:
             name_shadow: pg.Surface = self.score_font.render(name, True, "black")
             name_text: pg.Surface = self.score_font.render(name, True, "white")
             # blit shadow and text
-            self.screen.blit(number_shadow, (102, 22 + index * 35))
-            self.screen.blit(number_text, (100, 20 + index * 35))
-            self.screen.blit(score_shadow, (202, 22 + index * 35))
-            self.screen.blit(score_text, (200, 20 + index * 35))
-            self.screen.blit(name_shadow, (352, 22 + index * 35))
-            self.screen.blit(name_text, (350, 20 + index * 35))
+            self.screen.blit(number_shadow, (242, 122 + index * 35))
+            self.screen.blit(number_text, (240, 120 + index * 35))
+            self.screen.blit(score_shadow, (342, 122 + index * 35))
+            self.screen.blit(score_text, (340, 120 + index * 35))
+            self.screen.blit(name_shadow, (502, 122 + index * 35))
+            self.screen.blit(name_text, (500, 120 + index * 35))
         if self.game_state == "game over":
-            name_to_blit: pg.Surface = self.score_font.render(self.player_name, True, "white")
-            self.screen.blit(name_to_blit, (int(stgs.WINDOW_SIZE[0] / 2 - 200), stgs.WINDOW_SIZE[0] - 150))
+            enter_name_shadow: pg.Surface = self.score_font.render(stgs.GAME_OVER["enter name"][self.language], True, "black")
+            enter_name_text: pg.Surface = self.score_font.render(stgs.GAME_OVER["enter name"][self.language], True, "white")
+            enter_name_x_pos: int = int(stgs.WINDOW_SIZE[0] / 2 - enter_name_text.get_width() / 2)
+            self.screen.blit(enter_name_shadow, (enter_name_x_pos + 2, 502))
+            self.screen.blit(enter_name_text, (enter_name_x_pos, 500))
+            name_shadow: pg.Surface = self.score_font.render(self.player_name, True, "black")
+            name_text: pg.Surface = self.score_font.render(self.player_name, True, "white")
+            self.screen.blit(name_shadow, (enter_name_x_pos + 2, 552))
+            self.screen.blit(name_text, (enter_name_x_pos, 550))
+            if self.cursor_visible:
+                pg.draw.rect(self.screen, "black", (enter_name_x_pos + name_shadow.get_width() + 12, 562, 5, 28))
+                pg.draw.rect(self.screen, "white", (enter_name_x_pos + name_text.get_width() + 10, 560, 5, 28))
         if self.back_button and self.game_state != "game over":
             self.back_button.render(self.screen)
 
@@ -856,7 +872,7 @@ class Game:
 
             # check for traffic speed ups
             self.check_speed_up()
-            if self.game_state != "play" and self.game_state != "pause":
+            if self.game_state != "play" and self.game_state != "pause" and self.game_state != "game over":
                 self.check_buttons()
 
             # playing the game
@@ -873,6 +889,13 @@ class Game:
                 if self.blink_timer <= 0:
                     self.show_pause_text = False if self.show_pause_text == True else True
                     self.blink_timer = stgs.BLINK_TIME
+
+            # let the cursor blink while game over
+            elif self.game_state == "game over":
+                self.cursor_blink_timer += dt
+                if self.cursor_blink_timer >= 0.5:
+                    self.cursor_visible = not self.cursor_visible
+                    self.cursor_blink_timer = 0.0
 
             # call the methods
             self.event_handler()

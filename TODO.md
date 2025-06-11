@@ -17,7 +17,7 @@
 - speed up the traffic and water traffic at certain scores **done**
 
 - start screen **done**
-- highscore list <----------- **still needs to be prettified**
+- highscore list **done**
 - menu **done**
   - Buttons **done**
 - sounds **done**
